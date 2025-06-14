@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="VOLUNTEER" Class="queue1DataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="AppSettings" ConnectionString="Data Source=.;Initial Catalog=VOLUNTEER;Integrated Security=True" SettingsObjectName="大学生志愿者管理系统1.Properties.Settings" SettingsPropertyName="VOLUNTEERConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.ACTapply_T" Member="ACTapply_T">
+    <Type Name="ACTapply_T">
+      <Column Name="Aqueue_ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Vol_ID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Act_ID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Act_Name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Act_place" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Need" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Qty" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Holder" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ActivityT" Member="ActivityT">
+    <Type Name="ActivityT">
+      <Column Name="activity_ID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="activity_Name" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="activity_type" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="addtime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="stoptime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="place" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="renshu" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Image" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="descn" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="ShengyuNum" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Holder" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="status" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+    </Type>
+  </Table>
+</Database>

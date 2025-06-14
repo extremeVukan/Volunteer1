@@ -1,0 +1,363 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0FD49655-2DBE-436E-A7BE-6DE422529D68}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>大学生志愿者管理系统1</RootNamespace>
+    <AssemblyName>大学生志愿者管理系统1</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ActStop\ActStop.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ActStop\ActStop.Designer.cs">
+      <DependentUpon>ActStop.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Act_info.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Act_info.Designer.cs">
+      <DependentUpon>Act_info.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Apply_info.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Apply_info.Designer.cs">
+      <DependentUpon>Apply_info.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AQUEUE.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AQUEUE.Designer.cs">
+      <DependentUpon>AQUEUE.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CartItem.cs" />
+    <Compile Include="DB.cs" />
+    <Compile Include="Employee11\delete_emp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Employee11\delete_emp.Designer.cs">
+      <DependentUpon>delete_emp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Employee11\insert_emp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Employee11\insert_emp.Designer.cs">
+      <DependentUpon>insert_emp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Employee11\update_emp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Employee11\update_emp.Designer.cs">
+      <DependentUpon>update_emp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Identify\ExamineIdentify.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Identify\ExamineIdentify.Designer.cs">
+      <DependentUpon>ExamineIdentify.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Identify\VolIdentify.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Identify\VolIdentify.Designer.cs">
+      <DependentUpon>VolIdentify.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Login.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Login.Designer.cs">
+      <DependentUpon>Login.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Log\Log_Check.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Log\Log_Check.Designer.cs">
+      <DependentUpon>Log_Check.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Order\OrderTables.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Order\OrderTables.Designer.cs">
+      <DependentUpon>OrderTables.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="queue1.designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>queue1.dbml</DependentUpon>
+    </Compile>
+    <Compile Include="Register.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Register.Designer.cs">
+      <DependentUpon>Register.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SelfCheck\SelfInfoCheck1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SelfCheck\SelfInfoCheck1.Designer.cs">
+      <DependentUpon>SelfInfoCheck1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SelfCheck\Sign.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SelfCheck\Sign.Designer.cs">
+      <DependentUpon>Sign.cs</DependentUpon>
+    </Compile>
+    <Compile Include="start\Changepwd.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="start\Changepwd.Designer.cs">
+      <DependentUpon>Changepwd.cs</DependentUpon>
+    </Compile>
+    <Compile Include="start\Person.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="start\Person.Designer.cs">
+      <DependentUpon>Person.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tactivity\Delete_activity.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tactivity\Delete_activity.Designer.cs">
+      <DependentUpon>Delete_activity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tactivity\Insert_activity.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tactivity\Insert_activity.Designer.cs">
+      <DependentUpon>Insert_activity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tactivity\Update_activity.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tactivity\Update_activity.Designer.cs">
+      <DependentUpon>Update_activity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tindex.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tindex.Designer.cs">
+      <DependentUpon>Tindex.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VOLUNTEERDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>VOLUNTEERDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="VOLUNTEERDataSet1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>VOLUNTEERDataSet1.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Volunteer\deleteVol.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Volunteer\deleteVol.Designer.cs">
+      <DependentUpon>deleteVol.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Volunteer\InsertVol.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Volunteer\InsertVol.Designer.cs">
+      <DependentUpon>InsertVol.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Volunteer\UpdateVol.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Volunteer\UpdateVol.Designer.cs">
+      <DependentUpon>UpdateVol.cs</DependentUpon>
+    </Compile>
+    <Compile Include="volunteer_card\VolCard.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="volunteer_card\VolCard.Designer.cs">
+      <DependentUpon>VolCard.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="ActStop\ActStop.resx">
+      <DependentUpon>ActStop.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Act_info.resx">
+      <DependentUpon>Act_info.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Apply_info.resx">
+      <DependentUpon>Apply_info.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AQUEUE.resx">
+      <DependentUpon>AQUEUE.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Employee11\delete_emp.resx">
+      <DependentUpon>delete_emp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Employee11\insert_emp.resx">
+      <DependentUpon>insert_emp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Employee11\update_emp.resx">
+      <DependentUpon>update_emp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Identify\ExamineIdentify.resx">
+      <DependentUpon>ExamineIdentify.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Identify\VolIdentify.resx">
+      <DependentUpon>VolIdentify.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Login.resx">
+      <DependentUpon>Login.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Log\Log_Check.resx">
+      <DependentUpon>Log_Check.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Order\OrderTables.resx">
+      <DependentUpon>OrderTables.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Register.resx">
+      <DependentUpon>Register.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelfCheck\SelfInfoCheck1.resx">
+      <DependentUpon>SelfInfoCheck1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelfCheck\Sign.resx">
+      <DependentUpon>Sign.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="start\Changepwd.resx">
+      <DependentUpon>Changepwd.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="start\Person.resx">
+      <DependentUpon>Person.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tactivity\Delete_activity.resx">
+      <DependentUpon>Delete_activity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tactivity\Insert_activity.resx">
+      <DependentUpon>Insert_activity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tactivity\Update_activity.resx">
+      <DependentUpon>Update_activity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tindex.resx">
+      <DependentUpon>Tindex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Volunteer\deleteVol.resx">
+      <DependentUpon>deleteVol.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Volunteer\InsertVol.resx">
+      <DependentUpon>InsertVol.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Volunteer\UpdateVol.resx">
+      <DependentUpon>UpdateVol.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="volunteer_card\VolCard.resx">
+      <DependentUpon>VolCard.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <None Include="queue1.dbml">
+      <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>queue1.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="queue1.dbml.layout">
+      <DependentUpon>queue1.dbml</DependentUpon>
+    </None>
+    <None Include="VOLUNTEERDataSet.xsc">
+      <DependentUpon>VOLUNTEERDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="VOLUNTEERDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>VOLUNTEERDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="VOLUNTEERDataSet.xss">
+      <DependentUpon>VOLUNTEERDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="VOLUNTEERDataSet1.xsc">
+      <DependentUpon>VOLUNTEERDataSet1.xsd</DependentUpon>
+    </None>
+    <None Include="VOLUNTEERDataSet1.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>VOLUNTEERDataSet1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="VOLUNTEERDataSet1.xss">
+      <DependentUpon>VOLUNTEERDataSet1.xsd</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
