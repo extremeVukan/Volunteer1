@@ -7,32 +7,72 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Data.SqlClient;
+using BLL; // 添加BLL引用
+using DAL; // 添加DAL引用用于实体类
 
 namespace 大学生志愿者管理系统1.Employee11
 {
     public partial class insert_emp : Form
     {
+        private UserService _userService; // 添加UserService引用
+
         public insert_emp()
         {
             InitializeComponent();
+            _userService = new UserService(); // 初始化UserService
         }
-        SqlDataAdapter daAdmin;
-        DataSet ds = new DataSet();
 
-        void init()
+        private DataTable dtAdmin = new DataTable(); // 管理员数据表
+
+        void LoadAdmins()
         {
-            DB.Getcn();
-            string str = "select * from adminT";
-            daAdmin = new SqlDataAdapter(str, DB.cn);
-            daAdmin.Fill(ds, "Admin_info");
-            DB.cn.Close();
+            try
+            {
+                // 使用业务逻辑层获取所有管理员
+                var admins = _userService.GetAllAdmins();
+
+                // 清空现有数据表并创建列
+                dtAdmin.Clear();
+                if (dtAdmin.Columns.Count == 0)
+                {
+                    dtAdmin.Columns.Add("admin_ID", typeof(int));
+                    dtAdmin.Columns.Add("admin_Name", typeof(string));
+                    dtAdmin.Columns.Add("sex", typeof(string));
+                    dtAdmin.Columns.Add("birth_date", typeof(DateTime));
+                    dtAdmin.Columns.Add("hire_date", typeof(DateTime));
+                    dtAdmin.Columns.Add("address", typeof(string));
+                    dtAdmin.Columns.Add("telephone", typeof(string));
+                    dtAdmin.Columns.Add("wages", typeof(int));
+                    dtAdmin.Columns.Add("resume", typeof(string));
+                }
+
+                // 填充数据
+                foreach (var admin in admins)
+                {
+                    DataRow row = dtAdmin.NewRow();
+                    row["admin_ID"] = admin.admin_ID;
+                    row["admin_Name"] = admin.admin_Name ?? "";
+                    row["sex"] = admin.sex ?? "";
+                    row["birth_date"] = admin.birth_date ?? DateTime.Now;
+                    row["hire_date"] = admin.hire_date ?? DateTime.Now;
+                    row["address"] = admin.address ?? "";
+                    row["telephone"] = admin.telephone ?? "";
+                    row["wages"] = admin.wages ?? 0;
+                    row["resume"] = admin.resume ?? "";
+                    dtAdmin.Rows.Add(row);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"加载管理员数据出错: {ex.Message}");
+            }
         }
-        void showAll()//DGV载入
+
+        void showAll() // DGV载入
         {
-            DataView dvAdmin = new DataView(ds.Tables["Admin_info"]);
-            dgvEmp.DataSource = dvAdmin;
+            dgvEmp.DataSource = dtAdmin;
         }
+
         void dgvHead()
         {
             this.dgvEmp.Columns[0].HeaderText = "ID";
@@ -44,15 +84,11 @@ namespace 大学生志愿者管理系统1.Employee11
             this.dgvEmp.Columns[6].HeaderText = "联系方式";
             this.dgvEmp.Columns[7].HeaderText = "薪资";
             this.dgvEmp.Columns[8].HeaderText = "备注";
-
-
-
-
         }
 
         private void insert_emp_Load(object sender, EventArgs e)
         {
-            init();
+            LoadAdmins();
             showAll();
             dgvHead();
         }
@@ -62,69 +98,87 @@ namespace 大学生志愿者管理系统1.Employee11
             if (txtID.Text == "" || txtName.Text == "")
             {
                 MessageBox.Show("编号与姓名不能为空");
+                return;
             }
-            else
+
+            // 解析管理员ID
+            if (!int.TryParse(txtID.Text, out int adminId))
             {
-                DB.Getcn();
-                DialogResult dr = MessageBox.Show("是否要添加？", "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
-                if (dr == DialogResult.OK)
+                MessageBox.Show("管理员ID必须是整数");
+                return;
+            }
+
+            // 解析薪资
+            if (!int.TryParse(txtWages.Text, out int wages))
+            {
+                MessageBox.Show("薪资必须是整数");
+                return;
+            }
+
+            DialogResult dr = MessageBox.Show("是否要添加？", "提示",
+                MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+            if (dr != DialogResult.OK)
+            {
+                return;
+            }
+
+            try
+            {
+                // 检查ID和名称是否已存在
+                if (_userService.IsAdminIdExists(adminId))
                 {
-                    string Aid = "select * from adminT where admin_ID='" + txtID.Text + "'";
-                    DataTable dt1 = DB.GetDataSet(Aid);
-                    string Aname = "select * from adminT where admin_Name='" + txtName.Text + "'";
-                    DataTable dt2 = DB.GetDataSet(Aname);
-                    if (dt1.Rows.Count > 0)
-                    {
-                        MessageBox.Show("ID已存在");
-                    }
-                    else
-                    {
-                        if (dt2.Rows.Count > 0)
-                        {
-                            MessageBox.Show("名称已存在");
-                        }
-                        else
-                        {
-                            DataRow AdmRow = ds.Tables["Admin_info"].NewRow();
-                            AdmRow["admin_ID"] =Convert.ToInt32(txtID.Text);
-                            AdmRow["admin_Name"] =txtName.Text;
-                            AdmRow["sex"] =txtSex.Text;
-                            AdmRow["birth_date"] =dtpBirth.Value;
-                            AdmRow["hire_date"] =dtpHire.Value;
-                            AdmRow["address"] =txtAdress.Text;
-                            AdmRow["telephone"] =txtPhone.Text;
-                            AdmRow["wages"] =Convert.ToInt32(txtWages.Text);
-                            AdmRow["resume"] =txtResume.Text;
-                            ds.Tables["Admin_info"].Rows.Add(AdmRow);
-                            MessageBox.Show("添加成功");
-                        }
-                    }
+                    MessageBox.Show("ID已存在");
+                    return;
+                }
+
+                if (_userService.IsAdminNameExists(txtName.Text))
+                {
+                    MessageBox.Show("名称已存在");
+                    return;
+                }
+
+                // 创建新管理员对象
+                var admin = new adminT
+                {
+                    admin_ID = adminId,
+                    admin_Name = txtName.Text,
+                    sex = txtSex.Text,
+                    birth_date = dtpBirth.Value,
+                    hire_date = dtpHire.Value,
+                    address = txtAdress.Text,
+                    telephone = txtPhone.Text,
+                    wages = wages,
+                    resume = txtResume.Text
+                };
+
+                // 使用业务逻辑层添加管理员
+                bool result = _userService.AddAdmin(admin, Login.username);
+
+                if (result)
+                {
+                    MessageBox.Show("添加成功");
+
+                    // 重新加载数据
+                    LoadAdmins();
+                    showAll();
+
+                    // 清空输入框
+                    txtID.Text = "";
+                    txtName.Text = "";
+                    txtSex.Text = "";
+                    txtAdress.Text = "";
+                    txtPhone.Text = "";
+                    txtWages.Text = "";
+                    txtResume.Text = "";
                 }
                 else
                 {
-                    return;
+                    MessageBox.Show("添加失败");
                 }
-                //存储过程添加日志
-                SqlCommand cmd = new SqlCommand("add_log", DB.cn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add(new SqlParameter("username", SqlDbType.NVarChar));
-                cmd.Parameters.Add(new SqlParameter("log_type", SqlDbType.NVarChar));
-                cmd.Parameters.Add(new SqlParameter("action_date", SqlDbType.DateTime));
-                cmd.Parameters.Add(new SqlParameter("action_table", SqlDbType.NVarChar));
-                cmd.Parameters["username"].Value = Login.username;
-                cmd.Parameters["log_type"].Value = "添加";
-                cmd.Parameters["action_date"].Value = DateTime.Now;
-                cmd.Parameters["action_table"].Value = "AdminT表";
-                try
-                {
-                    SqlCommandBuilder dbAdmin = new SqlCommandBuilder(daAdmin);
-                    daAdmin.Update(ds,"Admin_info");
-                    cmd.ExecuteNonQuery();
-                }
-                catch(SqlException ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"添加管理员时出错: {ex.Message}");
             }
         }
 
