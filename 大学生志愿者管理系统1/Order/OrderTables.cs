@@ -7,141 +7,203 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Data.SqlClient;
+using BLL; // 添加BLL引用
+using DAL; // 添加DAL引用用于实体类
+
 namespace 大学生志愿者管理系统1.Order
 {
     public partial class OrderTables : Form
     {
+        private OrderService _orderService; // 添加OrderService引用
+
         public OrderTables()
         {
             InitializeComponent();
+            _orderService = new OrderService(); // 初始化OrderService
         }
-        SqlDataAdapter daOrder;
-        DataSet ds = new DataSet();
+
+        private DataTable dtOrders = new DataTable(); // 订单数据表
+        private List<OrderT> orderList; // 保存订单列表
+
         public static string VolID = "";
         public static string VolName = "";
         public static string VolPhone = "";
         public static string ActID = "";
         public static string ActName = "";
-        void init()
+
+        void LoadOrders()
         {
-            DB.Getcn();
-            string str = "select * from OrderT where Holder='" +Login.username+"'";
-            daOrder = new SqlDataAdapter(str, DB.cn);
-            daOrder.Fill(ds, "order_info");
+            try
+            {
+                // 使用业务逻辑层获取当前用户的所有订单
+                orderList = _orderService.GetOrdersByHolder(Login.username);
+
+                // 清空现有数据表并创建列
+                dtOrders.Clear();
+                if (dtOrders.Columns.Count == 0)
+                {
+                    dtOrders.Columns.Add("OrderID", typeof(int));
+                    dtOrders.Columns.Add("UserID", typeof(int));
+                    dtOrders.Columns.Add("UserName", typeof(string));
+                    dtOrders.Columns.Add("Orderdate", typeof(DateTime));
+                    dtOrders.Columns.Add("phone", typeof(string));
+                    dtOrders.Columns.Add("ActID", typeof(int));
+                    dtOrders.Columns.Add("Act_Name", typeof(string));
+                    dtOrders.Columns.Add("Holder", typeof(string));
+                    dtOrders.Columns.Add("status", typeof(string));
+                    dtOrders.Columns.Add("EmpID", typeof(int));
+                }
+
+                // 填充数据
+                foreach (var order in orderList)
+                {
+                    DataRow row = dtOrders.NewRow();
+                    row["OrderID"] = order.OrderID;
+                    row["UserID"] = order.UserID;
+                    row["UserName"] = order.UserName ?? "";
+                    row["Orderdate"] = order.OrderDate ?? DateTime.Now;
+                    row["phone"] = order.phone ?? "";
+                    row["ActID"] = order.ActID;
+                    row["Act_Name"] = order.Act_Name ?? "";
+                    row["Holder"] = order.Holder ?? "";
+                    row["status"] = order.status ?? "";
+                    row["EmpID"] = order.EmpID ?? (object)DBNull.Value;
+                    dtOrders.Rows.Add(row);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"加载订单数据出错: {ex.Message}");
+            }
         }
+
         void showAll()
         {
-            init();
+            LoadOrders();
+            dgvOrder.DataSource = dtOrders;
             showXZ();
         }
+
         void showXZ()
         {
-            DataGridViewCheckBoxColumn asCode = new DataGridViewCheckBoxColumn();
-            asCode.Name = "asCode";
-            asCode.HeaderText = "选择";
-            dgvOrder.Columns.Add(asCode);
+            // 检查是否已经添加了选择列
+            if (!dgvOrder.Columns.Contains("asCode"))
+            {
+                DataGridViewCheckBoxColumn asCode = new DataGridViewCheckBoxColumn();
+                asCode.Name = "asCode";
+                asCode.HeaderText = "选择";
+                dgvOrder.Columns.Add(asCode);
+            }
         }
 
         private void OrderTables_Load(object sender, EventArgs e)
         {
             showAll();
-            DataView dvOrder = new DataView(ds.Tables["order_info"]);
-            dgvOrder.DataSource = dvOrder;
         }
 
         private void dgvOrder_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (dgvOrder.Rows.Count > 0)
+            if (dgvOrder.Columns[e.ColumnIndex].Name == "asCode" && e.RowIndex >= 0)
             {
-                for (int i = 0; i < dgvOrder.Rows.Count; i++)
+                if (dgvOrder.Rows.Count > 0)
                 {
-                    DataGridViewCheckBoxCell ck = dgvOrder.Rows[i].Cells["asCode"] as DataGridViewCheckBoxCell;
-                    if (i != e.RowIndex)
+                    for (int i = 0; i < dgvOrder.Rows.Count; i++)
                     {
-                        ck.Value = false;
+                        DataGridViewCheckBoxCell ck = dgvOrder.Rows[i].Cells["asCode"] as DataGridViewCheckBoxCell;
+                        if (i != e.RowIndex)
+                        {
+                            ck.Value = false;
+                        }
+                        else
+                        {
+                            ck.Value = true;
+                        }
                     }
-                    else
-                    {
-                        ck.Value = true;
-                    }
-
                 }
-
             }
         }
 
         private void btncheck_Click(object sender, EventArgs e)
         {
-            int s = dgvOrder.Rows.Count;
-            for(int i=0;i<dgvOrder.Rows.Count;i++)
+            bool selected = false;
+            int selectedIndex = -1;
+
+            for (int i = 0; i < dgvOrder.Rows.Count; i++)
             {
-                if (dgvOrder.Rows[i].Cells["asCode"].EditedFormattedValue.ToString() == "True")
+                if (dgvOrder.Rows[i].Cells["asCode"]?.EditedFormattedValue?.ToString() == "True")
                 {
-                    if (dgvOrder.Rows[i].Cells["EmpID"].Value == null)
+                    selected = true;
+                    selectedIndex = i;
+                    break;
+                }
+            }
+
+            if (selected && selectedIndex >= 0)
+            {
+                // 检查是否已审核
+                string status = dgvOrder.Rows[selectedIndex].Cells["status"].Value?.ToString() ?? "";
+                if (status == "已审核")
+                {
+                    MessageBox.Show("该订单已审核");
+                    return;
+                }
+
+                // 获取订单ID
+                if (dgvOrder.Rows[selectedIndex].Cells["OrderID"].Value == null ||
+                    !int.TryParse(dgvOrder.Rows[selectedIndex].Cells["OrderID"].Value.ToString(), out int orderId))
+                {
+                    MessageBox.Show("无法获取订单ID");
+                    return;
+                }
+
+                // 确保管理员ID有效
+                if (string.IsNullOrEmpty(Login.Emp_ID))
+                {
+                    MessageBox.Show("管理员ID无效，请重新登录");
+                    return;
+                }
+
+                if (!int.TryParse(Login.Emp_ID, out int empId))
+                {
+                    MessageBox.Show("管理员ID格式错误");
+                    return;
+                }
+
+                try
+                {
+                    // 保存订单信息用于显示
+                    VolID = dgvOrder.Rows[selectedIndex].Cells["UserID"].Value?.ToString() ?? "";
+                    VolName = dgvOrder.Rows[selectedIndex].Cells["UserName"].Value?.ToString() ?? "";
+                    VolPhone = dgvOrder.Rows[selectedIndex].Cells["phone"].Value?.ToString() ?? "";
+                    ActID = dgvOrder.Rows[selectedIndex].Cells["ActID"].Value?.ToString() ?? "";
+                    ActName = dgvOrder.Rows[selectedIndex].Cells["Act_Name"].Value?.ToString() ?? "";
+
+                    // 使用业务逻辑层审核订单
+                    bool result = _orderService.ApproveOrder(orderId, empId);
+
+                    if (result)
                     {
-                        MessageBox.Show("已审核");
+                        // 更新UI
+                        dgvOrder.Rows[selectedIndex].Cells["status"].Value = "已审核";
+                        dgvOrder.Rows[selectedIndex].Cells["EmpID"].Value = empId;
+                        MessageBox.Show("审核成功");
+
+                        // 重新加载数据
+                        showAll();
                     }
                     else
                     {
-                        dgvOrder.Rows[i].Cells["status"].Value = "已审核";
-                        if (string.IsNullOrEmpty(dgvOrder.Rows[i].Cells["EmpID"].Value?.ToString()))
-                        {
-                            dgvOrder.Rows[i].Cells["EmpID"].Value = Login.Emp_ID;
-                            VolID = dgvOrder.Rows[i].Cells["UserID"].Value?.ToString();
-                            VolName = dgvOrder.Rows[i].Cells["UserName"].Value?.ToString();
-                            VolPhone = dgvOrder.Rows[i].Cells[4].Value?.ToString();
-                            ActID = dgvOrder.Rows[i].Cells[5].Value?.ToString();
-                            ActName = dgvOrder.Rows[i].Cells[6].Value?.ToString();
-
-                            MessageBox.Show("审核成功");
-
-
-
-                        }
-
-
-                        VolID = dgvOrder.Rows[i].Cells["UserID"].Value?.ToString();
-                        VolName = dgvOrder.Rows[i].Cells["UserName"].Value?.ToString();
-                        VolPhone = dgvOrder.Rows[i].Cells["phone"].Value?.ToString();
-                        ActID = dgvOrder.Rows[i].Cells["ActID"].Value?.ToString();
-                        ActName = dgvOrder.Rows[i].Cells[6].Value?.ToString();
-
-                        DB.Getcn();
-
-                        string sqr = "INSERT INTO ACTMember (ACTID,ACTNAME, Volunteerid,volunteer,PHONE,TIME) " +
-                        "VALUES ('" + Convert.ToInt32(ActID) + "','" + ActName + "','" + Convert.ToInt32(VolID) + "','" + VolName + "','" + VolPhone + "','" + '0' + "')";
-                        DB.sqlEx(sqr);
-
-
-
-
-
-
-                        UpdateDB();
-
+                        MessageBox.Show("审核失败");
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    s = s - 1;
-                }
-                if (s == 0)
-                {
-                    MessageBox.Show("请选择审核项");
+                    MessageBox.Show($"审核过程中出错: {ex.Message}");
                 }
             }
-            void UpdateDB()
+            else
             {
-                try
-                {
-                    SqlCommandBuilder dbOrder = new SqlCommandBuilder(daOrder);
-                    daOrder.Update(ds, "order_info");
-                }
-                catch(SqlException ex)
-                {
-                    MessageBox.Show(ex.Message.ToString());
-                }
+                MessageBox.Show("请选择审核项");
             }
         }
 
@@ -151,4 +213,3 @@ namespace 大学生志愿者管理系统1.Order
         }
     }
 }
-        

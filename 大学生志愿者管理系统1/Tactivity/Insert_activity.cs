@@ -7,50 +7,90 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Data.SqlClient;
 using System.IO;
-
+using BLL; // 添加BLL引用
+using DAL; // 添加DAL引用用于实体类
 
 namespace 大学生志愿者管理系统1.Tactivity
 {
     public partial class Insert_activity : Form
     {
+        private ActivityService _activityService; // 添加ActivityService引用
+
         public Insert_activity()
         {
             InitializeComponent();
+            _activityService = new ActivityService(); // 初始化ActivityService
         }
-        public static string path_source="";
-        SqlDataAdapter daActivity, dalog;
-        DataSet ds = new DataSet();
-        void init() //初始化
+
+        public static string path_source = "";
+        private DataTable dtActivities = new DataTable(); // 活动数据表
+
+        void LoadActivities()
         {
-            DB.Getcn();
-            string str = "select * from ActivityT where Holder='" + Login.username + "'";
-            string sdr = "select * from dalogT";
-            daActivity = new SqlDataAdapter(str, DB.cn);
-            dalog = new SqlDataAdapter(sdr, DB.cn);
-            daActivity.Fill(ds, "activity_info");
-            dalog.Fill(ds, "log_info");
+            try
+            {
+                // 使用业务逻辑层获取当前用户的所有活动
+                var activities = _activityService.GetActivitiesByHolder(Login.username);
+
+                // 清空现有数据表并创建列
+                dtActivities.Clear();
+                if (dtActivities.Columns.Count == 0)
+                {
+                    dtActivities.Columns.Add("activity_ID", typeof(int));
+                    dtActivities.Columns.Add("activity_Name", typeof(string));
+                    dtActivities.Columns.Add("activity_type", typeof(string));
+                    dtActivities.Columns.Add("addtime", typeof(DateTime));
+                    dtActivities.Columns.Add("stoptime", typeof(DateTime));
+                    dtActivities.Columns.Add("place", typeof(string));
+                    dtActivities.Columns.Add("renshu", typeof(int));
+                    dtActivities.Columns.Add("descn", typeof(string));
+                    dtActivities.Columns.Add("Image", typeof(string));
+                    dtActivities.Columns.Add("Holder", typeof(string));
+                    dtActivities.Columns.Add("status", typeof(string));
+                }
+
+                // 填充数据
+                foreach (var activity in activities)
+                {
+                    DataRow row = dtActivities.NewRow();
+                    row["activity_ID"] = activity.activity_ID;
+                    row["activity_Name"] = activity.activity_Name ?? "";
+                    row["activity_type"] = activity.activity_type ?? "";
+                    row["addtime"] = activity.addtime; // 根据签名信息，这是非空DateTime
+                    row["stoptime"] = activity.stoptime; // 根据签名信息，这是非空DateTime
+                    row["place"] = activity.place ?? "";
+                    row["renshu"] = activity.renshu ?? 0;
+                    row["descn"] = activity.descn ?? "";
+                    row["Image"] = activity.Image ?? "";
+                    row["Holder"] = activity.Holder ?? "";
+                    row["status"] = activity.status ?? "";
+                    dtActivities.Rows.Add(row);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"加载活动数据出错: {ex.Message}\r\n\r\n堆栈跟踪：{ex.StackTrace}");
+            }
         }
+
         void showAll()
         {
-            DataView dvActivity = new DataView(ds.Tables["activity_info"]);
-            dgvactivity.DataSource = dvActivity;
+            dgvactivity.DataSource = dtActivities;
         }
 
         private void Insert_activity_Load(object sender, EventArgs e)
         {
-            // TODO: 这行代码将数据加载到表“vOLUNTEERDataSet.activityTypeT”中。您可以根据需要移动或删除它。
+            // 加载活动类型数据
             this.activityTypeTTableAdapter.Fill(this.vOLUNTEERDataSet.activityTypeT);
-            init();
-            showAll();
-            string str = "select * from ActivityT";
-            DataTable dt = DB.GetDataSet(str);
-            int s = dt.Rows.Count-1;
-            string NID= dt.Rows[s][0].ToString();
-            int A = Convert.ToInt32(NID)+1;
-            txtActID.Text = A.ToString();
 
+            // 加载活动数据
+            LoadActivities();
+            showAll();
+
+            // 获取下一个活动ID
+            int nextId = _activityService.GetNextActivityId();
+            txtActID.Text = nextId.ToString();
         }
 
         private void btncancel_Click(object sender, EventArgs e)
@@ -60,89 +100,74 @@ namespace 大学生志愿者管理系统1.Tactivity
 
         private void btnOK_Click(object sender, EventArgs e)
         {
-            if (txtActID.Text == "" || txtActName.Text == "" || txtActNeed.Text == ""||txtplace.Text=="")
+            if (txtActID.Text == "" || txtActName.Text == "" || txtActNeed.Text == "" || txtplace.Text == "")
             {
                 MessageBox.Show("必选项不能为空");
+                return;
             }
-            else
-            {
-                DB.Getcn();
-                string str = "select * from ActivityT where activity_ID='" + txtActID.Text + "'";
-                DataTable dt = DB.GetDataSet(str);
 
-                if (dt.Rows.Count > 0)
+            try
+            {
+                // 解析活动ID和人数
+                if (!int.TryParse(txtActID.Text, out int activityId) ||
+                    !int.TryParse(txtActNeed.Text, out int need))
                 {
-                    MessageBox.Show("编号已存在");
+                    MessageBox.Show("活动ID和人数必须是整数");
+                    return;
+                }
+
+                // 创建正确类型(DAL.ActivityT)的新活动对象
+                var activity = new DAL.ActivityT  // 明确指定DAL命名空间
+                {
+                    activity_ID = activityId,
+                    activity_Name = txtActName.Text,
+                    activity_type = cboCategory.SelectedValue.ToString(),
+                    addtime = dtpBegin.Value,
+                    stoptime = dtpStop.Value,
+                    place = txtplace.Text,
+                    renshu = need,
+                    descn = txtActResume.Text,
+                    Holder = Login.username,
+                    status = "进行中"
+                };
+
+                // 使用业务逻辑层添加活动
+                bool result = _activityService.AddActivity(activity, path_source, Login.username);
+
+                if (result)
+                {
+                    MessageBox.Show("添加成功");
+
+                    // 重新加载数据
+                    LoadActivities();
+                    showAll();
+
+                    // 更新下一个活动ID
+                    int nextId = _activityService.GetNextActivityId();
+                    txtActID.Text = nextId.ToString();
+
+                    // 清空输入框
+                    txtActName.Text = "";
+                    txtActNeed.Text = "";
+                    txtplace.Text = "";
+                    txtActResume.Text = "";
+                    pictureBox1.Image = null;
+                    path_source = "";
                 }
                 else
                 {
-                    string filename;
-                    string fileFolder;
-                    string dateTime = "";
-                    //照片时间标记
-                    filename = Path.GetFileName(path_source);
-                    dateTime += DateTime.Now.Year.ToString();
-                    dateTime += DateTime.Now.Month.ToString();
-                    dateTime += DateTime.Now.Day.ToString();
-                    dateTime += DateTime.Now.Hour.ToString();
-                    dateTime += DateTime.Now.Minute.ToString();
-                    dateTime += DateTime.Now.Second.ToString();
-                    filename = dateTime + filename;
-                    fileFolder = Directory.GetCurrentDirectory() + "\\" + "Act_Images" + "\\"
-                        + cboCategory.Text + "\\";
-                    fileFolder += filename;
-
-                    DataRow drAct = ds.Tables["activity_info"].NewRow();
-                    drAct["activity_ID"] = Convert.ToInt32(txtActID.Text);
-                    drAct["activity_Name"] = txtActName.Text;
-                    drAct["activity_type"] = cboCategory.SelectedValue;
-                    drAct["addtime"] = dtpBegin.Value;
-                    drAct["stoptime"] = dtpStop.Value;
-                    drAct["place"] = txtplace.Text;
-                    drAct["renshu"] = int.Parse(txtActNeed.Text);
-                    drAct["descn"] = txtActResume.Text;
-                    drAct["Holder"] = Login.username;
-                    drAct["status"] = "进行中";
-                    if(path_source!="")
-                    {
-                        File.Copy(path_source, fileFolder, true);
-                        drAct["Image"] = "\\Act_Images\\" + cboCategory.Text + "\\" + filename;
-                    }
-                    else
-                    {
-                        drAct["Image"] = "暂无图片.gif";
-                    }
-
-                    ds.Tables["activity_info"].Rows.Add(drAct);
-
-                    DataRow drlog = ds.Tables["log_info"].NewRow();
-                    drlog["username"] = Login.username;
-                    drlog["log_type"] = "添加";
-                    drlog["action_date"] = DateTime.Now;
-                    drlog["action_table"] = "activity表";
-                    ds.Tables["log_info"].Rows.Add(drlog);
-                   
-                    try
-                    {
-                        SqlCommandBuilder dbActivity = new SqlCommandBuilder(daActivity);
-                        daActivity.Update(ds, "activity_info");
-                        SqlCommandBuilder dblog = new SqlCommandBuilder(dalog);
-                        dalog.Update(ds, "log_info");
-                        MessageBox.Show("添加成功");
-                    }
-                    catch(SqlException ex)
-                    {
-                        MessageBox.Show(ex.Message);
-                    }
-                    DB.cn.Close();
+                    MessageBox.Show("添加失败，可能是活动ID已存在");
                 }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"添加活动时出错: {ex.Message}\r\n\r\n堆栈跟踪：{ex.StackTrace}");
+            }
         }
-
         private void btnpid_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
-            if(ofd.ShowDialog()==DialogResult.OK)
+            if (ofd.ShowDialog() == DialogResult.OK)
             {
                 path_source = ofd.FileName;
                 pictureBox1.Image = Image.FromFile(path_source);
@@ -152,7 +177,7 @@ namespace 大学生志愿者管理系统1.Tactivity
 
         private void label9_Click(object sender, EventArgs e)
         {
-
+            // 空方法，保留原有的事件处理器
         }
     }
 }

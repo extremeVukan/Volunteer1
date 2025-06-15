@@ -2,38 +2,67 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BLL; // 添加BLL引用
+using DAL; // 添加DAL引用用于实体类
 
 namespace 大学生志愿者管理系统1.Volunteer
 {
     public partial class deleteVol : Form
     {
+        private VolunteerService _volunteerService; // 添加VolunteerService引用
+
         public deleteVol()
         {
             InitializeComponent();
+            _volunteerService = new VolunteerService(); // 初始化VolunteerService
         }
-        private string ShanchuID = "";
-        SqlDataAdapter daVol;
-        DataSet ds = new DataSet();
 
-        void init()
+        private DataTable dtVolunteers = new DataTable(); // 志愿者数据表
+
+        void LoadVolunteers()
         {
-            DB.Getcn();
-            string str = "select Aid,AName,Atelephone,email from volunteerT";
-            daVol = new SqlDataAdapter(str, DB.cn);
-            daVol.Fill(ds, "Vol_info");
-            DB.cn.Close();
+            try
+            {
+                // 使用业务逻辑层获取所有志愿者
+                var volunteers = _volunteerService.GetAllVolunteers();
+
+                // 清空现有数据表并创建列
+                dtVolunteers.Clear();
+                if (dtVolunteers.Columns.Count == 0)
+                {
+                    dtVolunteers.Columns.Add("Aid", typeof(int));
+                    dtVolunteers.Columns.Add("AName", typeof(string));
+                    dtVolunteers.Columns.Add("Atelephone", typeof(string));
+                    dtVolunteers.Columns.Add("email", typeof(string));
+                }
+
+                // 填充数据
+                foreach (var volunteer in volunteers)
+                {
+                    DataRow row = dtVolunteers.NewRow();
+                    row["Aid"] = volunteer.Aid;
+                    row["AName"] = volunteer.AName ?? "";
+                    row["Atelephone"] = volunteer.Atelephone ?? "";
+                    row["email"] = volunteer.email ?? "";
+                    dtVolunteers.Rows.Add(row);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"加载志愿者数据出错: {ex.Message}");
+            }
         }
-        void showAll()//DGV载入
+
+        void showAll() // DGV载入
         {
-            DataView dvVol = new DataView(ds.Tables["Vol_info"]);
-            dgvvol.DataSource = dvVol;
+            dgvvol.DataSource = dtVolunteers;
         }
+
         void dgvHead()
         {
             this.dgvvol.Columns[0].HeaderText = "ID";
@@ -41,17 +70,22 @@ namespace 大学生志愿者管理系统1.Volunteer
             this.dgvvol.Columns[2].HeaderText = "联系方式";
             this.dgvvol.Columns[3].HeaderText = "邮箱";
         }
+
         void showXz()
         {
-            DataGridViewCheckBoxColumn acCode = new DataGridViewCheckBoxColumn();
-            acCode.Name = "acCode";
-            acCode.HeaderText = "选择";
-            dgvvol.Columns.Add(acCode);
+            // 检查是否已经添加了选择列
+            if (!dgvvol.Columns.Contains("acCode"))
+            {
+                DataGridViewCheckBoxColumn acCode = new DataGridViewCheckBoxColumn();
+                acCode.Name = "acCode";
+                acCode.HeaderText = "选择";
+                dgvvol.Columns.Add(acCode);
+            }
         }
-        
 
         private void dgvvol_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
+            if (dgvvol.Columns[e.ColumnIndex].Name == "acCode" && e.RowIndex >= 0)
             {
                 if (dgvvol.Rows.Count > 0)
                 {
@@ -71,89 +105,66 @@ namespace 大学生志愿者管理系统1.Volunteer
             }
         }
 
-
-        void UpdateDB()
-        {
-            try
-            {
-                SqlCommandBuilder dbvolunteer = new SqlCommandBuilder(daVol);
-                daVol.Update(ds, "Vol_info");
-
-            }
-            catch (SqlException ex)
-            {
-                MessageBox.Show(ex.Message.ToString());
-            }
-        }
-
         private void btndelete_Click(object sender, EventArgs e)
         {
+            bool selected = false;
+            int selectedIndex = -1;
+
+            for (int i = 0; i < dgvvol.Rows.Count; i++)
             {
-                int s = dgvvol.Rows.Count;
-                for (int i = 0; i < dgvvol.Rows.Count; i++)
+                if (dgvvol.Rows[i].Cells["acCode"]?.EditedFormattedValue?.ToString() == "True")
                 {
-                    if (dgvvol.Rows[i].Cells["acCode"].EditedFormattedValue.ToString() == "True")
-                    {
-                        DialogResult dr = MessageBox.Show("是否要删除？", "提示",
-                            MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
-                        if (dr == DialogResult.OK)
-                        {
-                            DB.Getcn();
-                            //寻找目标ID
-                            string str = "select * from  volunteerT";
-                            DataTable dt = DB.GetDataSet(str);
-                            ShanchuID = dt.Rows[i][0].ToString();
-
-                            dgvvol.Rows.RemoveAt(i);
-                            //添加日志
-                            SqlCommand cmd = new SqlCommand("add_log", DB.cn);
-                            cmd.CommandType = CommandType.StoredProcedure;
-                            cmd.Parameters.Add(new SqlParameter("username", SqlDbType.NVarChar));
-                            cmd.Parameters.Add(new SqlParameter("log_type", SqlDbType.NVarChar));
-                            cmd.Parameters.Add(new SqlParameter("action_date", SqlDbType.DateTime));
-                            cmd.Parameters.Add(new SqlParameter("action_table", SqlDbType.NVarChar));
-                            cmd.Parameters["username"].Value = Login.username;
-                            cmd.Parameters["log_type"].Value = "删除";
-                            cmd.Parameters["action_date"].Value = DateTime.Now;
-                            cmd.Parameters["action_table"].Value = "Volunteer表";
-                            try
-                            {
-                                SqlCommandBuilder dbAdmin = new SqlCommandBuilder(daVol);
-                                daVol.Update(ds, "Vol_info");
-                                cmd.ExecuteNonQuery();
-                            }
-                            catch (SqlException ex)
-                            {
-                                MessageBox.Show(ex.Message);
-                            }
-
-
-
-                            MessageBox.Show("删除成功");
-                            UpdateDB();
-                        }
-                        else
-                        {
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        s = s - 1;
-                    }
+                    selected = true;
+                    selectedIndex = i;
+                    break;
                 }
-                if (s == 0)
-                {
-                    MessageBox.Show("请选择要删除的对象");
-                }
-                DB.cn.Close();
             }
 
+            if (selected && selectedIndex >= 0)
+            {
+                DialogResult dr = MessageBox.Show("是否要删除？", "提示",
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+
+                if (dr == DialogResult.OK)
+                {
+                    try
+                    {
+                        if (dgvvol.Rows[selectedIndex].Cells["Aid"].Value != null &&
+                            int.TryParse(dgvvol.Rows[selectedIndex].Cells["Aid"].Value.ToString(), out int volunteerId))
+                        {
+                            // 使用业务逻辑层删除志愿者
+                            bool result = _volunteerService.DeleteVolunteer(volunteerId, Login.username);
+
+                            if (result)
+                            {
+                                dgvvol.Rows.RemoveAt(selectedIndex);
+                                MessageBox.Show("删除成功");
+
+                                // 重新加载数据
+                                LoadVolunteers();
+                                showAll();
+                            }
+                            else
+                            {
+                                MessageBox.Show("删除失败");
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"删除过程中出错: {ex.Message}");
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("请选择要删除的对象");
+            }
         }
 
         private void deleteVol_Load(object sender, EventArgs e)
         {
-            init();
+            LoadVolunteers();
             showAll();
             dgvHead();
             showXz();

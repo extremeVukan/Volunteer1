@@ -71,5 +71,109 @@ namespace BLL
         {
             return context.volunteerT.Find(volunteerId);
         }
+
+        /// <summary>
+        /// 获取所有志愿者
+        /// </summary>
+        public List<volunteerT> GetAllVolunteers()
+        {
+            return context.volunteerT.ToList();
+        }
+
+        /// <summary>
+        /// 添加志愿者
+        /// </summary>
+        public bool AddVolunteer(volunteerT volunteer, string currentUsername)
+        {
+            try
+            {
+                // 检查ID是否已存在
+                if (context.volunteerT.Any(v => v.Aid == volunteer.Aid))
+                {
+                    return false;
+                }
+
+                // 检查名称是否已存在
+                if (context.volunteerT.Any(v => v.AName == volunteer.AName))
+                {
+                    return false;
+                }
+
+                context.volunteerT.Add(volunteer);
+                context.SaveChanges();
+
+                AddLog(currentUsername, "添加", "Volunteer表");
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 更新志愿者信息
+        /// </summary>
+        public bool UpdateVolunteer(volunteerT volunteer, string currentUsername)
+        {
+            try
+            {
+                var existingVolunteer = context.volunteerT.Find(volunteer.Aid);
+                if (existingVolunteer == null)
+                {
+                    return false;
+                }
+
+                existingVolunteer.AName = volunteer.AName;
+                existingVolunteer.Atelephone = volunteer.Atelephone;
+                existingVolunteer.email = volunteer.email;
+
+                context.SaveChanges();
+
+                AddLog(currentUsername, "修改", "Volunteer表");
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 删除志愿者
+        /// </summary>
+        public bool DeleteVolunteer(int volunteerId, string currentUsername)
+        {
+            try
+            {
+                var volunteer = context.volunteerT.Find(volunteerId);
+                if (volunteer == null)
+                {
+                    return false;
+                }
+
+                context.volunteerT.Remove(volunteer);
+                context.SaveChanges();
+
+                AddLog(currentUsername, "删除", "Volunteer表");
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 获取下一个志愿者ID
+        /// </summary>
+        public int GetNextVolunteerId()
+        {
+            if (!context.volunteerT.Any())
+            {
+                return 1;
+            }
+            return context.volunteerT.Max(v => v.Aid) + 1;
+        }
     }
 }
