@@ -87,55 +87,7 @@ namespace BLL
                 return false;
             }
         }
-        /// <summary>
-        /// 添加管理员
-        /// </summary>
-        public bool AddAdmin(adminT admin, string currentUsername)
-        {
-            try
-            {
-                // 检查ID是否已存在
-                if (context.adminT.Any(a => a.admin_ID == admin.admin_ID))
-                {
-                    return false;
-                }
 
-                // 检查用户名是否已存在
-                if (context.adminT.Any(a => a.admin_Name == admin.admin_Name))
-                {
-                    return false;
-                }
-
-                // 添加管理员
-                context.adminT.Add(admin);
-                context.SaveChanges();
-
-                // 记录日志
-                AddLog(currentUsername, "添加", "AdminT表");
-
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// 检查管理员ID是否存在
-        /// </summary>
-        public bool IsAdminIdExists(int adminId)
-        {
-            return context.adminT.Any(a => a.admin_ID == adminId);
-        }
-
-        /// <summary>
-        /// 检查管理员名称是否存在
-        /// </summary>
-        public bool IsAdminNameExists(string adminName)
-        {
-            return context.adminT.Any(a => a.admin_Name == adminName);
-        }
         /// <summary>
         /// 修改管理员密码
         /// </summary>
