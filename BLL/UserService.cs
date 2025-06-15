@@ -1,8 +1,9 @@
-﻿using System;
+﻿using DAL;
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using DAL;
 
 namespace BLL
 {
@@ -125,6 +126,40 @@ namespace BLL
         public zhuguanT GetSuperAdminInfo(string adminName)
         {
             return context.zhuguanT.FirstOrDefault(z => z.Sname == adminName);
+        }
+        /// <summary>
+        /// 获取所有管理员
+        /// </summary>
+        public List<adminT> GetAllAdmins()
+        {
+            return context.adminT.ToList();
+        }
+
+        /// <summary>
+        /// 通过ID删除管理员
+        /// </summary>
+        public bool DeleteAdmin(int adminId, string currentUsername)
+        {
+            try
+            {
+                var admin = context.adminT.Find(adminId);
+                if (admin == null)
+                {
+                    return false;
+                }
+
+                context.adminT.Remove(admin);
+                context.SaveChanges();
+
+                // 记录日志
+                AddLog(currentUsername, "删除", "AdminT表");
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>
