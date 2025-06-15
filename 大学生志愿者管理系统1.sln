@@ -1,13 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36203.30 d17.14
+VisualStudioVersion = 17.14.36203.30
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "大学生志愿者管理系统1", "大学生志愿者管理系统1\大学生志愿者管理系统1.csproj", "{0FD49655-2DBE-436E-A7BE-6DE422529D68}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL", "DAL\DAL.csproj", "{C6F32940-7F7F-4D11-856B-18FB8C32F030}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BLL", "BLL\BLL.csproj", "{E5514900-15AE-4E57-956D-C94EF16D6E17}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MVC", "MVC", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "大学生志愿者管理系统Web", "大学生志愿者管理系统Web\大学生志愿者管理系统Web.csproj", "{950DA787-D8F9-4353-9E75-1EFDA021F11B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,9 +31,16 @@ Global
 		{E5514900-15AE-4E57-956D-C94EF16D6E17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5514900-15AE-4E57-956D-C94EF16D6E17}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5514900-15AE-4E57-956D-C94EF16D6E17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{950DA787-D8F9-4353-9E75-1EFDA021F11B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{950DA787-D8F9-4353-9E75-1EFDA021F11B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{950DA787-D8F9-4353-9E75-1EFDA021F11B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{950DA787-D8F9-4353-9E75-1EFDA021F11B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{950DA787-D8F9-4353-9E75-1EFDA021F11B} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {46924C47-5855-4CA2-8294-7E84F987AD5E}
