@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
 using System.Web.Mvc;
-using BLL;
-using DAL;
 
 namespace 大学生志愿者管理系统Web.Controllers
 {
@@ -14,13 +15,15 @@ namespace 大学生志愿者管理系统Web.Controllers
 
         public ActionResult About()
         {
-            ViewBag.Message = "大学生志愿者管理系统Web版";
+            ViewBag.Message = "Your application description page.";
+
             return View();
         }
 
         public ActionResult Contact()
         {
-            ViewBag.Message = "联系我们";
+            ViewBag.Message = "Your contact page.";
+
             return View();
         }
     }

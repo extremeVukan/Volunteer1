@@ -231,5 +231,59 @@ namespace BLL
         {
             return context.ACTMember.Where(m => m.ACTID == activityId).ToList();
         }
+        /// <summary>
+        /// 根据志愿者ID获取参与的活动
+        /// </summary>
+        /// <param name="volunteerId">志愿者ID</param>
+        /// <param name="includeApplied">是否包括已申请但未通过的活动</param>
+        /// <param name="includeCompleted">是否包括已结束的活动</param>
+        public List<ActivityT> GetActivitiesByVolunteerId(int volunteerId, bool includeApplied = true, bool includeCompleted = true)
+        {
+            try
+            {
+                // 志愿者已参与的活动（通过ACTMember表）
+                var memberActivities = context.ACTMember
+                    .Where(m => m.Volunteerid == volunteerId)
+                    .Select(m => m.ACTID)
+                    .ToList();
+
+                // 志愿者已申请并通过的活动（通过OrderT表）
+                var approvedApplications = context.OrderT
+                    .Where(o => o.UserID == volunteerId && o.status == "已通过")
+                    .Select(o => o.ActID)
+                    .ToList();
+
+                // 合并两个列表
+                var allActivityIds = memberActivities.Union(approvedApplications).ToList();
+
+                // 如果包括申请中的活动
+                if (includeApplied)
+                {
+                    var pendingApplications = context.OrderT
+                        .Where(o => o.UserID == volunteerId && o.status == "未审核")
+                        .Select(o => o.ActID)
+                        .ToList();
+
+                    allActivityIds = allActivityIds.Union(pendingApplications).ToList();
+                }
+
+                // 构建查询
+                var query = context.ActivityT.Where(a => allActivityIds.Contains(a.activity_ID));
+
+                // 如果不包括已结束的活动
+                if (!includeCompleted)
+                {
+                    query = query.Where(a => a.status != "已结束");
+                }
+
+                return query.ToList();
+            }
+            catch (Exception ex)
+            {
+                // 记录异常
+                AddLog("System", "错误", "获取志愿者活动失败: " + ex.Message);
+                return new List<ActivityT>();
+            }
+        }
     }
 }

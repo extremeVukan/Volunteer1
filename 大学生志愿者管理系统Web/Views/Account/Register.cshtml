@@ -1,0 +1,80 @@
+﻿@{
+    ViewBag.Title = "用户注册";
+}
+
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">用户注册</h3>
+            </div>
+            <div class="panel-body">
+                @if (ViewBag.ErrorMessage != null)
+                {
+                    <div class="alert alert-danger">
+                        <span class="glyphicon glyphicon-exclamation-sign"></span>
+                        @ViewBag.ErrorMessage
+                    </div>
+                }
+
+                @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">用户名：</label>
+                        <div class="col-md-9">
+                            <input type="text" name="name" class="form-control" placeholder="请输入用户名" required />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">密码：</label>
+                        <div class="col-md-9">
+                            <input type="password" name="phone" class="form-control" placeholder="请输入密码" required />
+                            <span class="help-block">注：密码在原系统中存储为电话号码字段</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">邮箱：</label>
+                        <div class="col-md-9">
+                            <input type="email" name="email" class="form-control" placeholder="请输入邮箱" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-3 col-md-9">
+                            <button type="submit" class="btn btn-primary">
+                                <span class="glyphicon glyphicon-ok"></span> 注册
+                            </button>
+                            <a href="@Url.Action("Login")" class="btn btn-default">
+                                <span class="glyphicon glyphicon-arrow-left"></span> 返回登录
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .panel {
+        margin-top: 30px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    }
+
+    .panel-heading {
+        font-weight: bold;
+    }
+
+    .btn {
+        margin-right: 10px;
+    }
+
+    .alert {
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }
+</style>

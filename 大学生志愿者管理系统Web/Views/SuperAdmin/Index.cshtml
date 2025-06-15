@@ -1,0 +1,71 @@
+﻿@{
+    ViewBag.Title = "平台管理";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>欢迎，@ViewBag.Username</h2>
+        <p>您已成功登录为平台管理员。</p>
+        <p>
+            <a href="@Url.Action("Logout", "Account")" class="btn btn-default">
+                <span class="glyphicon glyphicon-log-out"></span> 退出登录
+            </a>
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">系统管理</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">管理员管理</h3>
+                            </div>
+                            <div class="panel-body">
+                                <a href="#" class="btn btn-block btn-info">
+                                    <span class="glyphicon glyphicon-user"></span> 管理员列表
+                                </a>
+                                <a href="#" class="btn btn-block btn-success">
+                                    <span class="glyphicon glyphicon-plus"></span> 添加管理员
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="panel panel-success">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">志愿者管理</h3>
+                            </div>
+                            <div class="panel-body">
+                                <a href="#" class="btn btn-block btn-info">
+                                    <span class="glyphicon glyphicon-list"></span> 志愿者列表
+                                </a>
+                                <a href="#" class="btn btn-block btn-warning">
+                                    <span class="glyphicon glyphicon-certificate"></span> 志愿者证书审核
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="panel panel-warning">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">系统日志</h3>
+                            </div>
+                            <div class="panel-body">
+                                <a href="#" class="btn btn-block btn-warning">
+                                    <span class="glyphicon glyphicon-list-alt"></span> 查看系统日志
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
