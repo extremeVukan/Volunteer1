@@ -6,7 +6,16 @@
     <title>@ViewBag.Title - 大学生志愿者管理系统</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
-    @RenderSection("styles", required: false)
+    <style>
+        body {
+            background-color: #f5f7fa;
+            padding-top: 0;
+        }
+
+        .navbar {
+            display: none;
+        }
+    </style>
 </head>
 <body class="login-page">
     <div class="content-wrapper">

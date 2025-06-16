@@ -62,8 +62,20 @@ namespace BLL
         {
             try
             {
-                // 检查用户名是否存在
+                // 检查志愿者表中是否有同名用户
                 if (context.volunteerT.Any(v => v.AName == name))
+                {
+                    return false;
+                }
+
+                // 检查管理员表中是否有同名用户
+                if (context.adminT.Any(a => a.admin_Name == name))
+                {
+                    return false;
+                }
+
+                // 检查平台管理员表中是否有同名用户
+                if (context.zhuguanT.Any(z => z.Sname == name))
                 {
                     return false;
                 }
@@ -71,6 +83,7 @@ namespace BLL
                 // 创建新志愿者
                 var volunteer = new volunteerT
                 {
+                    Aid = GetNextVolunteerId(), // 分配新的ID
                     AName = name,
                     Atelephone = phone,
                     email = email,
@@ -82,10 +95,24 @@ namespace BLL
                 AddLog("System", "注册志愿者", "volunteerT");
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                // 添加详细的日志记录
+                System.Diagnostics.Debug.WriteLine($"RegisterVolunteer失败: {ex.Message}");
                 return false;
             }
+        }
+
+        /// <summary>
+        /// 获取下一个志愿者ID
+        /// </summary>
+        private int GetNextVolunteerId()
+        {
+            if (!context.volunteerT.Any())
+            {
+                return 1;
+            }
+            return context.volunteerT.Max(v => v.Aid) + 1;
         }
         /// <summary>
         /// 根据ID获取管理员信息

@@ -189,7 +189,7 @@ namespace 大学生志愿者管理系统Web.Controllers
             try
             {
                 int volunteerId = (int)Session["UserId"];
-                string actId = id.ToString();
+                string volunteerName = Session["Username"].ToString();
 
                 // 获取活动
                 var activity = _activityService.GetActivityById(id);
@@ -225,24 +225,40 @@ namespace 大学生志愿者管理系统Web.Controllers
                 }
 
                 // 检查是否已申请
-                var applies = _applyService.GetAppliesByVolunteerId(volunteerId);
-                bool hasApplied = applies.Any(a => a.Act_ID == id);
+                var orders = _orderService.GetOrdersByUserName(volunteerName);
+                bool hasApplied = orders.Any(o => o.ActID == id);
                 if (hasApplied)
                 {
-                    TempData["ErrorMessage"] = "已申请";
+                    TempData["ErrorMessage"] = "您已经申请过此活动";
                     return RedirectToAction("MyApplications");
                 }
 
-                // 添加到申请队列
-                bool result = _applyService.AddToApplyQueue(volunteerId, id);
+                // 获取志愿者电话
+                var volunteer = _volunteerService.GetVolunteerById(volunteerId);
+                string phone = volunteer?.Atelephone ?? "";
+
+                // 直接创建订单（申请）
+                var order = new OrderT
+                {
+                    UserID = volunteerId,
+                    UserName = volunteerName,
+                    OrderDate = DateTime.Now,
+                    phone = phone,
+                    ActID = id,
+                    Act_Name = activity.activity_Name,
+                    Holder = activity.Holder,
+                    status = "未审核"
+                };
+
+                bool result = _orderService.AddOrder(order);
                 if (result)
                 {
-                    TempData["SuccessMessage"] = "申请成功";
+                    TempData["SuccessMessage"] = "活动申请成功，等待管理员审核";
                     return RedirectToAction("MyApplications");
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "申请失败";
+                    TempData["ErrorMessage"] = "申请失败，请稍后重试";
                     return RedirectToAction("ActivityDetails", new { id = id });
                 }
             }

@@ -72,7 +72,7 @@ namespace BLL
         }
 
         /// <summary>
-        /// 添加新活动
+        /// 添加新活动（修改后支持直接指定Image属性）
         /// </summary>
         public bool AddActivity(ActivityT activity, string imagePath, string username)
         {
@@ -100,7 +100,8 @@ namespace BLL
                     // 保存相对路径
                     activity.Image = $"\\Act_Images\\{activity.activity_type}\\{fileName}";
                 }
-                else
+                // 如果imagePath为空但activity.Image已设置，则保留activity.Image值
+                else if (string.IsNullOrEmpty(activity.Image))
                 {
                     activity.Image = "暂无图片.gif";
                 }
@@ -118,7 +119,7 @@ namespace BLL
         }
 
         /// <summary>
-        /// 更新活动信息
+        /// 更新活动信息（修改后支持直接指定Image属性）
         /// </summary>
         public bool UpdateActivity(ActivityT activity, string imagePath, string username)
         {

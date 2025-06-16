@@ -44,11 +44,11 @@ namespace 大学生志愿者管理系统Web.Controllers
             {
                 string username = Session["Username"].ToString();
                 ViewBag.Username = username;
-                
+
                 // 获取当前管理员创建的活动
                 var activities = _activityService.GetActivitiesByHolder(username);
                 ViewBag.ActivityCount = activities.Count;
-                
+
                 // 获取当前管理员待审核的申请数量
                 var pendingOrders = _orderService.GetPendingOrdersByHolder(username);
                 ViewBag.PendingOrderCount = pendingOrders.Count;
@@ -63,7 +63,7 @@ namespace 大学生志愿者管理系统Web.Controllers
         }
 
         #region 个人信息管理
-        
+
         // GET: Admin/PersonalInfo
         public ActionResult PersonalInfo()
         {
@@ -91,7 +91,7 @@ namespace 大学生志愿者管理系统Web.Controllers
                 return RedirectToAction("Index");
             }
         }
-        
+
         // POST: Admin/UpdatePersonalInfo
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -122,7 +122,7 @@ namespace 大学生志愿者管理系统Web.Controllers
                 return View("PersonalInfo", model);
             }
         }
-        
+
         // GET: Admin/ChangePassword
         public ActionResult ChangePassword()
         {
@@ -134,7 +134,7 @@ namespace 大学生志愿者管理系统Web.Controllers
 
             return View();
         }
-        
+
         // POST: Admin/ChangePassword
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -200,22 +200,10 @@ namespace 大学生志愿者管理系统Web.Controllers
                     ViewBag.ActivityType = activityType;
                 }
 
-                // 按状态筛选 - 修改这部分逻辑
+                // 按状态筛选
                 if (!string.IsNullOrEmpty(status))
                 {
-                    // 添加日志以便调试
-                    System.Diagnostics.Debug.WriteLine($"Filtering by status: {status}");
-                    System.Diagnostics.Debug.WriteLine($"Before filter: {activities.Count} activities");
-
-                    // 检查所有活动的状态
-                    foreach (var activity in activities)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"Activity ID: {activity.activity_ID}, Status: '{activity.status}'");
-                    }
-
                     activities = activities.Where(a => (a.status ?? "") == status).ToList();
-
-                    System.Diagnostics.Debug.WriteLine($"After filter: {activities.Count} activities");
                     ViewBag.Status = status;
                 }
 
@@ -254,7 +242,7 @@ namespace 大学生志愿者管理系统Web.Controllers
                 return RedirectToAction("Activities");
             }
         }
-        
+
         // GET: Admin/AddActivity
         public ActionResult AddActivity()
         {
@@ -269,14 +257,14 @@ namespace 大学生志愿者管理系统Web.Controllers
                 // 获取下一个活动ID
                 int nextId = _activityService.GetNextActivityId();
                 ViewBag.NextActivityId = nextId;
-                
+
                 // 获取活动类型列表
-                ViewBag.ActivityTypes = new List<string> 
-                { 
-                    "教育类", "社区发展类", "卫生与医疗类", 
-                    "环境保护类", "动物保护类", "紧急救援类" 
+                ViewBag.ActivityTypes = new List<string>
+                {
+                    "教育类", "社区发展类", "卫生与医疗类",
+                    "环境保护类", "动物保护类", "紧急救援类"
                 };
-                
+
                 return View();
             }
             catch (Exception ex)
@@ -285,7 +273,7 @@ namespace 大学生志愿者管理系统Web.Controllers
                 return RedirectToAction("Activities");
             }
         }
-        
+
         // POST: Admin/AddActivity
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -302,18 +290,58 @@ namespace 大学生志愿者管理系统Web.Controllers
                 // 设置活动创建者
                 model.Holder = Session["Username"].ToString();
                 model.status = "进行中";
-                
-                // 处理图片
-                string imagePath = string.Empty;
+
+                // 处理图片上传
                 if (activityImage != null && activityImage.ContentLength > 0)
                 {
-                    string fileName = Path.GetFileName(activityImage.FileName);
-                    string tempPath = Path.GetTempPath() + fileName;
-                    activityImage.SaveAs(tempPath);
-                    imagePath = tempPath;
+                    // 生成文件名和路径
+                    string dateTime = DateTime.Now.ToString("yyyyMMddHHmmss");
+                    string fileName = dateTime + Path.GetFileName(activityImage.FileName);
+
+                    // 1. 保存到Web应用程序目录
+                    string webAppPath = Server.MapPath("~/Act_Images");
+                    if (!Directory.Exists(webAppPath))
+                    {
+                        Directory.CreateDirectory(webAppPath);
+                    }
+
+                    string webTypePath = Path.Combine(webAppPath, model.activity_type);
+                    if (!Directory.Exists(webTypePath))
+                    {
+                        Directory.CreateDirectory(webTypePath);
+                    }
+
+                    string webFilePath = Path.Combine(webTypePath, fileName);
+                    activityImage.SaveAs(webFilePath);
+
+                    // 2. 同时保存到WinForm应用程序目录
+                    string winformPath = @"D:\大学\数据库开发\大学生志愿者管理系统1\大学生志愿者管理系统1\bin\Debug\Act_Images";
+                    if (!Directory.Exists(winformPath))
+                    {
+                        Directory.CreateDirectory(winformPath);
+                    }
+
+                    string winformTypePath = Path.Combine(winformPath, model.activity_type);
+                    if (!Directory.Exists(winformTypePath))
+                    {
+                        Directory.CreateDirectory(winformTypePath);
+                    }
+
+                    string winformFilePath = Path.Combine(winformTypePath, fileName);
+                    // 复制到WinForm目录
+                    System.IO.File.Copy(webFilePath, winformFilePath, true);
+
+                    // 设置相对路径 - 这里使用相对于WinForm的路径
+                    model.Image = $"Act_Images\\{model.activity_type}\\{fileName}";
                 }
-                
-                bool result = _activityService.AddActivity(model, imagePath, model.Holder);
+                else
+                {
+                    // 没有图片，使用默认图片
+                    model.Image = "暂无图片.gif";
+                }
+
+                // 添加活动
+                bool result = _activityService.AddActivity(model, null, model.Holder);
                 if (result)
                 {
                     TempData["SuccessMessage"] = "活动添加成功";
@@ -322,32 +350,32 @@ namespace 大学生志愿者管理系统Web.Controllers
                 else
                 {
                     TempData["ErrorMessage"] = "活动添加失败";
-                    
+
                     // 重新获取活动类型列表
-                    ViewBag.ActivityTypes = new List<string> 
-                    { 
-                        "教育类", "社区发展类", "卫生与医疗类", 
-                        "环境保护类", "动物保护类", "紧急救援类" 
-                    };
-                    
+                    ViewBag.ActivityTypes = new List<string>
+            {
+                "教育类", "社区发展类", "卫生与医疗类",
+                "环境保护类", "动物保护类", "紧急救援类"
+            };
+
                     return View(model);
                 }
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"添加活动出错: {ex.Message}";
-                
+
                 // 重新获取活动类型列表
-                ViewBag.ActivityTypes = new List<string> 
-                { 
-                    "教育类", "社区发展类", "卫生与医疗类", 
-                    "环境保护类", "动物保护类", "紧急救援类" 
-                };
-                
+                ViewBag.ActivityTypes = new List<string>
+        {
+            "教育类", "社区发展类", "卫生与医疗类",
+            "环境保护类", "动物保护类", "紧急救援类"
+        };
+
                 return View(model);
             }
         }
-        
+
         // GET: Admin/EditActivity/5
         public ActionResult EditActivity(int? id)
         {
@@ -356,7 +384,7 @@ namespace 大学生志愿者管理系统Web.Controllers
             {
                 return RedirectToAction("AccessDenied", "Account");
             }
-            
+
             // 如果没有传入ID，显示活动列表供选择
             if (id == null)
             {
@@ -383,12 +411,12 @@ namespace 大学生志愿者管理系统Web.Controllers
                 }
 
                 // 获取活动类型列表
-                ViewBag.ActivityTypes = new List<string> 
-                { 
-                    "教育类", "社区发展类", "卫生与医疗类", 
-                    "环境保护类", "动物保护类", "紧急救援类" 
+                ViewBag.ActivityTypes = new List<string>
+                {
+                    "教育类", "社区发展类", "卫生与医疗类",
+                    "环境保护类", "动物保护类", "紧急救援类"
                 };
-                
+
                 return View(activity);
             }
             catch (Exception ex)
@@ -397,7 +425,7 @@ namespace 大学生志愿者管理系统Web.Controllers
                 return RedirectToAction("Activities");
             }
         }
-        
+
         // POST: Admin/EditActivity
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -411,17 +439,63 @@ namespace 大学生志愿者管理系统Web.Controllers
 
             try
             {
-                // 处理图片
-                string imagePath = string.Empty;
+                // 处理图片上传
                 if (activityImage != null && activityImage.ContentLength > 0)
                 {
-                    string fileName = Path.GetFileName(activityImage.FileName);
-                    string tempPath = Path.GetTempPath() + fileName;
-                    activityImage.SaveAs(tempPath);
-                    imagePath = tempPath;
+                    // 生成文件名和路径
+                    string dateTime = DateTime.Now.ToString("yyyyMMddHHmmss");
+                    string fileName = dateTime + Path.GetFileName(activityImage.FileName);
+
+                    // 1. 保存到Web应用程序目录
+                    string webAppPath = Server.MapPath("~/Act_Images");
+                    if (!Directory.Exists(webAppPath))
+                    {
+                        Directory.CreateDirectory(webAppPath);
+                    }
+
+                    string webTypePath = Path.Combine(webAppPath, model.activity_type);
+                    if (!Directory.Exists(webTypePath))
+                    {
+                        Directory.CreateDirectory(webTypePath);
+                    }
+
+                    string webFilePath = Path.Combine(webTypePath, fileName);
+                    activityImage.SaveAs(webFilePath);
+
+                    // 2. 同时保存到WinForm应用程序目录
+                    string winformPath = @"D:\大学\数据库开发\大学生志愿者管理系统1\大学生志愿者管理系统1\bin\Debug\Act_Images";
+                    if (!Directory.Exists(winformPath))
+                    {
+                        Directory.CreateDirectory(winformPath);
+                    }
+
+                    string winformTypePath = Path.Combine(winformPath, model.activity_type);
+                    if (!Directory.Exists(winformTypePath))
+                    {
+                        Directory.CreateDirectory(winformTypePath);
+                    }
+
+                    string winformFilePath = Path.Combine(winformTypePath, fileName);
+                    // 复制到WinForm目录
+                    System.IO.File.Copy(webFilePath, winformFilePath, true);
+
+                    // 设置相对路径 - 确保使用正确的格式，不要以"~"开头
+                    model.Image = $"Act_Images\\{model.activity_type}\\{fileName}"; // 使用反斜杠格式
                 }
-                
-                bool result = _activityService.UpdateActivity(model, imagePath, Session["Username"].ToString());
+                // 找到原活动记录，保留原图片路径（如果未上传新图片）
+                else
+                {
+                    var existingActivity = _activityService.GetActivityById(model.activity_ID);
+                    if (existingActivity != null && !string.IsNullOrEmpty(existingActivity.Image))
+                    {
+                        // 保留原路径，确保它不以"~"开头
+                        model.Image = existingActivity.Image.StartsWith("~")
+                            ? existingActivity.Image.Substring(1)
+                            : existingActivity.Image;
+                    }
+                }
+
+                bool result = _activityService.UpdateActivity(model, null, Session["Username"].ToString());
                 if (result)
                 {
                     TempData["SuccessMessage"] = "活动信息更新成功";
@@ -430,32 +504,32 @@ namespace 大学生志愿者管理系统Web.Controllers
                 else
                 {
                     TempData["ErrorMessage"] = "活动信息更新失败";
-                    
+
                     // 重新获取活动类型列表
-                    ViewBag.ActivityTypes = new List<string> 
-                    { 
-                        "教育类", "社区发展类", "卫生与医疗类", 
-                        "环境保护类", "动物保护类", "紧急救援类" 
-                    };
-                    
+                    ViewBag.ActivityTypes = new List<string>
+            {
+                "教育类", "社区发展类", "卫生与医疗类",
+                "环境保护类", "动物保护类", "紧急救援类"
+            };
+
                     return View(model);
                 }
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"更新活动信息出错: {ex.Message}";
-                
+                // 添加更详细的错误信息用于调试
+                TempData["ErrorMessage"] = $"更新活动信息出错: {ex.Message}，堆栈跟踪：{ex.StackTrace}";
+
                 // 重新获取活动类型列表
-                ViewBag.ActivityTypes = new List<string> 
-                { 
-                    "教育类", "社区发展类", "卫生与医疗类", 
-                    "环境保护类", "动物保护类", "紧急救援类" 
-                };
-                
+                ViewBag.ActivityTypes = new List<string>
+        {
+            "教育类", "社区发展类", "卫生与医疗类",
+            "环境保护类", "动物保护类", "紧急救援类"
+        };
+
                 return View(model);
             }
         }
-        
         // GET: Admin/DeleteActivity
         public ActionResult DeleteActivity(int? id)
         {
@@ -464,7 +538,7 @@ namespace 大学生志愿者管理系统Web.Controllers
             {
                 return RedirectToAction("AccessDenied", "Account");
             }
-            
+
             // 如果没有传入ID，显示活动列表供选择
             if (id == null)
             {
@@ -498,7 +572,7 @@ namespace 大学生志愿者管理系统Web.Controllers
                 return RedirectToAction("Activities");
             }
         }
-        
+
         // POST: Admin/DeleteActivityConfirmed
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -529,7 +603,7 @@ namespace 大学生志愿者管理系统Web.Controllers
                 return RedirectToAction("Activities");
             }
         }
-        
+
         // GET: Admin/EndActivity
         public ActionResult EndActivity()
         {
@@ -545,7 +619,7 @@ namespace 大学生志愿者管理系统Web.Controllers
                 var activities = _activityService.GetActivitiesByHolder(username)
                     .Where(a => a.status != "已结束")
                     .ToList();
-                
+
                 return View(activities);
             }
             catch (Exception ex)
@@ -666,7 +740,7 @@ namespace 大学生志愿者管理系统Web.Controllers
                 return View(new List<OrderT>());
             }
         }
-        
+
         // POST: Admin/ApproveApplication
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -698,7 +772,7 @@ namespace 大学生志愿者管理系统Web.Controllers
                 return RedirectToAction("ApplicationReview");
             }
         }
-        
+
         #endregion
     }
 }

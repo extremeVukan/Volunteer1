@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BLL;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -13,9 +14,13 @@ namespace 大学生志愿者管理系统1
 {
     public partial class Tindex : Form
     {
+        private ActivityService _activityService; // 添加业务逻辑层服务
+        private UserService _userService;
         public Tindex()
         {
             InitializeComponent();
+            _activityService = new ActivityService();
+            _userService = new UserService();
         }
 
         private void 修改密码ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -177,13 +182,25 @@ namespace 大学生志愿者管理系统1
 
         private void Tindex_Load(object sender, EventArgs e)
         {
-            label1.Text = Login.username;
-            string str = "select * from ActivityT where Holder='" + Login.username + "'";
-            DataTable dt = DB.GetDataSet(str);
-            label2.Text=dt.Rows.Count.ToString()+"次活动";
-            if(Login.User == 2)
+            try
             {
-                label3.Text = "平台管理员";
+                // 显示当前用户名
+                label1.Text = Login.username;
+
+                // 使用业务逻辑层查询当前用户创建的活动数量
+                var activities = _activityService.GetActivitiesByHolder(Login.username);
+                label2.Text = activities.Count.ToString() + "次活动";
+
+                // 确定用户角色
+                if (Login.User == 2)
+                {
+                    label3.Text = "平台管理员";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("加载数据出错: " + ex.Message, "错误",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

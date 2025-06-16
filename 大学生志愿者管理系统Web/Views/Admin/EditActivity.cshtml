@@ -93,12 +93,19 @@
                                 @if (!string.IsNullOrEmpty(Model.Image))
                                 {
                                     <div class="current-image">
-                                        <img src="@Url.Content("~" + Model.Image)" alt="活动图片" style="max-width: 200px; margin-bottom: 10px;" />
-                                        <p>当前图片</p>
+                                        @if (Model.Image.StartsWith("~") || Model.Image.StartsWith("/"))
+                                        {
+                                            <img src="@Url.Content(Model.Image)" alt="活动图片" style="max-width: 200px; margin-bottom: 10px;" />
+                                        }
+                                        else
+                                        {
+                                            <img src="@Url.Content("~/" + Model.Image)" alt="活动图片" style="max-width: 200px; margin-bottom: 10px;" />
+                                        }
+                                        <p>当前图片: @Model.Image</p>
                                     </div>
                                 }
                                 <input type="file" name="activityImage" class="form-control" accept="image/*" />
-                                <span class="help-block">如需更新图片请选择新图片，否则将保留当前图片</span>
+                                <span class="help-block">支持JPG, PNG, GIF格式图片。如不上传则保留原图片。</span>
                             </div>
                         </div>
 

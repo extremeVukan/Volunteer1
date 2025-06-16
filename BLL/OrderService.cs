@@ -87,5 +87,66 @@ namespace BLL
                 return new List<OrderT>();
             }
         }
+        /// <summary>
+        /// 添加订单
+        /// </summary>
+        public bool AddOrder(OrderT order)
+        {
+            try
+            {
+                // 检查并处理可能为 null 的字段
+                if (order.UserID == null)
+                {
+                    // 可以设置默认值，或者在这里确保数据库可以接受 null
+                    // 例如：order.UserID = 0; // 或其他默认值
+
+                    // 或者，如果该字段不应该为 null，可以返回 false 表示数据不合法
+                    return false;
+                }
+
+                context.OrderT.Add(order);
+                context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 修改订单信息
+        /// </summary>
+        public bool UpdateOrder(OrderT order)
+        {
+            try
+            {
+                // 检查并处理可能为 null 的字段
+                if (order.UserID == null)
+                {
+                    // 可以设置默认值
+                    // order.UserID = 0; // 或其他默认值
+
+                    // 或返回 false
+                    return false;
+                }
+
+                var existingOrder = context.OrderT.Find(order.OrderID);
+                if (existingOrder == null)
+                    return false;
+
+                // 更新字段
+                existingOrder.UserName = order.UserName;
+                existingOrder.UserID = order.UserID;
+                // 更新其他字段...
+
+                context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
