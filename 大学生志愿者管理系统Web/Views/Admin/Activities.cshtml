@@ -1,6 +1,9 @@
 ﻿@model IEnumerable<DAL.ActivityT>
 @{
     ViewBag.Title = "活动列表";
+    // 添加缓存控制标识符，确保每次都获取最新数据
+    var cacheBreaker = DateTime.Now.Ticks;
+
     // 预先分离进行中和已结束的活动
     var ongoingActivities = Model.Where(a => a.status != "已结束").ToList();
     var endedActivities = Model.Where(a => a.status == "已结束").ToList();
@@ -43,8 +46,6 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
             animation: fadeIn 0.5s ease-in-out;
         }
-
-        
 
         /* 过滤卡片 */
         .filter-card {
@@ -363,8 +364,6 @@
             animation: slideIn 0.5s;
         }
 
-        
-
         .activity-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
@@ -483,6 +482,13 @@
                 animation: spin 1s infinite linear;
             }
 
+        /* 加载动画 */
+        .refresh-spinner {
+            display: inline-block;
+            animation: spin 1s infinite linear;
+            margin-right: 5px;
+        }
+
         
     </style>
 }
@@ -497,6 +503,9 @@
                 </div>
                 <div class="col-md-4 text-right">
                     <span class="badge activity-counter">总计: @Model.Count() 条记录</span>
+                    <button id="btnRefreshData" class="btn btn-sm btn-default" title="刷新数据">
+                        <i class="glyphicon glyphicon-refresh"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -517,6 +526,10 @@
                     <i class="glyphicon glyphicon-exclamation-sign"></i> @TempData["ErrorMessage"]
                 </div>
             }
+            <!-- 添加用于显示Ajax操作结果的提示区域 -->
+            <div id="ajaxMessage" class="alert" style="display:none;">
+                <i class="glyphicon"></i> <span id="ajaxMessageText"></span>
+            </div>
         </div>
     </div>
 
@@ -599,12 +612,12 @@
                                     <th>操作</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="activityTableBody">
                                 @if (Model.Any())
                                 {
                                     foreach (var activity in Model)
                                     {
-                                        <tr class="activity-row">
+                                        <tr class="activity-row" data-activity-id="@activity.activity_ID">
                                             <td>@activity.activity_ID</td>
                                             <td class="activity-name">@activity.activity_Name</td>
                                             <td><span class="type-tag">@activity.activity_type</span></td>
@@ -635,11 +648,10 @@
                                                     </a>
                                                     @if (activity.status != "已结束")
                                                     {
-                                                        <a href="@Url.Action("EndActivityConfirmed", new { id = activity.activity_ID })"
-                                                           class="btn btn-warning btn-xs"
-                                                           onclick="return confirm('确定要结束该活动吗？');">
+                                                        <button type="button" data-id="@activity.activity_ID" data-name="@activity.activity_Name"
+                                                                class="btn btn-warning btn-xs btn-end-activity">
                                                             <i class="glyphicon glyphicon-check"></i> 结束
-                                                        </a>
+                                                        </button>
                                                     }
                                                 </div>
                                             </td>
@@ -668,58 +680,60 @@
             <div class="activity-section">
                 <h3 class="section-title">
                     <i class="glyphicon glyphicon-play-circle"></i> 进行中的活动
-                    <span class="badge warm-badge">@ongoingActivities.Count</span>
+                    <span class="badge warm-badge" id="ongoingCount">@ongoingActivities.Count</span>
                 </h3>
 
-                @if (ongoingActivities.Any())
-                {
-                    <div class="row">
-                        @foreach (var activity in ongoingActivities.Take(4)) // 只显示前4个
-                        {
-                            <div class="col-md-3">
-                                <div class="activity-card">
-                                    <div class="activity-card-header">
-                                        <span class="type-tag-modal">@activity.activity_type</span>
-                                        <span class="status-badge ongoing">进行中</span>
-                                    </div>
-                                    <div class="activity-card-body">
-                                        <h4 class="activity-title">@activity.activity_Name</h4>
-                                        <div class="activity-info">
-                                            <p><i class="glyphicon glyphicon-map-marker"></i> @activity.place</p>
-                                            <p><i class="glyphicon glyphicon-time"></i> @activity.addtime</p>
-                                            <p><i class="glyphicon glyphicon-user"></i> @activity.renshu 人</p>
+                <div id="ongoingActivitiesContainer">
+                    @if (ongoingActivities.Any())
+                    {
+                        <div class="row">
+                            @foreach (var activity in ongoingActivities.Take(4)) // 只显示前4个
+                            {
+                                <div class="col-md-3">
+                                    <div class="activity-card" data-activity-id="@activity.activity_ID">
+                                        <div class="activity-card-header">
+                                            <span class="type-tag-modal">@activity.activity_type</span>
+                                            <span class="status-badge ongoing">进行中</span>
                                         </div>
-                                    </div>
-                                    <div class="activity-card-footer">
-                                        <div class="btn-group-justified">
-                                            <a href="@Url.Action("ActivityDetails", new { id = activity.activity_ID })" class="btn btn-info btn-sm">
-                                                <i class="glyphicon glyphicon-eye-open"></i> 查看
-                                            </a>
-                                            <a href="@Url.Action("EditActivity", new { id = activity.activity_ID })" class="btn btn-primary btn-sm">
-                                                <i class="glyphicon glyphicon-edit"></i> 编辑
-                                            </a>
+                                        <div class="activity-card-body">
+                                            <h4 class="activity-title">@activity.activity_Name</h4>
+                                            <div class="activity-info">
+                                                <p><i class="glyphicon glyphicon-map-marker"></i> @activity.place</p>
+                                                <p><i class="glyphicon glyphicon-time"></i> @activity.addtime</p>
+                                                <p><i class="glyphicon glyphicon-user"></i> @activity.renshu 人</p>
+                                            </div>
+                                        </div>
+                                        <div class="activity-card-footer">
+                                            <div class="btn-group-justified">
+                                                <a href="@Url.Action("ActivityDetails", new { id = activity.activity_ID })" class="btn btn-info btn-sm">
+                                                    <i class="glyphicon glyphicon-eye-open"></i> 查看
+                                                </a>
+                                                <a href="@Url.Action("EditActivity", new { id = activity.activity_ID })" class="btn btn-primary btn-sm">
+                                                    <i class="glyphicon glyphicon-edit"></i> 编辑
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                            }
+                        </div>
+
+                        if (ongoingActivities.Count > 4)
+                        {
+                            <div class="text-center">
+                                <button class="btn btn-warm" data-toggle="modal" data-target="#activitiesModal">
+                                    <i class="glyphicon glyphicon-plus-sign"></i> 查看全部 <span class="ongoing-count-badge">@ongoingActivities.Count</span> 个进行中的活动
+                                </button>
                             </div>
                         }
-                    </div>
-
-                    if (ongoingActivities.Count > 4)
+                    }
+                    else
                     {
-                        <div class="text-center">
-                            <button class="btn btn-warm" data-toggle="modal" data-target="#activitiesModal">
-                                <i class="glyphicon glyphicon-plus-sign"></i> 查看全部 @ongoingActivities.Count 个进行中的活动
-                            </button>
+                        <div class="alert alert-info message-alert">
+                            <i class="glyphicon glyphicon-info-sign"></i> 暂无进行中的活动
                         </div>
                     }
-                }
-                else
-                {
-                    <div class="alert alert-info message-alert">
-                        <i class="glyphicon glyphicon-info-sign"></i> 暂无进行中的活动
-                    </div>
-                }
+                </div>
             </div>
         </div>
     </div>
@@ -748,16 +762,16 @@
                 <div class="activity-section">
                     <h4 class="section-title">
                         <i class="glyphicon glyphicon-play-circle"></i> 进行中的活动
-                        <span class="badge warm-badge">@ongoingActivities.Count</span>
+                        <span class="badge warm-badge modal-ongoing-count">@ongoingActivities.Count</span>
                     </h4>
-                    <div class="activities-container">
+                    <div class="activities-container" id="modalOngoingActivities">
                         @if (ongoingActivities.Any())
                         {
                             <div class="row">
                                 @foreach (var activity in ongoingActivities)
                                 {
                                     <div class="col-md-6">
-                                        <div class="activity-card">
+                                        <div class="activity-card" data-activity-id="@activity.activity_ID">
                                             <div class="activity-card-header">
                                                 <span class="type-tag-modal">@activity.activity_type</span>
                                                 <span class="status-badge ongoing">进行中</span>
@@ -779,11 +793,10 @@
                                                     <a href="@Url.Action("EditActivity", new { id = activity.activity_ID })" class="btn btn-primary">
                                                         <i class="glyphicon glyphicon-edit"></i> 编辑
                                                     </a>
-                                                    <a href="@Url.Action("EndActivityConfirmed", new { id = activity.activity_ID })"
-                                                       class="btn btn-warning"
-                                                       onclick="return confirm('确定要结束该活动吗？');">
+                                                    <button type="button" data-id="@activity.activity_ID" data-name="@activity.activity_Name"
+                                                            class="btn btn-warning btn-end-activity">
                                                         <i class="glyphicon glyphicon-check"></i> 结束
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -804,16 +817,16 @@
                 <div class="activity-section">
                     <h4 class="section-title">
                         <i class="glyphicon glyphicon-check"></i> 已结束的活动
-                        <span class="badge ended-badge">@endedActivities.Count</span>
+                        <span class="badge ended-badge modal-ended-count">@endedActivities.Count</span>
                     </h4>
-                    <div class="activities-container">
+                    <div class="activities-container" id="modalEndedActivities">
                         @if (endedActivities.Any())
                         {
                             <div class="row">
                                 @foreach (var activity in endedActivities)
                                 {
                                     <div class="col-md-6">
-                                        <div class="activity-card ended-card">
+                                        <div class="activity-card ended-card" data-activity-id="@activity.activity_ID">
                                             <div class="activity-card-header">
                                                 <span class="type-tag-modal">@activity.activity_type</span>
                                                 <span class="status-badge ended">已结束</span>
@@ -853,6 +866,35 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="btnRefreshModal">
+                    <i class="glyphicon glyphicon-refresh"></i> 刷新数据
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 结束活动确认模态框 -->
+<div class="modal fade" id="endActivityModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><i class="glyphicon glyphicon-flag"></i> 结束活动确认</h4>
+            </div>
+            <div class="modal-body">
+                <p>您确定要结束活动 <strong id="activityNameToEnd"></strong> 吗？</p>
+                <p class="text-warning"><i class="glyphicon glyphicon-exclamation-sign"></i> 结束活动后，所有未签退的志愿者将被自动签退并计算志愿时长。</p>
+            </div>
+            <div class="modal-footer">
+                <form id="endActivityForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="activityIdToEnd" name="id" value="" />
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="glyphicon glyphicon-flag"></i> 确认结束
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -863,6 +905,18 @@
         $(document).ready(function() {
             // 设置当前选中的活动类型
             $("#activityType").val('@ViewBag.ActivityType');
+
+            // 检查是否需要自动刷新
+            var needRefresh = @(TempData["NeedRefresh"]?.ToString().ToLower() ?? "false");
+            if (needRefresh) {
+                // 显示"正在刷新"的消息
+                showAjaxMessage("正在刷新活动数据...", "info");
+
+                // 延迟一秒后刷新页面，给用户视觉提示
+                setTimeout(function() {
+                    refreshActivityData();
+                }, 1000);
+            }
 
             // 隐藏5秒后淡出消息提示
             setTimeout(function() {
@@ -918,6 +972,200 @@
             if (@ongoingActivities.Count < 3) {
                 $('#tableToggle').trigger('click');
             }
+
+            // 刷新按钮点击事件
+            $('#btnRefreshData, #btnRefreshModal').click(function() {
+                refreshActivityData();
+            });
+
+            // 结束活动按钮点击事件
+            $(document).on('click', '.btn-end-activity', function(e) {
+                e.preventDefault();
+                var activityId = $(this).data('id');
+                var activityName = $(this).data('name');
+
+                // 设置模态框数据
+                $('#activityIdToEnd').val(activityId);
+                $('#activityNameToEnd').text(activityName);
+
+                // 显示确认模态框
+                $('#endActivityModal').modal('show');
+            });
+
+            // 结束活动表单提交
+            $('#endActivityForm').on('submit', function(e) {
+                e.preventDefault();
+                var activityId = $('#activityIdToEnd').val();
+
+                // 显示处理中状态
+                $('#endActivityModal').modal('hide');
+                showAjaxMessage("正在处理，请稍候...", "info");
+
+                // 发送Ajax请求
+                $.ajax({
+                    url: '@Url.Action("EndActivityAjax", "Admin")',
+                    type: 'POST',
+                    data: {
+                        id: activityId,
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(result) {
+                        if (result.success) {
+                            showAjaxMessage(result.message, "success");
+
+                            // 更新活动状态
+                            updateActivityStatus(activityId, "已结束");
+
+                            // 3秒后自动刷新数据
+                            setTimeout(function() {
+                                refreshActivityData();
+                            }, 3000);
+                        } else {
+                            showAjaxMessage("操作失败: " + result.message, "error");
+                        }
+                    },
+                    error: function() {
+                        showAjaxMessage("发生错误，请稍后再试", "error");
+                    }
+                });
+            });
         });
+
+        // 显示Ajax消息
+        function showAjaxMessage(message, type) {
+            var $ajaxMessage = $('#ajaxMessage');
+            var $icon = $ajaxMessage.find('i.glyphicon');
+            var $text = $('#ajaxMessageText');
+
+            // 设置消息类型
+            $ajaxMessage.removeClass('alert-success alert-info alert-danger');
+            $icon.removeClass('glyphicon-ok-sign glyphicon-info-sign glyphicon-exclamation-sign glyphicon-refresh refresh-spinner');
+
+            if (type === "success") {
+                $ajaxMessage.addClass('alert-success');
+                $icon.addClass('glyphicon-ok-sign');
+            } else if (type === "error") {
+                $ajaxMessage.addClass('alert-danger');
+                $icon.addClass('glyphicon-exclamation-sign');
+            } else {
+                $ajaxMessage.addClass('alert-info');
+                $icon.addClass('glyphicon-refresh refresh-spinner');
+            }
+
+            // 设置消息内容
+            $text.text(message);
+
+            // 显示消息
+            $ajaxMessage.fadeIn();
+
+            // 如果是成功或错误消息，5秒后自动隐藏
+            if (type === "success" || type === "error") {
+                setTimeout(function() {
+                    $ajaxMessage.fadeOut();
+                }, 5000);
+            }
+        }
+
+        // 刷新活动数据
+        function refreshActivityData() {
+            showAjaxMessage("正在刷新活动数据...", "info");
+
+            $.ajax({
+                url: '@Url.Action("GetActivitiesJson", "Admin")',
+                type: 'GET',
+                data: {
+                    activityType: '@ViewBag.ActivityType',
+                    status: '@ViewBag.Status',
+                    t: new Date().getTime() // 防止缓存
+                },
+                success: function(data) {
+                    if (data.success) {
+                        // 更新统计数据
+                        updateActivityCounts(data.ongoingCount, data.endedCount);
+
+                        // 如果需要，更新活动列表
+                        if (data.activities) {
+                            updateActivitiesList(data.activities, data.ongoingActivities, data.endedActivities);
+                        }
+
+                        showAjaxMessage("数据刷新成功", "success");
+                    } else {
+                        showAjaxMessage("刷新数据失败: " + data.message, "error");
+                    }
+                },
+                error: function() {
+                    showAjaxMessage("刷新数据时发生错误", "error");
+                }
+            });
+        }
+
+        // 更新活动状态
+        function updateActivityStatus(activityId, newStatus) {
+            // 更新表格中的活动状态
+            var $tableRow = $('tr.activity-row[data-activity-id="' + activityId + '"]');
+            if ($tableRow.length) {
+                var $statusCell = $tableRow.find('td:eq(7)');
+                var $actionsCell = $tableRow.find('td:eq(8)');
+
+                if (newStatus === "已结束") {
+                    $statusCell.html('<span class="status-badge ended">已结束</span>');
+                    $actionsCell.find('.btn-end-activity').remove();
+                } else {
+                    $statusCell.html('<span class="status-badge ongoing">进行中</span>');
+                }
+            }
+
+            // 更新卡片中的活动状态
+            var $card = $('.activity-card[data-activity-id="' + activityId + '"]');
+            if ($card.length) {
+                if (newStatus === "已结束") {
+                    // 将卡片移到已结束区域
+                    var $cardClone = $card.clone();
+                    $cardClone.addClass('ended-card');
+                    $cardClone.find('.status-badge').removeClass('ongoing').addClass('ended').text('已结束');
+                    $cardClone.find('.btn-end-activity').remove();
+
+                    // 从进行中区域移除
+                    $card.fadeOut(function() {
+                        $(this).remove();
+
+                        // 添加到已结束区域
+                        if ($('#modalEndedActivities .row').length === 0) {
+                            $('#modalEndedActivities').html('<div class="row"></div>');
+                        }
+
+                        var $newCol = $('<div class="col-md-6"></div>').append($cardClone);
+                        $('#modalEndedActivities .row').prepend($newCol);
+                        $cardClone.hide().fadeIn();
+                    });
+                }
+            }
+        }
+
+        // 更新活动计数
+        function updateActivityCounts(ongoingCount, endedCount) {
+            // 更新主页面的计数
+            $('#ongoingCount').text(ongoingCount);
+            $('.ongoing-count-badge').text(ongoingCount);
+
+            // 更新模态框中的计数
+            $('.modal-ongoing-count').text(ongoingCount);
+            $('.modal-ended-count').text(endedCount);
+
+            // 更新总计数
+            $('.activity-counter').text('总计: ' + (ongoingCount + endedCount) + ' 条记录');
+        }
+
+        // 完全更新活动列表（如果返回了完整数据）
+        function updateActivitiesList(activities, ongoingActivities, endedActivities) {
+            // 这个功能比较复杂，需要根据返回的活动数据重新生成HTML
+            // 实际项目中可能需要根据具体的数据结构和展示需求来实现
+            console.log("收到活动数据更新:", activities.length, "条活动");
+
+            // 如果需要完全重新加载页面：
+            if (confirm("活动数据有较大变动，需要重新加载页面以显示最新数据。是否立即刷新页面？")) {
+                location.reload();
+            }
+        }
     </script>
 }

@@ -343,5 +343,42 @@ namespace BLL
                 return false;
             }
         }
+        /// <summary>
+        /// 更新活动成员签退时间
+        /// </summary>
+        public bool UpdateMemberReturnTime(int activityId, int volunteerId, DateTime returnTime)
+        {
+            try
+            {
+                var member = context.ACTMember
+                    .FirstOrDefault(m => m.ACTID == activityId && m.Volunteerid == volunteerId);
+
+                if (member == null)
+                    return false;
+
+                member.ReturnTime = returnTime;
+                context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 计算志愿者参与活动的小时数
+        /// </summary>
+        public int CalculateVolunteerHours(DateTime signTime, DateTime returnTime)
+        {
+            // 计算时间差
+            TimeSpan duration = returnTime - signTime;
+
+            // 转换为小时，四舍五入到最近的整数
+            int hours = (int)Math.Round(duration.TotalHours);
+
+            // 确保至少计算为1小时
+            return Math.Max(1, hours);
+        }
     }
 }

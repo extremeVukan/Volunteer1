@@ -875,6 +875,48 @@ namespace 大学生志愿者管理系统Web.Controllers
                 return RedirectToAction("ActivityParticipants", new { id = activityId });
             }
         }
+        // GET: Admin/GetActivitiesJson
+        public ActionResult GetActivitiesJson(string activityType = "", string status = "")
+        {
+            // 检查权限
+            if (Session["Username"] == null || ((int)Session["UserType"] != 1 && (int)Session["UserType"] != 2))
+            {
+                return Json(new { success = false, message = "没有权限执行此操作" }, JsonRequestBehavior.AllowGet);
+            }
+
+            try
+            {
+                string username = Session["Username"].ToString();
+                var allActivities = _activityService.GetActivitiesByHolder(username);
+
+                // 按类型筛选
+                if (!string.IsNullOrEmpty(activityType))
+                {
+                    allActivities = allActivities.Where(a => a.activity_type == activityType).ToList();
+                }
+
+                // 按状态筛选
+                if (!string.IsNullOrEmpty(status))
+                {
+                    allActivities = allActivities.Where(a => (a.status ?? "") == status).ToList();
+                }
+
+                // 分离进行中和已结束的活动
+                var ongoingActivities = allActivities.Where(a => a.status != "已结束").ToList();
+                var endedActivities = allActivities.Where(a => a.status == "已结束").ToList();
+
+                return Json(new
+                {
+                    success = true,
+                    ongoingCount = ongoingActivities.Count,
+                    endedCount = endedActivities.Count
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
 
         // POST: Admin/EndActivityTask
         [HttpPost]
@@ -897,11 +939,83 @@ namespace 大学生志愿者管理系统Web.Controllers
                     return RedirectToAction("Activities");
                 }
 
+                // 获取活动参与者
+                var members = _activityService.GetActivityMembers(activityId);
+
+                // 统计处理的数据
+                int autoSignOutCount = 0;   // 自动签退人数
+                int hoursAddedCount = 0;    // 更新时长人数
+                int totalHoursAdded = 0;    // 总计增加时长
+
+                DateTime now = DateTime.Now;
+
+                foreach (var member in members)
+                {
+                    // 只处理已签到的志愿者
+                    if (member.SignTime.HasValue)
+                    {
+                        DateTime returnTime;
+                        bool needUpdateHours = false;
+
+                        // 情况1：已签到但未签退的志愿者，自动签退
+                        if (!member.ReturnTime.HasValue)
+                        {
+                            bool signOutResult = _activityService.UpdateMemberReturnTime(activityId, member.Volunteerid.Value, now);
+                            if (signOutResult)
+                            {
+                                autoSignOutCount++;
+                                returnTime = now;
+                                needUpdateHours = true;
+                            }
+                            else
+                            {
+                                continue; // 签退失败，跳过此志愿者
+                            }
+                        }
+                        // 情况2：已签到且已签退的志愿者，计算时长
+                        else
+                        {
+                            returnTime = member.ReturnTime.Value;
+                            needUpdateHours = true;
+                        }
+
+                        // 更新志愿者时长
+                        if (needUpdateHours && member.Volunteerid.HasValue)
+                        {
+                            // 计算时长
+                            int hours = _activityService.CalculateVolunteerHours(member.SignTime.Value, returnTime);
+
+                            // 更新志愿者的累计时长
+                            bool updateHoursResult = _volunteerService.UpdateVolunteerHours(member.Volunteerid.Value, hours);
+
+                            if (updateHoursResult)
+                            {
+                                hoursAddedCount++;
+                                totalHoursAdded += hours;
+                            }
+                        }
+                    }
+                }
+
                 // 结束活动
                 bool result = _activityService.EndActivity(activityId, Session["Username"].ToString());
                 if (result)
                 {
-                    TempData["SuccessMessage"] = $"活动 \"{activity.activity_Name}\" 已成功结束";
+                    string successMessage = $"活动 \"{activity.activity_Name}\" 已成功结束";
+
+                    // 添加自动签退信息
+                    if (autoSignOutCount > 0)
+                    {
+                        successMessage += $"，已为{autoSignOutCount}名未签退志愿者自动处理";
+                    }
+
+                    // 添加时长更新信息
+                    if (hoursAddedCount > 0)
+                    {
+                        successMessage += $"，共为{hoursAddedCount}名志愿者增加了{totalHoursAdded}小时志愿时长";
+                    }
+
+                    TempData["SuccessMessage"] = successMessage;
                 }
                 else
                 {
@@ -914,6 +1028,67 @@ namespace 大学生志愿者管理系统Web.Controllers
             {
                 TempData["ErrorMessage"] = $"结束活动出错: {ex.Message}";
                 return RedirectToAction("Activities");
+            }
+        }
+        // POST: Admin/ConfirmSignOut
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ConfirmSignOut(int volunteerId, int activityId)
+        {
+            // 检查权限
+            if (Session["Username"] == null || ((int)Session["UserType"] != 1 && (int)Session["UserType"] != 2))
+            {
+                return RedirectToAction("AccessDenied", "Account");
+            }
+
+            try
+            {
+                // 查找活动成员
+                var member = _activityService.GetActivityMembers(activityId)
+                    .FirstOrDefault(m => m.Volunteerid == volunteerId);
+
+                if (member == null)
+                {
+                    TempData["ErrorMessage"] = "找不到指定的志愿者信息";
+                    return RedirectToAction("ActivityParticipants", new { id = activityId });
+                }
+
+                // 检查是否已签到
+                if (!member.SignTime.HasValue)
+                {
+                    TempData["ErrorMessage"] = "该志愿者尚未签到，无法签退";
+                    return RedirectToAction("ActivityParticipants", new { id = activityId });
+                }
+
+                // 检查是否已签退
+                if (member.ReturnTime.HasValue)
+                {
+                    TempData["ErrorMessage"] = "该志愿者已经签退";
+                    return RedirectToAction("ActivityParticipants", new { id = activityId });
+                }
+
+                // 更新签退时间
+                DateTime now = DateTime.Now;
+                bool result = _activityService.UpdateMemberReturnTime(activityId, volunteerId, now);
+
+                if (result)
+                {
+                    // 计算志愿时长
+                    int hoursSpent = _activityService.CalculateVolunteerHours(member.SignTime.Value, now);
+
+                    TempData["SuccessMessage"] = $"志愿者 {member.volunteer}(ID:{volunteerId}) 签退成功，志愿时长 {hoursSpent} 小时";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "签退操作失败";
+                }
+
+                return RedirectToAction("ActivityParticipants", new { id = activityId });
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"签退出错: {ex.Message}";
+                return RedirectToAction("ActivityParticipants", new { id = activityId });
             }
         }
         #endregion

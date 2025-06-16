@@ -4,7 +4,19 @@
     int activityId = ViewBag.ActivityId ?? 0;
     string activityName = ViewBag.ActivityName ?? "未知活动";
 }
+@section scripts {
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script>
+        // 确保jQuery和Bootstrap已加载
+        $(document).ready(function () {
+            console.log("jQuery版本: " + $.fn.jquery);
+            console.log("Bootstrap模态框是否存在: " + (typeof $().modal === 'function'));
 
+            // 你的其他JavaScript代码
+        });
+    </script>
+}
 <div class="container">
     <div class="panel panel-default admin-panel">
         <div class="panel-heading admin-panel-heading">
@@ -26,6 +38,12 @@
             {
                 <div class="alert alert-success message-alert">
                     <i class="glyphicon glyphicon-ok-sign"></i> @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (TempData["WarningMessage"] != null)
+            {
+                <div class="alert alert-warning message-alert">
+                    <i class="glyphicon glyphicon-warning-sign"></i> @TempData["WarningMessage"]
                 </div>
             }
             @if (TempData["ErrorMessage"] != null)
@@ -60,11 +78,21 @@
                         {
                             <div class="stat-item">
                                 <div class="stat-icon">
-                                    <i class="glyphicon glyphicon-calendar"></i>
+                                    <i class="glyphicon glyphicon-log-in"></i>
                                 </div>
                                 <div class="stat-content">
                                     <div class="stat-value">@Model.Count(m => m.SignTime.HasValue)</div>
                                     <div class="stat-label">已签到人数</div>
+                                </div>
+                            </div>
+
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="glyphicon glyphicon-log-out"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-value">@Model.Count(m => m.ReturnTime.HasValue)</div>
+                                    <div class="stat-label">已签退人数</div>
                                 </div>
                             </div>
 
@@ -92,6 +120,7 @@
                                 <select id="statusFilter" class="form-control">
                                     <option value="all">全部</option>
                                     <option value="signed">已签到</option>
+                                    <option value="returned">已签退</option>
                                     <option value="notsigned">未签到</option>
                                 </select>
                             </div>
@@ -128,13 +157,10 @@
                         <h4>
                             <i class="glyphicon glyphicon-list"></i> 参与者列表
                             <div class="header-actions pull-right">
-                                <button id="btnExportExcel" class="btn btn-sm btn-success">
-                                    <i class="glyphicon glyphicon-export"></i> 导出Excel
-                                </button>
-                                <button id="btnPrint" class="btn btn-sm btn-info">
-                                    <i class="glyphicon glyphicon-print"></i> 打印名单
-                                </button>
-                                <button id="btnEndTask" class="btn btn-sm btn-danger">
+
+
+                                <!-- 修改"结束志愿"按钮，添加onclick内联事件 -->
+                                <button id="btnEndTask" class="btn btn-sm btn-danger" onclick="$('#endTaskModal').modal('show'); console.log('内联方式点击');">
                                     <i class="glyphicon glyphicon-flag"></i> 结束志愿
                                 </button>
                             </div>
@@ -161,7 +187,9 @@
                                             <th>志愿者ID</th>
                                             <th>姓名</th>
                                             <th>联系电话</th>
-                                            <th>签到状态</th>
+                                            <th>签到时间</th>
+                                            <th>签退时间</th>
+                                            <th>志愿时长</th>
                                             <th>操作</th>
                                         </tr>
                                     </thead>
@@ -170,7 +198,31 @@
                                             int rowIndex = 1;
                                             foreach (var member in Model)
                                             {
-                                                <tr class="participant-row @(member.SignTime.HasValue ? "signed" : "unsigned")" data-volunteer-id="@member.Volunteerid">
+                                                // 计算志愿时长
+                                                string volunteerHours = "-";
+                                                if (member.SignTime.HasValue && member.ReturnTime.HasValue)
+                                                {
+                                                    TimeSpan duration = member.ReturnTime.Value - member.SignTime.Value;
+                                                    int hours = (int)Math.Round(duration.TotalHours);
+                                                    hours = Math.Max(1, hours);
+                                                    volunteerHours = $"{hours} 小时";
+                                                }
+
+                                                string rowClass = "participant-row";
+                                                if (member.ReturnTime.HasValue)
+                                                {
+                                                    rowClass += " returned";
+                                                }
+                                                else if (member.SignTime.HasValue)
+                                                {
+                                                    rowClass += " signed";
+                                                }
+                                                else
+                                                {
+                                                    rowClass += " unsigned";
+                                                }
+
+                                                <tr class="@rowClass" data-volunteer-id="@member.Volunteerid">
                                                     <td>@rowIndex</td>
                                                     <td>@member.Volunteerid</td>
                                                     <td>@member.volunteer</td>
@@ -179,13 +231,28 @@
                                                         @if (member.SignTime.HasValue)
                                                         {
                                                             <span class="label label-success">
-                                                                已签到 (@member.SignTime.Value.ToString("yyyy-MM-dd HH:mm"))
+                                                                @member.SignTime.Value.ToString("yyyy-MM-dd HH:mm")
                                                             </span>
                                                         }
                                                         else
                                                         {
                                                             <span class="label label-default">未签到</span>
                                                         }
+                                                    </td>
+                                                    <td>
+                                                        @if (member.ReturnTime.HasValue)
+                                                        {
+                                                            <span class="label label-info">
+                                                                @member.ReturnTime.Value.ToString("yyyy-MM-dd HH:mm")
+                                                            </span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="label label-default">未签退</span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @volunteerHours
                                                     </td>
                                                     <td>
                                                         @if (!member.SignTime.HasValue)
@@ -196,13 +263,25 @@
                                                                 <input type="hidden" name="volunteerId" value="@member.Volunteerid" />
                                                                 <input type="hidden" name="activityId" value="@activityId" />
                                                                 <button type="submit" class="btn btn-primary btn-xs">
-                                                                    <i class="glyphicon glyphicon-check"></i> 确认签到
+                                                                    <i class="glyphicon glyphicon-log-in"></i> 确认签到
+                                                                </button>
+                                                            }
+                                                        }
+                                                        else if (!member.ReturnTime.HasValue)
+                                                        {
+                                                            using (Html.BeginForm("ConfirmSignOut", "Admin", FormMethod.Post, new { style = "display: inline;" }))
+                                                            {
+                                                                @Html.AntiForgeryToken()
+                                                                <input type="hidden" name="volunteerId" value="@member.Volunteerid" />
+                                                                <input type="hidden" name="activityId" value="@activityId" />
+                                                                <button type="submit" class="btn btn-success btn-xs">
+                                                                    <i class="glyphicon glyphicon-log-out"></i> 确认签退
                                                                 </button>
                                                             }
                                                         }
                                                         else
                                                         {
-                                                            <span class="text-success"><i class="glyphicon glyphicon-ok"></i> 已完成签到</span>
+                                                            <span class="text-success"><i class="glyphicon glyphicon-ok"></i> 已完成志愿</span>
                                                         }
                                                     </td>
                                                 </tr>
@@ -219,7 +298,6 @@
         </div>
     </div>
 </div>
-
 <!-- 结束任务确认模态框 -->
 <div class="modal fade" id="endTaskModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -230,7 +308,7 @@
             </div>
             <div class="modal-body">
                 <p>您确定要结束 <strong>"@activityName"</strong> 的任务吗？</p>
-                <p class="text-warning"><i class="glyphicon glyphicon-exclamation-sign"></i> 结束任务后，未签到的志愿者将无法再签到，且活动将被标记为已结束。</p>
+                <p class="text-warning"><i class="glyphicon glyphicon-exclamation-sign"></i> 结束任务后，未签退的志愿者将被自动签退并计算志愿时长，且活动将被标记为已结束。</p>
             </div>
             <div class="modal-footer">
                 @using (Html.BeginForm("EndActivityTask", "Admin", FormMethod.Post))
@@ -459,6 +537,10 @@
         background-color: #fff9f9;
     }
 
+    .participant-row.returned {
+        background-color: #f0f9ff;
+    }
+
     /* 标签样式 */
     .label {
         display: inline-block;
@@ -469,6 +551,10 @@
 
     .label-success {
         background-color: #28a745;
+    }
+
+    .label-info {
+        background-color: #17a2b8;
     }
 
     .label-default {
@@ -512,6 +598,9 @@
             } else if (status === "signed") {
                 $(".participant-row").hide();
                 $(".participant-row.signed").show();
+            } else if (status === "returned") {
+                $(".participant-row").hide();
+                $(".participant-row.returned").show();
             } else if (status === "notsigned") {
                 $(".participant-row").hide();
                 $(".participant-row.unsigned").show();
@@ -554,9 +643,20 @@
             window.print();
         });
 
-        // 结束任务按钮
-        $("#btnEndTask").click(function () {
+        // 结束任务按钮 - 增强版
+        $("#btnEndTask").click(function (e) {
+            e.preventDefault(); // 阻止默认行为
+            console.log("结束任务按钮被点击"); // 调试信息
             $('#endTaskModal').modal('show');
+        });
+
+        // 添加模态框显示和隐藏的事件监听，以便调试
+        $('#endTaskModal').on('show.bs.modal', function () {
+            console.log('模态框正在显示');
+        });
+
+        $('#endTaskModal').on('shown.bs.modal', function () {
+            console.log('模态框已显示');
         });
 
         // 自动隐藏消息提示
