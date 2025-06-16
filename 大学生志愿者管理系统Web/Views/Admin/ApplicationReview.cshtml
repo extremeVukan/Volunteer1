@@ -1,0 +1,133 @@
+﻿@model IEnumerable<DAL.OrderT>
+@{
+    ViewBag.Title = "志愿者申请审核";
+}
+
+<div class="container">
+    <div class="page-header">
+        <h2><span class="glyphicon glyphicon-check"></span> 志愿者申请审核</h2>
+        <p class="lead">审核志愿者参与活动的申请</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">
+                    <span class="glyphicon glyphicon-ok-sign"></span> @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3 class="panel-title"><span class="glyphicon glyphicon-list"></span> 申请列表</h3>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <span class="badge">总计: @Model.Count() 条申请</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>申请ID</th>
+                                    <th>志愿者ID</th>
+                                    <th>志愿者姓名</th>
+                                    <th>申请日期</th>
+                                    <th>联系电话</th>
+                                    <th>活动ID</th>
+                                    <th>活动名称</th>
+                                    <th>审核状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Any())
+                                {
+                                    foreach (var order in Model)
+                                    {
+                                        <tr>
+                                            <td>@order.OrderID</td>
+                                            <td>@order.UserID</td>
+                                            <td>@order.UserName</td>
+                                            <td>@(order.OrderDate != null ? ((DateTime)order.OrderDate).ToString("yyyy-MM-dd HH:mm") : "-")</td>
+                                            <td>@order.phone</td>
+                                            <td>@order.ActID</td>
+                                            <td>@order.Act_Name</td>
+                                            <td>
+                                                @if (order.status == "已审核")
+                                                {
+                                                    <span class="label label-success">已审核</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="label label-warning">未审核</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (order.status != "已审核")
+                                                {
+                                                    using (Html.BeginForm("ApproveApplication", "Admin", FormMethod.Post, new { style = "display: inline" }))
+                                                    {
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="id" value="@order.OrderID" />
+                                                        <button type="submit" class="btn btn-success btn-xs" onclick="return confirm('确认通过此申请吗？');">
+                                                            <span class="glyphicon glyphicon-ok"></span> 审核通过
+                                                        </button>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <span>已审核</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="9" class="text-center">暂无申请数据</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <a href="@Url.Action("Index")" class="btn btn-default">
+                <span class="glyphicon glyphicon-arrow-left"></span> 返回管理面板
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    .panel {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+</style>

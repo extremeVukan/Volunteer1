@@ -1,0 +1,115 @@
+﻿@model DAL.ActivityT
+@{
+    ViewBag.Title = "删除活动";
+}
+
+<div class="container">
+    <div class="page-header">
+        <h2><span class="glyphicon glyphicon-trash"></span> 删除活动</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    <h3 class="panel-title">确认删除</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="alert alert-warning">
+                        <strong>警告!</strong> 您即将删除此活动。此操作无法撤销！
+                    </div>
+
+                    <div class="activity-details">
+                        <h4>活动详情</h4>
+                        <table class="table table-striped">
+                            <tr>
+                                <th style="width: 120px;">活动编号:</th>
+                                <td>@Model.activity_ID</td>
+                            </tr>
+                            <tr>
+                                <th>活动名称:</th>
+                                <td>@Model.activity_Name</td>
+                            </tr>
+                            <tr>
+                                <th>活动类型:</th>
+                                <td>@Model.activity_type</td>
+                            </tr>
+                            <tr>
+                                <th>开始时间:</th>
+                                <td>@Model.addtime.ToString("yyyy-MM-dd HH:mm")</td>
+                            </tr>
+                            <tr>
+                                <th>结束时间:</th>
+                                <td>@Model.stoptime.ToString("yyyy-MM-dd HH:mm")</td>
+                            </tr>
+                            <tr>
+                                <th>活动地点:</th>
+                                <td>@Model.place</td>
+                            </tr>
+                            <tr>
+                                <th>需要人数:</th>
+                                <td>@Model.renshu</td>
+                            </tr>
+                            <tr>
+                                <th>活动状态:</th>
+                                <td>@Model.status</td>
+                            </tr>
+                            <tr>
+                                <th>活动描述:</th>
+                                <td>@Model.descn</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    @using (Html.BeginForm("DeleteActivityConfirmed", "Admin", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.activity_ID" />
+
+                        <div class="form-actions text-right">
+                            <button type="submit" class="btn btn-danger">
+                                <span class="glyphicon glyphicon-trash"></span> 确认删除
+                            </button>
+                            <a href="@Url.Action("Activities")" class="btn btn-default">
+                                <span class="glyphicon glyphicon-arrow-left"></span> 返回
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        margin-top: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+    }
+
+    .panel {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .activity-details {
+        margin-bottom: 20px;
+    }
+
+    .form-actions {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+    }
+</style>

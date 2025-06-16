@@ -1,0 +1,141 @@
+﻿@model DAL.volunteerT
+@{
+    ViewBag.Title = "个人信息";
+}
+
+<div class="container">
+    <div class="page-header">
+        <h2><span class="glyphicon glyphicon-user"></span> 个人信息</h2>
+        <p class="lead">查看和编辑您的个人资料</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">
+                    <span class="glyphicon glyphicon-ok-sign"></span> @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">个人资料</h3>
+                </div>
+                <div class="panel-body">
+                    @using (Html.BeginForm("UpdatePersonalInfo", "Volunteer", FormMethod.Post, new { @class = "form-horizontal" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(m => m.Aid)
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">志愿者ID:</label>
+                            <div class="col-md-9">
+                                <p class="form-control-static">@Model.Aid</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">姓名:</label>
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(m => m.AName, new { @class = "form-control" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">电话/密码:</label>
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(m => m.Atelephone, new { @class = "form-control" })
+                                <span class="help-block">注：电话号码同时作为您的登录密码</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">电子邮箱:</label>
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(m => m.email, new { @class = "form-control", type = "email" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">志愿时长:</label>
+                            <div class="col-md-9">
+                                <p class="form-control-static">@Model.Act_Time 小时</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">志愿者证状态:</label>
+                            <div class="col-md-9">
+                                <p class="form-control-static">
+                                    @if (ViewBag.IdentifyStatus == "已通过")
+                                    {
+                                        <span class="label label-success">已通过</span>
+                                    }
+                                    else if (ViewBag.IdentifyStatus == "已拒绝")
+                                    {
+                                        <span class="label label-danger">已拒绝</span>
+                                    }
+                                    else if (ViewBag.IdentifyStatus == "审核中")
+                                    {
+                                        <span class="label label-warning">审核中</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="label label-default">未申请</span>
+                                        <a href="@Url.Action("ApplyIdentify", "Volunteer")" class="btn btn-xs btn-primary">
+                                            <span class="glyphicon glyphicon-file"></span> 申请志愿者证
+                                        </a>
+                                    }
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-offset-3 col-md-9">
+                                <button type="submit" class="btn btn-primary">
+                                    <span class="glyphicon glyphicon-floppy-disk"></span> 保存信息
+                                </button>
+                                <a href="@Url.Action("Index")" class="btn btn-default">
+                                    <span class="glyphicon glyphicon-arrow-left"></span> 返回
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        margin-top: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+    }
+
+    .panel {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .help-block {
+        font-size: 12px;
+        color: #777;
+        margin-top: 5px;
+    }
+</style>

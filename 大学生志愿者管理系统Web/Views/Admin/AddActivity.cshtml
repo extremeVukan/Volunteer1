@@ -1,0 +1,160 @@
+﻿@model DAL.ActivityT
+@{
+    ViewBag.Title = "添加活动";
+}
+
+<div class="container">
+    <div class="page-header">
+        <h2><span class="glyphicon glyphicon-plus"></span> 添加活动</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">填写活动信息</h3>
+                </div>
+                <div class="panel-body">
+                    @using (Html.BeginForm("AddActivity", "Admin", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">活动编号:</label>
+                            <div class="col-md-9">
+                                <input type="number" name="activity_ID" value="@ViewBag.NextActivityId" class="form-control" readonly />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">活动名称:<span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <input type="text" name="activity_Name" class="form-control" required placeholder="请输入活动名称" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">活动类型:<span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <select name="activity_type" class="form-control" required>
+                                    @foreach (var type in ViewBag.ActivityTypes)
+                                    {
+                                        <option value="@type">@type</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">开始时间:<span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <input type="datetime-local" name="addtime" class="form-control" required value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">结束时间:<span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <input type="datetime-local" name="stoptime" class="form-control" required value="@DateTime.Now.AddDays(7).ToString("yyyy-MM-ddTHH:mm")" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">活动地点:<span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <input type="text" name="place" class="form-control" required placeholder="请输入活动地点" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">需要人数:<span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <input type="number" name="renshu" class="form-control" required placeholder="请输入需要志愿者人数" min="1" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">活动图片:</label>
+                            <div class="col-md-9">
+                                <input type="file" name="activityImage" class="form-control" accept="image/*" />
+                                <span class="help-block">支持JPG, PNG, GIF格式图片</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">活动描述:</label>
+                            <div class="col-md-9">
+                                <textarea name="descn" class="form-control" rows="5" placeholder="请输入活动描述"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-offset-3 col-md-9">
+                                <button type="submit" class="btn btn-primary">
+                                    <span class="glyphicon glyphicon-floppy-disk"></span> 添加活动
+                                </button>
+                                <a href="@Url.Action("Activities")" class="btn btn-default">
+                                    <span class="glyphicon glyphicon-arrow-left"></span> 返回
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        margin-top: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+    }
+
+    .panel {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .text-danger {
+        color: #a94442;
+        margin-left: 3px;
+    }
+
+    .help-block {
+        font-size: 12px;
+        color: #777;
+        margin-top: 5px;
+    }
+</style>
+
+<script>$(document).ready(function() {
+        // 表单验证
+        $('form').submit(function(e) {
+            var startTime = new Date($('[name="addtime"]').val());
+            var endTime = new Date($('[name="stoptime"]').val());
+
+            if (endTime <= startTime) {
+                alert('结束时间必须晚于开始时间');
+                e.preventDefault();
+                return false;
+            }
+
+            return true;
+        });
+    });</script>

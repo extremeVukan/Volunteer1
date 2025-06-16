@@ -1,0 +1,178 @@
+﻿@model DAL.ActivityT
+@{
+    ViewBag.Title = "修改活动";
+}
+
+<div class="container">
+    <div class="page-header">
+        <h2><span class="glyphicon glyphicon-edit"></span> 修改活动</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">编辑活动信息</h3>
+                </div>
+                <div class="panel-body">
+                    @using (Html.BeginForm("EditActivity", "Admin", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(m => m.activity_ID)
+                        @Html.HiddenFor(m => m.Holder)
+                        @Html.HiddenFor(m => m.status)
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">活动编号:</label>
+                            <div class="col-md-9">
+                                <p class="form-control-static">@Model.activity_ID</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">活动名称:<span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(m => m.activity_Name, new { @class = "form-control", required = "required" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">活动类型:<span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <select name="activity_type" class="form-control" required>
+                                    @foreach (var type in ViewBag.ActivityTypes)
+                                    {
+                                        <option value="@type" @(Model.activity_type == type ? "selected" : "")>@type</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">开始时间:<span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <input type="datetime-local" name="addtime" class="form-control" required value="@Model.addtime.ToString("yyyy-MM-ddTHH:mm")" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">结束时间:<span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <input type="datetime-local" name="stoptime" class="form-control" required value="@Model.stoptime.ToString("yyyy-MM-ddTHH:mm")" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">活动地点:<span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(m => m.place, new { @class = "form-control", required = "required" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">需要人数:<span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(m => m.renshu, new { @class = "form-control", type = "number", min = "1", required = "required" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">活动图片:</label>
+                            <div class="col-md-9">
+                                @if (!string.IsNullOrEmpty(Model.Image))
+                                {
+                                    <div class="current-image">
+                                        <img src="@Url.Content("~" + Model.Image)" alt="活动图片" style="max-width: 200px; margin-bottom: 10px;" />
+                                        <p>当前图片</p>
+                                    </div>
+                                }
+                                <input type="file" name="activityImage" class="form-control" accept="image/*" />
+                                <span class="help-block">如需更新图片请选择新图片，否则将保留当前图片</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">活动描述:</label>
+                            <div class="col-md-9">
+                                @Html.TextAreaFor(m => m.descn, new { @class = "form-control", rows = "5" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-offset-3 col-md-9">
+                                <button type="submit" class="btn btn-primary">
+                                    <span class="glyphicon glyphicon-floppy-disk"></span> 保存修改
+                                </button>
+                                <a href="@Url.Action("Activities")" class="btn btn-default">
+                                    <span class="glyphicon glyphicon-arrow-left"></span> 返回
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        margin-top: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+    }
+
+    .panel {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .text-danger {
+        color: #a94442;
+        margin-left: 3px;
+    }
+
+    .help-block {
+        font-size: 12px;
+        color: #777;
+        margin-top: 5px;
+    }
+
+    .current-image {
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        display: inline-block;
+    }
+</style>
+
+<script>$(document).ready(function() {
+        // 表单验证
+        $('form').submit(function(e) {
+            var startTime = new Date($('[name="addtime"]').val());
+            var endTime = new Date($('[name="stoptime"]').val());
+
+            if (endTime <= startTime) {
+                alert('结束时间必须晚于开始时间');
+                e.preventDefault();
+                return false;
+            }
+
+            return true;
+        });
+    });</script>

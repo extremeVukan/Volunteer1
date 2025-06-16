@@ -146,5 +146,19 @@ namespace BLL
                 return false;
             }
         }
+        /// <summary>
+        /// 获取志愿者的证件信息
+        /// </summary>
+        public VolIdentifyT GetVolunteerIdentify(int volunteerId)
+        {
+            try
+            {
+                return context.VolIdentifyT.FirstOrDefault(v => v.EMPID == volunteerId);
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }

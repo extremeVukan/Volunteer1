@@ -13,6 +13,7 @@ namespace 大学生志愿者管理系统Web.Controllers
         private ApplyService _applyService;
         private VolunteerService _volunteerService;
         private IdentifyService _identifyService;
+        private OrderService _orderService;
 
         public VolunteerController()
         {
@@ -20,6 +21,7 @@ namespace 大学生志愿者管理系统Web.Controllers
             _applyService = new ApplyService();
             _volunteerService = new VolunteerService();
             _identifyService = new IdentifyService();
+            _orderService = new OrderService();
         }
 
         // 辅助方法：处理活动图片路径
@@ -254,23 +256,26 @@ namespace 大学生志愿者管理系统Web.Controllers
         // GET: Volunteer/MyApplications
         public ActionResult MyApplications()
         {
-            // 检查是否已登录
-            if (Session["Username"] == null)
+            // 检查权限
+            if (Session["Username"] == null || (int)Session["UserType"] != 0)
             {
-                TempData["ErrorMessage"] = "请登录后查看申请";
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("AccessDenied", "Account");
             }
 
             try
             {
                 int volunteerId = (int)Session["UserId"];
-                var applications = _applyService.GetAppliesByVolunteerId(volunteerId);
+                string volunteerName = Session["Username"].ToString();
+
+                // 获取当前志愿者的所有申请
+                var applications = _orderService.GetOrdersByUserName(volunteerName);
+
                 return View(applications);
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"获取申请列表出错: {ex.Message}";
-                return RedirectToAction("Index");
+                return View(new List<OrderT>());
             }
         }
 
@@ -335,7 +340,7 @@ namespace 大学生志愿者管理系统Web.Controllers
                     volunteerId,
                     volunteerName,
                     phone,
-                    Convert.ToInt32( apply.Act_ID),
+                    Convert.ToInt32(apply.Act_ID),
                     apply.Act_Name,
                     apply.Holder
                 );
@@ -360,19 +365,36 @@ namespace 大学生志愿者管理系统Web.Controllers
         // GET: Volunteer/GetVolunteerHours
         public ActionResult GetVolunteerHours()
         {
-            // 检查是否已登录
-            if (Session["Username"] == null)
+            // 检查权限
+            if (Session["Username"] == null || (int)Session["UserType"] != 0)
             {
-                TempData["ErrorMessage"] = "请登录后查看志愿时长";
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("AccessDenied", "Account");
             }
 
             try
             {
                 int volunteerId = (int)Session["UserId"];
-                int hours = _volunteerService.GetVolunteerHours(volunteerId);
-                ViewBag.Hours = hours;
-                return View();
+                var volunteer = _volunteerService.GetVolunteerById(volunteerId);
+
+                if (volunteer == null)
+                {
+                    TempData["ErrorMessage"] = "找不到志愿者信息";
+                    return RedirectToAction("Index");
+                }
+
+                // 获取志愿者参与的活动
+                var activities = _activityService.GetActivitiesByVolunteerId(volunteerId, includeApplied: false, includeCompleted: true);
+                ViewBag.Activities = activities;
+
+                // 获取志愿者总时长
+                string hoursStr = volunteer.Act_Time ?? "0";
+                if (!int.TryParse(hoursStr, out int hours))
+                {
+                    hours = 0;
+                }
+                ViewBag.TotalHours = hours;
+
+                return View(volunteer);
             }
             catch (Exception ex)
             {
@@ -384,23 +406,73 @@ namespace 大学生志愿者管理系统Web.Controllers
         // GET: Volunteer/SelfCheck
         public ActionResult SelfCheck()
         {
-            // 检查是否已登录
-            if (Session["Username"] == null)
+            // 检查权限
+            if (Session["Username"] == null || (int)Session["UserType"] != 0)
             {
-                TempData["ErrorMessage"] = "请登录后查看个人信息";
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("AccessDenied", "Account");
             }
 
             try
             {
                 int volunteerId = (int)Session["UserId"];
                 var volunteer = _volunteerService.GetVolunteerById(volunteerId);
+
+                if (volunteer == null)
+                {
+                    TempData["ErrorMessage"] = "找不到志愿者信息";
+                    return RedirectToAction("Index");
+                }
+
+                // 获取志愿者证信息
+                var identify = _identifyService.GetVolunteerIdentify(volunteerId);
+                ViewBag.HasIdentify = (identify != null);
+                ViewBag.IdentifyStatus = identify?.Status ?? "未申请";
+
                 return View(volunteer);
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"获取个人信息出错: {ex.Message}";
                 return RedirectToAction("Index");
+            }
+        }
+
+        // POST: Volunteer/UpdatePersonalInfo
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult UpdatePersonalInfo(volunteerT model)
+        {
+            // 检查权限
+            if (Session["Username"] == null || (int)Session["UserType"] != 0)
+            {
+                return RedirectToAction("AccessDenied", "Account");
+            }
+
+            try
+            {
+                // 确保更新的是当前用户
+                int currentUserId = (int)Session["UserId"];
+                if (model.Aid != currentUserId)
+                {
+                    TempData["ErrorMessage"] = "无权修改其他用户信息";
+                    return RedirectToAction("SelfCheck");
+                }
+
+                bool result = _volunteerService.UpdateVolunteer(model, Session["Username"].ToString());
+                if (result)
+                {
+                    TempData["SuccessMessage"] = "个人信息更新成功";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "个人信息更新失败";
+                }
+                return RedirectToAction("SelfCheck");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"更新个人信息出错: {ex.Message}";
+                return RedirectToAction("SelfCheck");
             }
         }
 
@@ -585,7 +657,7 @@ namespace 大学生志愿者管理系统Web.Controllers
                 TempData["ErrorMessage"] = "请登录后查看我的活动";
                 return RedirectToAction("Login", "Account");
             }
-            
+
             try
             {
                 int volunteerId = (int)Session["UserId"];

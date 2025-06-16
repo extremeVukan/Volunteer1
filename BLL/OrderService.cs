@@ -69,5 +69,23 @@ namespace BLL
         {
             return context.OrderT.Find(orderId);
         }
+        /// <summary>
+        /// 获取特定管理员待审核的申请
+        /// </summary>
+        public List<OrderT> GetPendingOrdersByHolder(string holderName)
+        {
+            try
+            {
+                // 从数据库中查询指定Holder名下且状态为"未审核"的订单
+                return context.OrderT
+                    .Where(o => o.Holder == holderName && o.status == "未审核")
+                    .ToList();
+            }
+            catch (Exception)
+            {
+                // 出现异常时返回空列表
+                return new List<OrderT>();
+            }
+        }
     }
 }

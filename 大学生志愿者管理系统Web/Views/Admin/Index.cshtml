@@ -1,73 +1,200 @@
 ﻿@model IEnumerable<DAL.ActivityT>
 @{
-    ViewBag.Title = "管理员面板";
+    ViewBag.Title = "管理员中心";
 }
 
-<div class="row">
-    <div class="col-md-12">
-        <h2>欢迎，@ViewBag.Username</h2>
-        <p>您已成功登录为管理员。</p>
-        <p>
-            <a href="@Url.Action("Logout", "Account")" class="btn btn-default">
-                <span class="glyphicon glyphicon-log-out"></span> 退出登录
-            </a>
-        </p>
+<div class="container">
+    <div class="page-header">
+        <h2><span class="glyphicon glyphicon-dashboard"></span> 管理员控制面板</h2>
+        <p class="lead">您好，@ViewBag.Username，欢迎使用志愿者管理系统</p>
     </div>
-</div>
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h3 class="panel-title">管理活动</h3>
+    <div class="row">
+        <div class="col-md-12">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">
+                    <span class="glyphicon glyphicon-ok-sign"></span> @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 活动管理模块 -->
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-calendar"></span> 活动管理</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="list-group admin-menu">
+                        <a href="@Url.Action("Activities", "Admin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-list"></span> 活动列表
+                            <span class="badge">@ViewBag.ActivityCount</span>
+                        </a>
+                        <a href="@Url.Action("AddActivity", "Admin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-plus"></span> 添加活动
+                        </a>
+                        <a href="@Url.Action("EditActivity", "Admin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-edit"></span> 修改活动
+                        </a>
+                        <a href="@Url.Action("DeleteActivity", "Admin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-trash"></span> 删除活动
+                        </a>
+                        <a href="@Url.Action("EndActivity", "Admin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-check"></span> 结束活动
+                        </a>
+                    </div>
+                </div>
             </div>
-            <div class="panel-body">
-                <p>
-                    <a href="#" class="btn btn-success">
-                        <span class="glyphicon glyphicon-plus"></span> 添加活动
+        </div>
+
+        <!-- 申请管理模块 -->
+        <div class="col-md-4">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-file"></span> 申请管理</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="list-group admin-menu">
+                        <a href="@Url.Action("ApplicationReview", "Admin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-check"></span> 审核志愿者申请
+                            <span class="badge">@ViewBag.PendingOrderCount</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 个人设置模块 -->
+        <div class="col-md-4">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-user"></span> 个人管理</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="list-group admin-menu">
+                        <a href="@Url.Action("PersonalInfo", "Admin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-user"></span> 个人信息
+                        </a>
+                        <a href="@Url.Action("ChangePassword", "Admin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-lock"></span> 修改密码
+                        </a>
+                        <a href="@Url.Action("Logout", "Account")" class="list-group-item">
+                            <span class="glyphicon glyphicon-log-out"></span> 退出登录
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 最近活动列表 -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-time"></span> 最近的活动</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>活动ID</th>
+                                    <th>活动名称</th>
+                                    <th>类型</th>
+                                    <th>开始时间</th>
+                                    <th>结束时间</th>
+                                    <th>地点</th>
+                                    <th>人数</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model != null && Model.Any())
+                                {
+                                    foreach (var activity in Model.OrderByDescending(a => a.addtime).Take(5))
+                                    {
+                                        <tr>
+                                            <td>@activity.activity_ID</td>
+                                            <td>@activity.activity_Name</td>
+                                            <td>@activity.activity_type</td>
+                                            <td>@(activity.addtime.ToString("yyyy-MM-dd HH:mm"))</td>
+                                            <td>@(activity.stoptime.ToString("yyyy-MM-dd HH:mm"))</td>
+                                            <td>@activity.place</td>
+                                            <td>@activity.renshu</td>
+                                            <td>
+                                                @if (activity.status == "已结束")
+                                                {
+                                                    <span class="label label-default">已结束</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="label label-success">进行中</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <a href="@Url.Action("ActivityDetails", "Admin", new { id = activity.activity_ID })" class="btn btn-info btn-xs">
+                                                    <span class="glyphicon glyphicon-eye-open"></span> 查看
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="9" class="text-center">暂无活动数据</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <a href="@Url.Action("Activities", "Admin")" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-list"></span> 查看所有活动
                     </a>
-                </p>
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>活动编号</th>
-                            <th>活动名称</th>
-                            <th>活动类型</th>
-                            <th>开始时间</th>
-                            <th>结束时间</th>
-                            <th>地点</th>
-                            <th>需要人数</th>
-                            <th>发起人</th>
-                            <th>状态</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var activity in Model)
-                        {
-                            <tr>
-                                <td>@activity.activity_ID</td>
-                                <td>@activity.activity_Name</td>
-                                <td>@activity.activity_type</td>
-                                <td>@activity.addtime</td>
-                                <td>@activity.stoptime</td>
-                                <td>@activity.place</td>
-                                <td>@activity.renshu</td>
-                                <td>@activity.Holder</td>
-                                <td>@activity.status</td>
-                                <td>
-                                    <a href="#" class="btn btn-primary btn-sm">
-                                        <span class="glyphicon glyphicon-edit"></span> 编辑
-                                    </a>
-                                    <a href="#" class="btn btn-danger btn-sm">
-                                        <span class="glyphicon glyphicon-trash"></span> 删除
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .page-header {
+        margin-top: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+    }
+
+    .admin-menu {
+        margin-bottom: 0;
+    }
+
+    .panel {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .list-group-item {
+        border-left: none;
+        border-right: none;
+    }
+
+        .list-group-item:first-child {
+            border-top: none;
+        }
+
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+</style>

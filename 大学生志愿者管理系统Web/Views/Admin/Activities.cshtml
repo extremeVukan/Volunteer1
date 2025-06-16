@@ -1,0 +1,197 @@
+﻿@model IEnumerable<DAL.ActivityT>
+@{
+    ViewBag.Title = "活动列表";
+}
+
+<div class="container">
+    <div class="page-header">
+        <h2><span class="glyphicon glyphicon-calendar"></span> 活动列表</h2>
+        <p class="lead">您管理的所有志愿活动</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">
+                    <span class="glyphicon glyphicon-ok-sign"></span> @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row filter-section">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <form class="form-inline" method="get" action="@Url.Action("Activities")">
+                                <div class="form-group">
+                                    <label for="activityType">活动类型:</label>
+                                    <select id="activityType" name="activityType" class="form-control">
+                                        <option value="">全部</option>
+                                        <option value="教育类">教育类</option>
+                                        <option value="社区发展类">社区发展类</option>
+                                        <option value="卫生与医疗类">卫生与医疗类</option>
+                                        <option value="环境保护类">环境保护类</option>
+                                        <option value="动物保护类">动物保护类</option>
+                                        <option value="紧急救援类">紧急救援类</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-primary">
+                                        筛选
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="btn-group" role="group">
+                                <a href="@Url.Action("Activities", new { activityType = ViewBag.ActivityType })" class="btn @(string.IsNullOrEmpty(ViewBag.Status) ? "btn-primary" : "btn-default")">
+                                    全部活动
+                                </a>
+                                <a href="@Url.Action("Activities", new { activityType = ViewBag.ActivityType, status = "进行中" })" class="btn @(ViewBag.Status == "进行中" ? "btn-primary" : "btn-default")">
+                                    进行中
+                                </a>
+                                <a href="@Url.Action("Activities", new { activityType = ViewBag.ActivityType, status = "已结束" })" class="btn @(ViewBag.Status == "已结束" ? "btn-primary" : "btn-default")">
+                                    已结束
+                                </a>
+                            </div>
+                        </div>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <a href="@Url.Action("AddActivity")" class="btn btn-success">
+                                <span class="glyphicon glyphicon-plus"></span> 添加活动
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3 class="panel-title"><span class="glyphicon glyphicon-list"></span> 活动信息</h3>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <span class="badge">总计: @Model.Count() 条记录</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>活动名称</th>
+                                    <th>活动类型</th>
+                                    <th>开始时间</th>
+                                    <th>结束时间</th>
+                                    <th>地点</th>
+                                    <th>需要人数</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Any())
+                                {
+                                    foreach (var activity in Model)
+                                    {
+                                        <tr>
+                                            <td>@activity.activity_ID</td>
+                                            <td>@activity.activity_Name</td>
+                                            <td>@activity.activity_type</td>
+                                            <td>@activity.addtime</td>
+                                            <td>@activity.stoptime</td>
+                                            <td>@activity.place</td>
+                                            <td>@activity.renshu</td>
+                                            <td>
+                                                @if (activity.status == "已结束")
+                                                {
+                                                    <span class="label label-default">已结束</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="label label-success">进行中</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <a href="@Url.Action("ActivityDetails", new { id = activity.activity_ID })" class="btn btn-info btn-xs">
+                                                        <span class="glyphicon glyphicon-eye-open"></span> 查看
+                                                    </a>
+                                                    <a href="@Url.Action("EditActivity", new { id = activity.activity_ID })" class="btn btn-primary btn-xs">
+                                                        <span class="glyphicon glyphicon-edit"></span> 编辑
+                                                    </a>
+                                                    <a href="@Url.Action("DeleteActivity", new { id = activity.activity_ID })" class="btn btn-danger btn-xs">
+                                                        <span class="glyphicon glyphicon-trash"></span> 删除
+                                                    </a>
+                                                    @if (activity.status != "已结束")
+                                                    {
+                                                        <a href="@Url.Action("EndActivityConfirmed", new { id = activity.activity_ID })"
+                                                           class="btn btn-warning btn-xs"
+                                                           onclick="return confirm('确定要结束该活动吗？');">
+                                                            <span class="glyphicon glyphicon-check"></span> 结束
+                                                        </a>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="9" class="text-center">暂无活动数据</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <a href="@Url.Action("Index")" class="btn btn-default">
+                <span class="glyphicon glyphicon-arrow-left"></span> 返回管理面板
+            </a>
+        </div>
+    </div>
+
+
+<style>
+    .page-header {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    .panel {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .filter-section {
+        margin-bottom: 20px;
+    }
+</style>
+
+<script>
+    $(document).ready(function() {
+        // 设置当前选中的活动类型
+        $("#activityType").val('@ViewBag.ActivityType');
+    });
+</script>

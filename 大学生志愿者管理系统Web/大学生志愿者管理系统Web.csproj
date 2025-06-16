@@ -216,6 +216,20 @@
     <Content Include="Views\SuperAdmin\DeleteVolunteer.cshtml" />
     <Content Include="Views\SuperAdmin\Activities.cshtml" />
     <Content Include="Views\SuperAdmin\SystemStats.cshtml" />
+    <Content Include="Views\Admin\PersonalInfo.cshtml" />
+    <Content Include="Views\Admin\ChangePassword.cshtml" />
+    <Content Include="Views\Admin\Activities.cshtml" />
+    <Content Include="Views\Admin\ApplicationReview.cshtml" />
+    <Content Include="Views\Admin\AddActivity.cshtml" />
+    <Content Include="Views\Admin\EditActivity.cshtml" />
+    <Content Include="Views\Admin\DeleteActivity.cshtml" />
+    <Content Include="Views\Admin\SelectActivity.cshtml" />
+    <Content Include="Views\Admin\SelectActivityToDelete.cshtml" />
+    <Content Include="Views\Admin\EndActivity.cshtml" />
+    <Content Include="Views\Admin\ActivityMembers.cshtml" />
+    <Content Include="Views\Admin\ActivityMembersList.cshtml" />
+    <Content Include="Views\Volunteer\SelfCheck.cshtml" />
+    <Content Include="Views\Volunteer\GetVolunteerHours.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

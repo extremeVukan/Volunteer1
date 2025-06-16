@@ -1,0 +1,145 @@
+﻿@model DAL.adminT
+@{
+    ViewBag.Title = "个人信息";
+}
+
+<div class="container">
+    <div class="page-header">
+        <h2><span class="glyphicon glyphicon-user"></span> 个人信息</h2>
+        <p class="lead">查看和修改您的个人资料</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">
+                    <span class="glyphicon glyphicon-ok-sign"></span> @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">个人详细信息</h3>
+                </div>
+                <div class="panel-body">
+                    @using (Html.BeginForm("UpdatePersonalInfo", "Admin", FormMethod.Post, new { @class = "form-horizontal" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(m => m.admin_ID)
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">管理员ID:</label>
+                            <div class="col-md-9">
+                                <p class="form-control-static">@Model.admin_ID</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">姓名:</label>
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(m => m.admin_Name, new { @class = "form-control", @readonly = "readonly" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">性别:</label>
+                            <div class="col-md-9">
+                                <select name="sex" class="form-control">
+                                    <option value="男" @(Model.sex == "男" ? "selected" : "")>男</option>
+                                    <option value="女" @(Model.sex == "女" ? "selected" : "")>女</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">出生日期:</label>
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(m => m.birth_date, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">雇佣日期:</label>
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(m => m.hire_date, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @readonly = "readonly" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">地址:</label>
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(m => m.address, new { @class = "form-control" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">电话/密码:</label>
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(m => m.telephone, new { @class = "form-control", @readonly = "readonly" })
+                                <span class="help-block">注：如需修改密码，请使用"修改密码"功能</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">工资:</label>
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(m => m.wages, new { @class = "form-control", @readonly = "readonly" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">个人简介:</label>
+                            <div class="col-md-9">
+                                @Html.TextAreaFor(m => m.resume, new { @class = "form-control", rows = "4" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-offset-3 col-md-9">
+                                <button type="submit" class="btn btn-primary">
+                                    <span class="glyphicon glyphicon-floppy-disk"></span> 保存修改
+                                </button>
+                                <a href="@Url.Action("Index")" class="btn btn-default">
+                                    <span class="glyphicon glyphicon-arrow-left"></span> 返回
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        margin-top: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+    }
+
+    .panel {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .help-block {
+        font-size: 12px;
+        color: #777;
+        margin-top: 5px;
+    }
+</style>

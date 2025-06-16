@@ -1,0 +1,95 @@
+﻿@model IEnumerable<DAL.ActivityT>
+@{
+    ViewBag.Title = "选择活动";
+}
+
+<div class="container">
+    <div class="page-header">
+        <h2><span class="glyphicon glyphicon-trash"></span> 选择要删除的活动</h2>
+        <p class="lead">请选择需要删除的活动</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">活动列表</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>活动名称</th>
+                                    <th>活动类型</th>
+                                    <th>开始时间</th>
+                                    <th>结束时间</th>
+                                    <th>地点</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Any())
+                                {
+                                    foreach (var activity in Model)
+                                    {
+                                        <tr>
+                                            <td>@activity.activity_ID</td>
+                                            <td>@activity.activity_Name</td>
+                                            <td>@activity.activity_type</td>
+                                            <td>@activity.addtime</td>
+                                            <td>@activity.stoptime</td>
+                                            <td>@activity.place</td>
+                                            <td>
+                                                @if (activity.status == "已结束")
+                                                {
+                                                    <span class="label label-default">已结束</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="label label-success">进行中</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <a href="@Url.Action("DeleteActivity", new { id = activity.activity_ID })" class="btn btn-danger btn-xs">
+                                                    <span class="glyphicon glyphicon-trash"></span> 删除
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="8" class="text-center">暂无活动数据</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <a href="@Url.Action("Index")" class="btn btn-default">
+                <span class="glyphicon glyphicon-arrow-left"></span> 返回管理面板
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    .panel {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+</style>
