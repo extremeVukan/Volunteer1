@@ -1,0 +1,418 @@
+﻿@model IEnumerable<DAL.ActivityT>
+@{
+    ViewBag.Title = "我的活动";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="page-header volunteer-header">
+                <h2><i class="glyphicon glyphicon-calendar"></i> 我的活动</h2>
+                <p class="lead">查看您已报名参加的志愿活动</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success fade in">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <i class="glyphicon glyphicon-ok-sign"></i> @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger fade in">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <i class="glyphicon glyphicon-exclamation-sign"></i> @TempData["ErrorMessage"]
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- 活动类型统计 -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="activity-stats-panel">
+                <h4>活动参与统计</h4>
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <div class="stat-circle ongoing">
+                            <span>@(Model?.Count(a => a.status == "进行中") ?? 0)</span>
+                        </div>
+                        <div class="stat-label">进行中</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-circle completed">
+                            <span>@(Model?.Count(a => a.status == "已结束") ?? 0)</span>
+                        </div>
+                        <div class="stat-label">已完成</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-circle total">
+                            <span>@(Model?.Count() ?? 0)</span>
+                        </div>
+                        <div class="stat-label">活动总数</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <!-- 进行中的活动 -->
+            <div class="panel panel-primary activity-panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="glyphicon glyphicon-play-circle"></i> 进行中的活动</h3>
+                </div>
+                <div class="panel-body">
+                    @{
+                        var ongoingActivities = Model?.Where(a => a.status == "进行中").ToList();
+                    }
+
+                    @if (ongoingActivities != null && ongoingActivities.Any())
+                    {
+                        <div class="row">
+                            @foreach (var activity in ongoingActivities)
+                            {
+                                <div class="col-md-6">
+                                    <div class="activity-card">
+                                        <div class="activity-image">
+                                            <img src="/@activity.Image" alt="@activity.activity_Name" onerror="this.src='/Content/Images/暂无图片.gif'; this.onerror=null;" />
+                                            <div class="activity-type">@activity.activity_type</div>
+                                        </div>
+                                        <div class="activity-content">
+                                            <h4>@activity.activity_Name</h4>
+                                            <p class="activity-desc">@(activity.descn?.Length > 50 ? activity.descn.Substring(0, 50) + "..." : activity.descn)</p>
+                                            <div class="activity-details">
+                                                <div>
+                                                    <i class="glyphicon glyphicon-map-marker"></i> @activity.place
+                                                </div>
+                                                <div>
+                                                    <i class="glyphicon glyphicon-calendar"></i> @activity.addtime.ToString("yyyy-MM-dd")
+                                                </div>
+                                                <div>
+                                                    <i class="glyphicon glyphicon-user"></i> 发起人: @activity.Holder
+                                                </div>
+                                            </div>
+                                            <div class="text-center">
+                                                <a href="@Url.Action("ActivityDetails", new { id = activity.activity_ID })" class="btn btn-info">
+                                                    <i class="glyphicon glyphicon-info-sign"></i> 查看详情
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="glyphicon glyphicon-info-sign"></i> 您目前没有正在进行的活动
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- 已完成的活动 -->
+            <div class="panel panel-success activity-panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="glyphicon glyphicon-ok-circle"></i> 已完成的活动</h3>
+                </div>
+                <div class="panel-body">
+                    @{
+                        var completedActivities = Model?.Where(a => a.status == "已结束").ToList();
+                    }
+
+                    @if (completedActivities != null && completedActivities.Any())
+                    {
+                        <div class="row">
+                            @foreach (var activity in completedActivities)
+                            {
+                                <div class="col-md-6">
+                                    <div class="activity-card completed-card">
+                                        <div class="activity-image">
+                                            <img src="/@activity.Image" alt="@activity.activity_Name" onerror="this.src='/Content/Images/暂无图片.gif'; this.onerror=null;" />
+                                            <div class="activity-type">@activity.activity_type</div>
+                                            <div class="completed-badge">已完成</div>
+                                        </div>
+                                        <div class="activity-content">
+                                            <h4>@activity.activity_Name</h4>
+                                            <p class="activity-desc">@(activity.descn?.Length > 50 ? activity.descn.Substring(0, 50) + "..." : activity.descn)</p>
+                                            <div class="activity-details">
+                                                <div>
+                                                    <i class="glyphicon glyphicon-map-marker"></i> @activity.place
+                                                </div>
+                                                <div>
+                                                    <i class="glyphicon glyphicon-calendar"></i> @activity.addtime.ToString("yyyy-MM-dd") 至 @activity.stoptime.ToString("yyyy-MM-dd")
+                                                </div>
+                                            </div>
+                                            <div class="text-center">
+                                                <a href="@Url.Action("ActivityDetails", new { id = activity.activity_ID })" class="btn btn-default">
+                                                    <i class="glyphicon glyphicon-info-sign"></i> 查看详情
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="glyphicon glyphicon-info-sign"></i> 您还没有完成过活动
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 text-center navigation-buttons">
+            <a href="@Url.Action("Index")" class="btn btn-default btn-lg">
+                <i class="glyphicon glyphicon-th-list"></i> 活动广场
+            </a>
+            <a href="@Url.Action("MyApplications")" class="btn btn-primary btn-lg">
+                <i class="glyphicon glyphicon-list-alt"></i> 我的申请
+            </a>
+            <a href="@Url.Action("GetVolunteerHours")" class="btn btn-info btn-lg">
+                <i class="glyphicon glyphicon-time"></i> 我的志愿时长
+            </a>
+        </div>
+    </div>
+</div>
+
+@section styles {
+    <style>
+        /* 整体页面样式 */
+        body {
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+
+        /* 页面标题样式 */
+        .volunteer-header {
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #FF9966;
+        }
+
+        .volunteer-header h2 {
+            color: #FF5E62;
+            font-weight: 600;
+        }
+
+        .volunteer-header .lead {
+            color: #777;
+        }
+
+        /* 活动统计面板 */
+        .activity-stats-panel {
+            background: linear-gradient(135deg, #FF9966, #FF5E62);
+            color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .activity-stats-panel h4 {
+            margin-top: 0;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            background-color: rgba(255,255,255,0.3);
+            border: 3px solid rgba(255,255,255,0.6);
+            transition: all 0.3s ease;
+        }
+
+        .stat-circle:hover {
+            transform: scale(1.1);
+        }
+
+        .stat-circle.ongoing {
+            background-color: rgba(92, 184, 92, 0.2);
+            border-color: #5cb85c;
+        }
+
+        .stat-circle.completed {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: white;
+        }
+
+        .stat-circle.total {
+            background-color: rgba(51, 122, 183, 0.2);
+            border-color: #337ab7;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* 活动面板样式 */
+        .activity-panel {
+            margin-bottom: 30px;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .activity-panel .panel-heading {
+            padding: 15px 20px;
+        }
+
+        .activity-panel .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* 活动卡片样式 */
+        .activity-card {
+            margin-bottom: 25px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .activity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+
+        .activity-image {
+            position: relative;
+            height: 180px;
+            overflow: hidden;
+        }
+
+        .activity-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .activity-card:hover .activity-image img {
+            transform: scale(1.1);
+        }
+
+        .activity-type {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            background: linear-gradient(to right, #FF5E62, #FF9966);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 0 20px 20px 0;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .completed-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .activity-content {
+            padding: 15px;
+        }
+
+        .activity-content h4 {
+            margin-top: 0;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .activity-desc {
+            color: #666;
+            margin-bottom: 15px;
+            height: 40px;
+            overflow: hidden;
+        }
+
+        .activity-details {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .activity-details div {
+            margin-bottom: 5px;
+        }
+
+        .activity-details i {
+            margin-right: 5px;
+            width: 16px;
+            text-align: center;
+        }
+
+        .completed-card {
+            opacity: 0.85;
+        }
+
+        /* 导航按钮 */
+        .navigation-buttons {
+            margin-top: 30px;
+        }
+
+        .navigation-buttons .btn {
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+
+        .navigation-buttons .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+
+        
+    </style>
+}

@@ -1,0 +1,125 @@
+﻿@{
+    ViewBag.Title = "志愿者证申请状态";
+}
+
+<div class="container"style="margin-left:16%">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="panel panel-default identify-status-panel">
+                <div class="panel-heading text-center">
+                    <h3><i class="glyphicon glyphicon-certificate"></i> 志愿者证申请状态</h3>
+                </div>
+                <div class="panel-body text-center">
+                    @if (ViewBag.Status == "未拥有")
+                    {
+                        <div class="status-icon status-none">
+                            <i class="glyphicon glyphicon-exclamation-sign"></i>
+                        </div>
+                        <h4 class="text-muted">您尚未申请志愿者证</h4>
+                        <p>满10小时志愿服务时长后即可申请志愿者证</p>
+                        <div class="action-buttons">
+                            <a href="@Url.Action("ApplyIdentify", "Volunteer")" class="btn btn-primary">
+                                <i class="glyphicon glyphicon-pencil"></i> 立即申请
+                            </a>
+                            <a href="@Url.Action("GetVolunteerHours", "Volunteer")" class="btn btn-info">
+                                <i class="glyphicon glyphicon-time"></i> 查看我的时长
+                            </a>
+                        </div>
+                    }
+                    else if (ViewBag.Status == "未审核")
+                    {
+                        <div class="status-icon status-pending">
+                            <i class="glyphicon glyphicon-time"></i>
+                        </div>
+                        <h4 class="text-warning">您的志愿者证申请正在审核中</h4>
+                        <p>请耐心等待管理员审核，审核通过后将为您寄送志愿者证</p>
+                        <div class="action-buttons">
+                            <a href="@Url.Action("Index", "Volunteer")" class="btn btn-default">
+                                <i class="glyphicon glyphicon-home"></i> 返回首页
+                            </a>
+                        </div>
+                    }
+                    else if (ViewBag.Status == "已通过")
+                    {
+                        <div class="status-icon status-approved">
+                            <i class="glyphicon glyphicon-ok-circle"></i>
+                        </div>
+                        <h4 class="text-success">恭喜！您的志愿者证申请已通过</h4>
+                        <p>志愿者证将在7-15个工作日内寄出，请保持联系方式畅通</p>
+                        <div class="action-buttons">
+                            <a href="@Url.Action("Index", "Volunteer")" class="btn btn-success">
+                                <i class="glyphicon glyphicon-home"></i> 返回首页
+                            </a>
+                        </div>
+                    }
+                    else if (ViewBag.Status == "已拒绝")
+                    {
+                        <div class="status-icon status-rejected">
+                            <i class="glyphicon glyphicon-remove-circle"></i>
+                        </div>
+                        <h4 class="text-danger">您的志愿者证申请未通过审核</h4>
+                        <p>可能是因为信息填写有误或不符合申请条件，请联系管理员了解详情</p>
+                        <div class="action-buttons">
+                            <a href="@Url.Action("Index", "Volunteer")" class="btn btn-default">
+                                <i class="glyphicon glyphicon-home"></i> 返回首页
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .identify-status-panel {
+            margin-top: 40px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .identify-status-panel .panel-heading {
+            background: linear-gradient(135deg, #6a82fb, #fc5c7d);
+            color: white;
+            border-bottom: none;
+            padding: 15px;
+        }
+
+        .identify-status-panel .panel-body {
+            padding: 30px 20px;
+        }
+
+        .status-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .status-none {
+            color: #777;
+        }
+
+        .status-pending {
+            color: #f0ad4e;
+        }
+
+        .status-approved {
+            color: #5cb85c;
+        }
+
+        .status-rejected {
+            color: #d9534f;
+        }
+
+        .action-buttons {
+            margin-top: 25px;
+        }
+
+        .action-buttons .btn {
+            margin: 0 5px;
+        }
+
+        
+    </style>
+}

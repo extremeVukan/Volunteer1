@@ -578,6 +578,8 @@ namespace 大学生志愿者管理系统Web.Controllers
                 int volunteerId = (int)Session["UserId"];
                 int hours = _volunteerService.GetVolunteerHours(volunteerId);
 
+                ViewBag.TotalHours = hours; // 为视图传递志愿时长
+
                 if (hours < 10)
                 {
                     TempData["ErrorMessage"] = "很抱歉，您的志愿时长不足10小时";
@@ -617,7 +619,25 @@ namespace 大学生志愿者管理系统Web.Controllers
                     string.IsNullOrEmpty(city) || string.IsNullOrEmpty(address))
                 {
                     TempData["ErrorMessage"] = "请填写所有必填信息";
-                    return View();
+                    var volunteer = _volunteerService.GetVolunteerById(volunteerId);
+                    ViewBag.TotalHours = _volunteerService.GetVolunteerHours(volunteerId);
+                    return View(volunteer);
+                }
+
+                // 检查志愿者是否已申请证书
+                string status = _identifyService.GetVolunteerIdentifyStatus(volunteerName);
+                if (status != "未拥有")
+                {
+                    TempData["ErrorMessage"] = $"您已申请志愿者证，当前状态为：{status}";
+                    return RedirectToAction("CheckIdentifyStatus");
+                }
+
+                // 检查志愿时长
+                int hours = _volunteerService.GetVolunteerHours(volunteerId);
+                if (hours < 10)
+                {
+                    TempData["ErrorMessage"] = $"志愿时长不足10小时，您当前时长为{hours}小时";
+                    return RedirectToAction("GetVolunteerHours");
                 }
 
                 bool result = _identifyService.ApplyForIdentify(
@@ -625,22 +645,21 @@ namespace 大学生志愿者管理系统Web.Controllers
 
                 if (result)
                 {
-                    TempData["SuccessMessage"] = "申请成功，等待审核";
+                    TempData["SuccessMessage"] = "志愿者证申请成功，请等待管理员审核";
+                    return RedirectToAction("CheckIdentifyStatus");
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "申请失败";
+                    TempData["ErrorMessage"] = "申请失败，可能您已申请过证件或信息有误";
+                    return RedirectToAction("ApplyIdentify");
                 }
-
-                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"申请志愿者证出错: {ex.Message}";
-                return View();
+                return RedirectToAction("Index");
             }
         }
-
         // GET: Volunteer/CheckIdentifyStatus
         public ActionResult CheckIdentifyStatus()
         {
@@ -653,8 +672,13 @@ namespace 大学生志愿者管理系统Web.Controllers
 
             try
             {
-                string status = _identifyService.GetVolunteerIdentifyStatus(Session["Username"].ToString());
+                string volunteerName = Session["Username"].ToString();
+                string status = _identifyService.GetVolunteerIdentifyStatus(volunteerName);
                 ViewBag.Status = status;
+
+                // 添加志愿者ID到ViewBag
+                ViewBag.VolunteerId = (int)Session["UserId"];
+
                 return View();
             }
             catch (Exception ex)

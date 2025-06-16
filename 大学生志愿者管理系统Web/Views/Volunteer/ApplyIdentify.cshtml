@@ -1,0 +1,299 @@
+﻿@model DAL.volunteerT
+@{
+    ViewBag.Title = "申请志愿者证";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <div class="panel panel-default volunteer-card">
+                <div class="panel-heading volunteer-card-header text-center">
+                    
+                    <h2 class="volunteer-title">申请志愿者证</h2>
+                    <p class="volunteer-subtitle">用爱心传递温暖，用行动创造价值</p>
+                </div>
+
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-8 col-md-offset-2">
+                            <div class="alert alert-info">
+                                <div class="info-container">
+                                    <div class="info-icon">
+                                        <i class="glyphicon glyphicon-info-sign"></i>
+                                    </div>
+                                    <div class="info-content" style="margin-left:100px">
+                                        <h4>申请须知</h4>
+                                        <p>志愿者证是您参与志愿服务的重要凭证，申请成功后将由管理员审核。</p>
+                                        <hr>
+                                        <p>您当前的志愿时长为: <strong class="text-danger">@ViewBag.TotalHours</strong> 小时，已满足申请条件（需满10小时）。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @using (Html.BeginForm("ApplyIdentify", "Volunteer", FormMethod.Post, new { @class = "form-horizontal volunteer-form", role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- 左侧个人信息 -->
+                                <div class="panel panel-default info-panel">
+                                    <div class="panel-body">
+                                        <h4 class="section-title"><i class="glyphicon glyphicon-user text-primary"></i> 个人信息</h4>
+
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3">姓名 <span class="required">*</span></label>
+                                            <div class="col-md-9">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                                    <input type="text" class="form-control" value="@Model.AName" readonly />
+                                                </div>
+                                                <span class="help-block">使用您的注册姓名</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3" for="phone">联系电话 <span class="required">*</span></label>
+                                            <div class="col-md-9">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="glyphicon glyphicon-phone"></i></span>
+                                                    <input type="text" class="form-control" id="phone" name="phone" value="@Model.Atelephone" required />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <!-- 右侧地址信息 -->
+                                <div class="panel panel-default info-panel">
+                                    <div class="panel-body">
+                                        <h4 class="section-title"><i class="glyphicon glyphicon-map-marker text-primary"></i> 邮寄地址</h4>
+
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3" for="province">省份 <span class="required">*</span></label>
+                                            <div class="col-md-9">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="glyphicon glyphicon-globe"></i></span>
+                                                    <input type="text" class="form-control" id="province" name="province" required placeholder="例如: 北京" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3" for="city">城市 <span class="required">*</span></label>
+                                            <div class="col-md-9">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
+                                                    <input type="text" class="form-control" id="city" name="city" required placeholder="例如: 北京市" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3" for="address">详细地址 <span class="required">*</span></label>
+                                            <div class="col-md-9">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="glyphicon glyphicon-road"></i></span>
+                                                    <textarea class="form-control" id="address" name="address" rows="2" required placeholder="例如: XX区XX街XX号"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8 col-md-offset-2">
+                                <div class="checkbox" style="margin-left:50px">
+                                    <label>
+                                        <input type="checkbox" id="agreeTerms" required />
+                                        我已阅读并同意<a href="#" data-toggle="modal" data-target="#termsModal">《志愿者证使用条款》</a>，并承诺提供的信息真实有效。
+                                    </label>
+                                </div>
+
+                                <div class="form-group text-center" style="margin-top: 20px;margin-left:300px">
+                                    <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                        <i class="glyphicon glyphicon-send"></i> 提交申请
+                                    </button>
+                                    <a href="@Url.Action("Index", "Volunteer")" class="btn btn-default btn-lg">
+                                        <i class="glyphicon glyphicon-arrow-left"></i> 返回首页
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="panel-footer text-center">
+                    <small class="text-muted">
+                        <i class="glyphicon glyphicon-heart text-danger"></i>
+                        志愿者证将在审核通过后的7-15个工作日内寄出
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 使用条款模态框 -->
+<div class="modal fade" id="termsModal" tabindex="-1" role="dialog" aria-labelledby="termsModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="termsModalLabel">志愿者证使用条款</h4>
+            </div>
+            <div class="modal-body">
+                <h5>志愿者证的使用规范</h5>
+                <p>1. 志愿者证是志愿者参与志愿服务的重要凭证，应妥善保管。</p>
+                <p>2. 志愿者证仅限本人使用，不得转借他人使用或伪造、变造。</p>
+                <p>3. 在参与志愿服务活动时，应主动出示志愿者证，以便核实身份。</p>
+                <p>4. 如志愿者证遗失，应及时向管理员申请补办。</p>
+                <p>5. 使用志愿者证享受相关优惠政策时，应遵守相关规定。</p>
+                <hr>
+                <h5>志愿者的权利与义务</h5>
+                <p>1. 志愿者有权参与志愿服务活动，获得必要的培训和指导。</p>
+                <p>2. 志愿者有权了解所参与志愿服务的相关信息。</p>
+                <p>3. 志愿者应遵守志愿服务组织的规章制度，按时参与活动。</p>
+                <p>4. 志愿者应尊重服务对象，保护服务对象的隐私。</p>
+                <p>5. 志愿者应积极传播志愿服务理念，促进志愿服务事业发展。</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="agreeBtn">我已阅读并同意</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script type="text/javascript">
+        $(function () {
+            // 同意条款后自动勾选复选框
+            $('#agreeBtn').click(function () {
+                $('#agreeTerms').prop('checked', true);
+            });
+
+            // 提交前验证
+            $('form').submit(function (e) {
+                if (!$('#agreeTerms').is(':checked')) {
+                    alert('请阅读并同意《志愿者证使用条款》');
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        /* 整体卡片样式 */
+        .volunteer-card {
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            border: none;
+        }
+
+        /* 卡片头部 */
+        .volunteer-card-header {
+            background: linear-gradient(135deg, #FF9966, #FF5E62);
+            color: white;
+            padding: 25px 15px;
+            border-bottom: none;
+        }
+
+        .volunteer-title {
+            font-weight: bold;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        .volunteer-subtitle {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .volunteer-badge-img {
+            max-width: 80px;
+            margin-bottom: 10px;
+        }
+
+        /* 信息面板 */
+        .info-panel {
+            margin-bottom: 20px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            height: 100%;
+            border: 1px solid #f0f0f0;
+            
+        }
+
+        .info-panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        /* 申请须知 */
+        .info-container {
+            display: flex;
+            align-items: flex-start;
+
+        }
+
+        .info-icon {
+            font-size: 24px;
+            margin-right: 15px;
+            color: #5bc0de;
+        }
+
+        .info-content h4 {
+            margin-top: 0;
+            font-weight: bold;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .required {
+            color: #d9534f;
+        }
+
+        .input-group-addon {
+            background-color: #f8f9fa;
+            border-color: #ddd;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, #FF5E62, #FF9966);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover, .btn-primary:focus {
+            background: linear-gradient(to right, #FF4B4B, #FF8856);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 94, 98, 0.4);
+        }
+
+        /* 响应式调整 */
+       
+    </style>
+}

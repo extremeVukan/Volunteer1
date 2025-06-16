@@ -23,7 +23,12 @@ namespace BLL
 
                 // 检查志愿时长
                 var volunteer = context.volunteerT.Find(volunteerId);
-                if (volunteer == null || Convert.ToInt32( volunteer.Act_Time) < 10)
+                if (volunteer == null || string.IsNullOrEmpty(volunteer.Act_Time))
+                {
+                    return false;
+                }
+
+                if (!int.TryParse(volunteer.Act_Time, out int hours) || hours < 10)
                 {
                     return false;
                 }
@@ -33,7 +38,7 @@ namespace BLL
                 {
                     VID = volunteerId.ToString(),
                     VName = volunteerName,
-                    Phone = phone,
+                    Phone = phone?.Trim(),
                     Province = province,
                     City = city,
                     Address = address,
@@ -41,10 +46,14 @@ namespace BLL
                 };
 
                 context.VolIdentifyT.Add(identify);
-                context.SaveChanges();
+                int result = context.SaveChanges();
 
-                AddLog(volunteerName, "申请证件", "VolIdentifyT");
-                return true;
+                if (result > 0)
+                {
+                    AddLog(volunteerName, "申请志愿者证", "VolIdentifyT");
+                    return true;
+                }
+                return false;
             }
             catch
             {
@@ -153,12 +162,14 @@ namespace BLL
         {
             try
             {
-                return context.VolIdentifyT.FirstOrDefault(v => v.EMPID == volunteerId);
+                // 修改查询条件：使用VID字段查询，而不是EMPID
+                return context.VolIdentifyT.FirstOrDefault(v => v.VID == volunteerId.ToString());
             }
             catch
             {
                 return null;
             }
         }
+
     }
 }

@@ -1,186 +1,237 @@
 ﻿@model IEnumerable<DAL.ActivityT>
 @{
-    ViewBag.Title = "志愿者活动广场";
-    var ongoingActivities = Model.Where(a => a.status == "进行中").ToList();
+    ViewBag.Title = "志愿者中心";
 }
 
+@section Styles {
+    <style>
+        /* 整体卡片样式 */
+        .volunteer-panel {
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: none;
+        }
+
+        /* 卡片头部 */
+        .volunteer-panel-heading {
+            background: linear-gradient(135deg, #FF9966, #FF5E62);
+            color: white;
+            padding: 20px 15px;
+            border-bottom: none;
+        }
+
+        /* 个人信息卡片 */
+        .profile-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+            .profile-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .profile-hours {
+            font-size: 16px;
+            text-align: center;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+
+        .profile-buttons {
+            text-align: center;
+        }
+
+            .profile-buttons .btn {
+                margin-bottom: 10px;
+                border-radius: 30px;
+                padding: 8px 20px;
+                width: 100%;
+            }
+
+        /* 活动卡片 */
+        .activity-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+            .activity-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+
+        .activity-img {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .activity-body {
+            padding: 15px;
+        }
+
+        .activity-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 18px;
+            height: 40px;
+            overflow: hidden;
+        }
+
+        .activity-info {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .activity-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .status-ongoing {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .status-ended {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .activity-footer {
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            text-align: right;
+        }
+
+        /* 功能按钮 */
+        .function-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 15px;
+        }
+
+        .function-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .function-buttons .btn {
+            margin-bottom: 10px;
+            width: 100%;
+            text-align: left;
+            padding: 10px 15px;
+        }
+
+        /* 搜索框 */
+        .search-bar {
+            margin-bottom: 20px;
+        }
+
+            .search-bar .input-group {
+                border-radius: 30px;
+                overflow: hidden;
+            }
+
+            .search-bar .form-control {
+                border-right: 0;
+            }
+
+            .search-bar .btn {
+                border-left: 0;
+                background-color: white;
+            }
+
+        /* 过滤器样式 */
+        .filter-badges {
+            margin-bottom: 20px;
+        }
+
+        .filter-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            border-radius: 20px;
+            background-color: #f8f9fa;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+            .filter-badge:hover, .filter-badge.active {
+                background-color: #FF5E62;
+                color: white;
+            }
+
+        /* 可滚动活动容器 */
+        .scrollable-activities {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+            .scrollable-activities::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .scrollable-activities::-webkit-scrollbar-track {
+                background: #f1f1f1;
+                border-radius: 10px;
+            }
+
+            .scrollable-activities::-webkit-scrollbar-thumb {
+                background: #FF9966;
+                border-radius: 10px;
+            }
+
+                .scrollable-activities::-webkit-scrollbar-thumb:hover {
+                    background: #FF5E62;
+                }
+    </style>
+}
+
+<!-- 志愿者首页新设计 -->
 <div class="container">
-    <!-- 用户信息部分 -->
-    <div class="row">
-        <div class="col-md-8">
-            <h2>志愿者活动广场</h2>
-        </div>
-        <div class="col-md-4 text-right">
-            @if (Session["Username"] != null)
-            {
-                <div class="volunteer-info">
-                    <p>
-                        <span class="label label-success">已登录</span>
-                        欢迎, <strong>@Session["Username"]</strong>
-                    </p>
-                    @if (ViewBag.VolunteerHours != null)
-                    {
-                        <p>志愿时长: <span class="badge" style="color:black">@ViewBag.VolunteerHours 小时</span></p>
-                    }
-                </div>
-            }
-            else
-            {
-                <p>
-                    <a href="@Url.Action("Login", "Account")" class="btn btn-primary">
-                        <span class="glyphicon glyphicon-log-in"></span> 登录
-                    </a>
-                    <a href="@Url.Action("Register", "Account")" class="btn btn-default">
-                        <span class="glyphicon glyphicon-user"></span> 注册
-                    </a>
-                </p>
-            }
-        </div>
-    </div>
-
-    <!-- 轮播图展示最新活动 -->
     <div class="row">
         <div class="col-md-12">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title"><span class="glyphicon glyphicon-fire"></span> 推荐活动</h3>
-                </div>
-                <div class="panel-body">
-                    @if (ongoingActivities != null && ongoingActivities.Any())
-                    {
-                        <div id="activityCarousel" class="carousel slide" data-ride="carousel">
-                            <!-- 指示器 -->
-                            <ol class="carousel-indicators">
-                                @for (int i = 0; i < Math.Min(ongoingActivities.Count, 5); i++)
-                                {
-                                    <li data-target="#activityCarousel" data-slide-to="@i" class="@(i == 0 ? "active" : "")"></li>
-                                }
-                            </ol>
-
-                            <!-- 轮播项目 -->
-                            <div class="carousel-inner" role="listbox">
-                                @{
-                                    var featuredActivities = ongoingActivities.Take(5).ToList();
-                                    for (int i = 0; i < featuredActivities.Count; i++)
-                                    {
-                                        var activity = featuredActivities[i];
-                                        <div class="item @(i == 0 ? "active" : "")">
-                                            <div class="carousel-content">
-                                                <div class="row">
-                                                    <div class="col-md-4">
-                                                        <!-- 修改轮播图部分的图片显示 -->
-                                                        @if (!string.IsNullOrEmpty(activity.Image) && !activity.Image.Contains("暂无图片"))
-                                                        {
-                                                            <img src="@Url.Action("Activity", "Image", new { path = activity.Image })"
-                                                                 alt="活动图片" class="img-responsive carousel-img"
-                                                                 onerror="this.src='@Url.Content("~/Content/Images/暂无图片.gif")';" />
-                                                        }
-                                                        else
-                                                        {
-                                                            <img src="@Url.Content("~/Content/Images/暂无图片.gif")" alt="暂无图片" class="img-responsive carousel-img" />
-                                                        }
-                                                    </div>
-                                                    <div class="col-md-8">
-                                                        <h3>
-                                                            <a href="@Url.Action("ActivityDetails", new { id = activity.activity_ID })">
-                                                                @activity.activity_Name
-                                                            </a>
-                                                        </h3>
-                                                        <p><strong>类型:</strong> @activity.activity_type</p>
-                                                        <p><strong>时间:</strong> @activity.addtime.ToString("yyyy-MM-dd") 至 @activity.stoptime.ToString("yyyy-MM-dd")</p>
-                                                        <p><strong>地点:</strong> @activity.place</p>
-                                                        <p><strong>需要人数:</strong> @activity.renshu 名</p>
-                                                        <p class="carousel-description">
-                                                            @(string.IsNullOrEmpty(activity.descn) ? "暂无描述" :
-                                                                (activity.descn.Length > 150 ? activity.descn.Substring(0, 150) + "..." : activity.descn))
-                                                        </p>
-                                                        <p>
-                                                            <a href="@Url.Action("ActivityDetails", new { id = activity.activity_ID })" class="btn btn-info">
-                                                                <span class="glyphicon glyphicon-info-sign"></span> 详情
-                                                            </a>
-                                                            <a href="@Url.Action("ApplyActivity", new { id = activity.activity_ID })" class="btn btn-primary">
-                                                                <span class="glyphicon glyphicon-ok"></span> 立即申请
-                                                            </a>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    }
-                                }
-                            </div>
-
-                            <!-- 左右控制按钮 -->
-                            <a class="left carousel-control" href="#activityCarousel" role="button" data-slide="prev">
-                                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-                                <span class="sr-only">上一个</span>
-                            </a>
-                            <a class="right carousel-control" href="#activityCarousel" role="button" data-slide="next">
-                                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-                                <span class="sr-only">下一个</span>
-                            </a>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-info">
-                            <span class="glyphicon glyphicon-info-sign"></span> 暂无进行中的活动
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 搜索和筛选部分 -->
-    <div class="row search-panel">
-        <div class="col-md-12">
-            <div class="panel panel-default">
-                <div class="panel-body">
+            <div class="panel panel-default volunteer-panel">
+                <div class="panel-heading volunteer-panel-heading">
                     <div class="row">
-                        <!-- 按名称搜索 -->
-                        <div class="col-md-5">
-                            @using (Html.BeginForm("Search", "Volunteer", FormMethod.Get, new { @class = "form-inline" }))
-                            {
-                                <div class="form-group">
-                                    <div class="input-group">
-                                        <input type="text" name="keyword" class="form-control" placeholder="活动名称关键词" />
-                                        <span class="input-group-btn">
-                                            <button type="submit" class="btn btn-primary">
-                                                <span class="glyphicon glyphicon-search"></span> 搜索
-                                            </button>
-                                        </span>
-                                    </div>
-                                </div>
-                            }
+                        <div class="col-md-8">
+                            <h2><i class="glyphicon glyphicon-heart"></i> 志愿者中心</h2>
+                            <p>欢迎回来，@Session["Username"]！今天是 @DateTime.Now.ToString("yyyy年MM月dd日")</p>
                         </div>
-
-                        <!-- 按类型筛选 -->
-                        <div class="col-md-5">
-                            @using (Html.BeginForm("Filter", "Volunteer", FormMethod.Get, new { @class = "form-inline" }))
-                            {
-                                <div class="form-group">
-                                    <select name="activityType" class="form-control">
-                                        <option value="">--选择活动类型--</option>
-                                        <option value="教育类">教育类</option>
-                                        <option value="社区发展类">社区发展类</option>
-                                        <option value="卫生与医疗类">卫生与医疗类</option>
-                                        <option value="环境保护类">环境保护类</option>
-                                        <option value="动物保护类">动物保护类</option>
-                                        <option value="紧急救援类">紧急救援类</option>
-                                    </select>
-                                    <button type="submit" class="btn btn-info">
-                                        <span class="glyphicon glyphicon-filter"></span> 筛选
-                                    </button>
-                                </div>
-                            }
-                        </div>
-
-                        <!-- 刷新按钮 -->
-                        <div class="col-md-2 text-right">
-                            <a href="@Url.Action("Index", "Volunteer")" class="btn btn-default">
-                                <span class="glyphicon glyphicon-refresh"></span> 刷新
-                            </a>
+                        <div class="col-md-4 text-right">
+                            <p>您的志愿时长：<span class="label label-success">@ViewBag.VolunteerHours 小时</span></p>
                         </div>
                     </div>
                 </div>
@@ -188,89 +239,139 @@
         </div>
     </div>
 
-    <!-- 功能按钮区 -->
-    <div class="row button-panel">
-        <div class="col-md-12">
-            <div class="btn-group">
-                <a href="@Url.Action("MyApplications", "Volunteer")" class="btn btn-primary">
-                    <span class="glyphicon glyphicon-list"></span> 我的申请
-                </a>
-                <a href="@Url.Action("GetVolunteerHours", "Volunteer")" class="btn btn-success">
-                    <span class="glyphicon glyphicon-time"></span> 查看志愿时长
-                </a>
-                <a href="@Url.Action("SelfCheck", "Volunteer")" class="btn btn-info">
-                    <span class="glyphicon glyphicon-user"></span> 个人信息
-                </a>
-                <a href="@Url.Action("ApplyIdentify", "Volunteer")" class="btn btn-warning">
-                    <span class="glyphicon glyphicon-certificate"></span> 申请志愿者证
-                </a>
+    <div class="row">
+        <!-- 左侧个人信息和功能按钮 -->
+        <div class="col-md-3">
+            <!-- 个人信息卡片 -->
+            <div class="profile-card">
+                <div class="profile-name">@Session["Username"]</div>
+                <div class="profile-hours">志愿时长: @ViewBag.VolunteerHours 小时</div>
+                <div class="profile-buttons">
+                    <a href="@Url.Action("SelfCheck", "Volunteer")" class="btn btn-info">
+                        <i class="glyphicon glyphicon-user"></i> 个人信息
+                    </a>
+                    <a href="@Url.Action("CheckIdentifyStatus", "Volunteer")" class="btn btn-warning">
+                        <i class="glyphicon glyphicon-certificate"></i> 志愿者证状态
+                    </a>
+                    <a href="@Url.Action("Logout", "Account")" class="btn btn-danger">
+                        <i class="glyphicon glyphicon-log-out"></i> 退出登录
+                    </a>
+                </div>
+            </div>
+
+            <!-- 功能按钮卡片 -->
+            <div class="function-card">
+                <div class="function-title">
+                    <i class="glyphicon glyphicon-th-list"></i> 功能导航
+                </div>
+                <div class="function-buttons">
+                    <a href="@Url.Action("Index", "Volunteer")" class="btn btn-default">
+                        <i class="glyphicon glyphicon-home"></i> 活动首页
+                    </a>
+                    <a href="@Url.Action("MyApplications", "Volunteer")" class="btn btn-default">
+                        <i class="glyphicon glyphicon-list-alt"></i> 我的申请
+                    </a>
+                    <a href="@Url.Action("MyActivities", "Volunteer")" class="btn btn-default">
+                        <i class="glyphicon glyphicon-calendar"></i> 我的活动
+                    </a>
+                    <a href="@Url.Action("GetVolunteerHours", "Volunteer")" class="btn btn-default">
+                        <i class="glyphicon glyphicon-time"></i> 志愿时长
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- 活动列表 -->
-    <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-primary">
+        <!-- 右侧活动列表 -->
+        <div class="col-md-9">
+            <!-- 搜索栏 -->
+            <div class="search-bar">
+                @using (Html.BeginForm("Search", "Volunteer", FormMethod.Get, new { @class = "form-inline" }))
+                {
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="keyword" placeholder="搜索活动名称..." value="@ViewBag.SearchTerm">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit">
+                                <i class="glyphicon glyphicon-search"></i>
+                            </button>
+                        </span>
+                    </div>
+                }
+            </div>
+
+            <!-- 过滤标签 -->
+            <div class="filter-badges">
+                <a href="@Url.Action("Index", "Volunteer")" class="filter-badge @(ViewBag.ActivityType == null ? "active" : "")">
+                    全部活动
+                </a>
+                <a href="@Url.Action("Filter", "Volunteer", new { activityType = "教育类" })" class="filter-badge @(ViewBag.ActivityType == "教育类" ? "active" : "")">
+                    教育类
+                </a>
+                <a href="@Url.Action("Filter", "Volunteer", new { activityType = "社区发展类" })" class="filter-badge @(ViewBag.ActivityType == "社区发展类" ? "active" : "")">
+                    社区发展类
+                </a>
+                <a href="@Url.Action("Filter", "Volunteer", new { activityType = "卫生与医疗类" })" class="filter-badge @(ViewBag.ActivityType == "卫生与医疗类" ? "active" : "")">
+                    卫生与医疗类
+                </a>
+                <a href="@Url.Action("Filter", "Volunteer", new { activityType = "环境保护类" })" class="filter-badge @(ViewBag.ActivityType == "环境保护类" ? "active" : "")">
+                    环境保护类
+                </a>
+                <a href="@Url.Action("Filter", "Volunteer", new { activityType = "动物保护类" })" class="filter-badge @(ViewBag.ActivityType == "动物保护类" ? "active" : "")">
+                    动物保护类
+                </a>
+            </div>
+
+            <!-- 活动列表 - 可滚动容器 -->
+            <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">进行中的志愿活动</h3>
+                    <h4><i class="glyphicon glyphicon-list"></i> 进行中的活动</h4>
                 </div>
-                <div class="panel-body">
-                    <div class="activity-slider">
-                        @if (ongoingActivities != null && ongoingActivities.Any())
+                <div class="panel-body scrollable-activities">
+                    <div class="row">
+                        @{
+                            var ongoingActivities = Model != null ? Model.Where(a => a.status == "进行中").ToList() : new List<DAL.ActivityT>();
+                        }
+
+                        @if (ongoingActivities.Any())
                         {
-                            <div class="slider-container">
-                                <button class="slider-prev"><span class="glyphicon glyphicon-chevron-left"></span></button>
-                                <div class="slider-wrapper">
-                                    @foreach (var activity in ongoingActivities)
-                                    {
-                                        <div class="activity-card" data-id="@activity.activity_ID">
-                                            <div class="activity-image">
-                                                <!-- 修改活动卡片部分的图片显示 -->
-                                                @if (!string.IsNullOrEmpty(activity.Image) && !activity.Image.Contains("暂无图片"))
-                                                {
-                                                    <img src="@Url.Action("Activity", "Image", new { path = activity.Image })"
-                                                         alt="活动图片" class="img-responsive"
-                                                         onerror="this.src='@Url.Content("~/Content/Images/暂无图片.gif")';" />
-                                                }
-                                                else
-                                                {
-                                                    <img src="@Url.Content("~/Content/Images/暂无图片.gif")" alt="暂无图片" class="img-responsive" />
+                            foreach (var activity in ongoingActivities)
+                            {
+                                <div class="col-md-4">
+                                    <div class="activity-card">
+                                        
+                                        <div class="activity-body">
+                                            <div class="activity-title">@activity.activity_Name</div>
+                                            <div class="activity-info">
+                                                <i class="glyphicon glyphicon-tag"></i> @activity.activity_type
+                                            </div>
+                                            <div class="activity-info">
+                                                <i class="glyphicon glyphicon-user"></i> 人数: @activity.renshu
+                                            </div>
+                                            <div class="activity-info">
+                                                <i class="glyphicon glyphicon-calendar"></i> 截止日期:
+                                                @{
+                                                    var dateToDisplay = activity.stoptime != null ? activity.stoptime : (activity.stoptime != null ? activity.stoptime : DateTime.Now);
+                                                    @dateToDisplay.ToString("yyyy-MM-dd")
                                                 }
                                             </div>
-                                            <div class="activity-content">
-                                                <h4>@activity.activity_Name</h4>
-                                                <p class="activity-type"><span class="label label-info">@activity.activity_type</span></p>
-                                                <p class="activity-date">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
-                                                    @activity.addtime.ToString("yyyy-MM-dd")
-                                                </p>
-                                                <p class="activity-place">
-                                                    <span class="glyphicon glyphicon-map-marker"></span>
-                                                    @activity.place
-                                                </p>
-                                                <p class="activity-people">
-                                                    <span class="glyphicon glyphicon-user"></span> 需要 @activity.renshu 人
-                                                </p>
-                                                <div class="activity-buttons">
-                                                    <a href="@Url.Action("ActivityDetails", "Volunteer", new { id = activity.activity_ID })" class="btn btn-info btn-sm">
-                                                        <span class="glyphicon glyphicon-info-sign"></span> 详情
-                                                    </a>
-                                                    <a href="@Url.Action("ApplyActivity", "Volunteer", new { id = activity.activity_ID })" class="btn btn-primary btn-sm">
-                                                        <span class="glyphicon glyphicon-ok"></span> 申请
-                                                    </a>
-                                                </div>
+                                            <div>
+                                                <span class="activity-status status-ongoing">进行中</span>
                                             </div>
                                         </div>
-                                    }
+                                        <div class="activity-footer">
+                                            <a href="@Url.Action("ActivityDetails", "Volunteer", new { id = activity.activity_ID })" class="btn btn-primary btn-sm">
+                                                <i class="glyphicon glyphicon-info-sign"></i> 查看详情
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
-                                <button class="slider-next"><span class="glyphicon glyphicon-chevron-right"></span></button>
-                            </div>
+                            }
                         }
                         else
                         {
-                            <div class="alert alert-info">
-                                <span class="glyphicon glyphicon-info-sign"></span> 暂无进行中的活动
+                            <div class="col-md-12">
+                                <div class="alert alert-info">
+                                    <i class="glyphicon glyphicon-info-sign"></i> 暂无进行中的志愿活动
+                                </div>
                             </div>
                         }
                     </div>
@@ -280,179 +381,11 @@
     </div>
 </div>
 
-<style>
-    /* 基本样式 */
-    .search-panel {
-        margin-bottom: 15px;
-    }
-
-    .button-panel {
-        margin-bottom: 20px;
-    }
-
-    .volunteer-info {
-        background-color: #f9f9f9;
-        padding: 10px;
-        border-radius: 4px;
-        border: 1px solid #eee;
-    }
-
-    /* 轮播图样式 */
-    .carousel-content {
-        background: #f8f8f8;
-        padding: 20px;
-        border-radius: 5px;
-        min-height: 350px;
-    }
-
-    .carousel-img {
-        max-height: 300px;
-        margin: 0 auto;
-        border-radius: 5px;
-        border: 1px solid #ddd;
-    }
-
-    .carousel-description {
-        height: 60px;
-        overflow: hidden;
-    }
-
-    /* 活动卡片滑块样式 */
-    .activity-slider {
-        width: 100%;
-        overflow: hidden;
-        position: relative;
-    }
-
-    .slider-container {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-    }
-
-    .slider-wrapper {
-        display: flex;
-        overflow-x: hidden;
-        scroll-behavior: smooth;
-        gap: 15px;
-        padding: 10px 0;
-        flex-grow: 1;
-    }
-
-    .slider-prev, .slider-next {
-        background: rgba(0, 0, 0, 0.6);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 10;
-    }
-
-        .slider-prev:hover, .slider-next:hover {
-            background: rgba(0, 0, 0, 0.8);
-        }
-
-    .slider-prev {
-        margin-right: 10px;
-    }
-
-    .slider-next {
-        margin-left: 10px;
-    }
-
-    .activity-card {
-        flex: 0 0 250px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        overflow: hidden;
-        background: white;
-        transition: transform 0.3s;
-        cursor: pointer;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-        .activity-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-    .activity-image {
-        height: 150px;
-        overflow: hidden;
-    }
-
-        .activity-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-    .activity-content {
-        padding: 10px;
-    }
-
-        .activity-content h4 {
-            margin-top: 0;
-            height: 40px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-    .activity-type, .activity-date, .activity-place, .activity-people {
-        margin: 5px 0;
-        font-size: 12px;
-    }
-
-    .activity-buttons {
-        margin-top: 10px;
-        text-align: center;
-    }
-</style>
-
 @section scripts {
     <script>
-        $(document).ready(function () {
-            // 轮播图自动播放设置
-            $('#activityCarousel').carousel({
-                interval: 5000
-            });
-
-            // 活动卡片滑块功能
-            const sliderWrapper = $('.slider-wrapper');
-            const cardWidth = 265; // 卡片宽度 + 间距
-            const visibleCards = Math.floor(sliderWrapper.width() / cardWidth);
-
-            $('.slider-prev').click(function () {
-                sliderWrapper.animate({
-                    scrollLeft: '-=' + (cardWidth * visibleCards)
-                }, 300);
-            });
-
-            $('.slider-next').click(function () {
-                sliderWrapper.animate({
-                    scrollLeft: '+=' + (cardWidth * visibleCards)
-                }, 300);
-            });
-
-            // 点击活动卡片跳转到详情页
-            $('.activity-card').click(function (e) {
-                // 如果点击的是按钮，不执行卡片的点击事件
-                if ($(e.target).closest('.activity-buttons').length === 0) {
-                    const activityId = $(this).data('id');
-                    window.location.href = '@Url.Action("ActivityDetails", "Volunteer")/' + activityId;
-                }
-            });
-
-            // 阻止按钮点击事件冒泡
-            $('.activity-buttons a').click(function (e) {
-                e.stopPropagation();
-            });
+        $(function () {
+            // 初始化工具提示
+            $('[data-toggle="tooltip"]').tooltip();
         });
     </script>
 }

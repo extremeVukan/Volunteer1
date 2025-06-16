@@ -154,6 +154,7 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
+    <Content Include="Content\Images\volunteer-icon.png" />
     <Content Include="Content\Images\暂无图片.gif" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
@@ -232,10 +233,14 @@
     <Content Include="Views\Volunteer\SelfCheck.cshtml" />
     <Content Include="Views\Volunteer\GetVolunteerHours.cshtml" />
     <Content Include="Views\Admin\ActivityDetails.cshtml" />
+    <Content Include="Views\Volunteer\ApplyIdentify.cshtml" />
+    <Content Include="Views\Volunteer\CheckIdentifyStatus.cshtml" />
+    <Content Include="Views\Volunteer\MyActivities.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Models\" />
+    <Folder Include="Views\CheckInOut\" />
     <Folder Include="Views\Image\" />
   </ItemGroup>
   <ItemGroup>
