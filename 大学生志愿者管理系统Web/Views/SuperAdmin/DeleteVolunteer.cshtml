@@ -1,0 +1,100 @@
+﻿@model DAL.volunteerT
+@{
+    ViewBag.Title = "删除志愿者";
+}
+
+<div class="container">
+    <div class="page-header">
+        <h2><span class="glyphicon glyphicon-trash"></span> 删除志愿者</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                </div>
+            }
+
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    <h3 class="panel-title">确认删除</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="alert alert-warning">
+                        <span class="glyphicon glyphicon-warning-sign"></span> 警告：此操作将永久删除该志愿者账号，请确认！
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="well">
+                                <dl class="dl-horizontal">
+                                    <dt>志愿者ID:</dt>
+                                    <dd>@Model.Aid</dd>
+
+                                    <dt>志愿者姓名:</dt>
+                                    <dd>@Model.AName</dd>
+
+                                    <dt>电话:</dt>
+                                    <dd>@Model.Atelephone</dd>
+
+                                    <dt>邮箱:</dt>
+                                    <dd>@(string.IsNullOrEmpty(Model.email) ? "-" : Model.email)</dd>
+
+                                    <dt>志愿时长:</dt>
+                                    <dd>@Model.Act_Time</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+
+                    @using (Html.BeginForm("DeleteVolunteerConfirmed", "SuperAdmin", new { id = Model.Aid }, FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-group text-center">
+                            <button type="submit" class="btn btn-danger">
+                                <span class="glyphicon glyphicon-trash"></span> 确认删除
+                            </button>
+                            <a href="@Url.Action("Volunteers")" class="btn btn-default">
+                                <span class="glyphicon glyphicon-arrow-left"></span> 取消
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        margin-top: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+    }
+
+    .panel {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .dl-horizontal dt {
+        width: 120px;
+        text-align: right;
+        padding-right: 15px;
+    }
+
+    .dl-horizontal dd {
+        margin-left: 130px;
+        margin-bottom: 10px;
+    }
+
+    .well {
+        background-color: #f9f9f9;
+    }
+
+    .btn {
+        margin: 0 5px;
+    }
+</style>

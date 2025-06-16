@@ -1,0 +1,122 @@
+﻿@model DAL.zhuguanT
+@{
+    ViewBag.Title = "个人信息";
+}
+
+<div class="container">
+    <div class="page-header">
+        <h2><span class="glyphicon glyphicon-user"></span> 个人信息</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">
+                    <span class="glyphicon glyphicon-ok-sign"></span> @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                </div>
+            }
+
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">平台管理员信息</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            <div class="user-avatar">
+                                <span class="glyphicon glyphicon-user"></span>
+                            </div>
+                            <h4>@Model.Sname</h4>
+                            <span class="label label-primary">平台管理员</span>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="user-info">
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-3">管理员ID:</label>
+                                        <div class="col-md-9">
+                                            <p class="form-control-static">@Model.S_id</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-md-3">用户名:</label>
+                                        <div class="col-md-9">
+                                            <p class="form-control-static">@Model.Sname</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-md-3">账号密码:</label>
+                                        <div class="col-md-9">
+                                            <p class="form-control-static">
+                                                <a href="@Url.Action("ChangePassword")" class="btn btn-xs btn-warning">
+                                                    <span class="glyphicon glyphicon-lock"></span> 修改密码
+                                                </a>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-md-3">登录邮箱:</label>
+                                        <div class="col-md-9">
+                                            <p class="form-control-static">@Model.Semail</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer text-center">
+                    <a href="@Url.Action("Index")" class="btn btn-default">
+                        <span class="glyphicon glyphicon-arrow-left"></span> 返回管理中心
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        margin-top: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+    }
+
+    .panel {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .form-control-static {
+        padding-top: 7px;
+    }
+
+    .user-avatar {
+        background-color: #eee;
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .user-avatar .glyphicon {
+            font-size: 60px;
+            color: #777;
+        }
+
+    .user-info {
+        margin-top: 20px;
+    }
+</style>

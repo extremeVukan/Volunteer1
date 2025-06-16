@@ -1,0 +1,108 @@
+﻿@model DAL.volunteerT
+@{
+    ViewBag.Title = "编辑志愿者";
+}
+
+<div class="container">
+    <div class="page-header">
+        <h2><span class="glyphicon glyphicon-edit"></span> 编辑志愿者</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                </div>
+            }
+
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">志愿者信息</h3>
+                </div>
+                <div class="panel-body">
+                    @using (Html.BeginForm("EditVolunteer", "SuperAdmin", FormMethod.Post, new { @class = "form-horizontal" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(m => m.Aid)
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">志愿者ID:</label>
+                            <div class="col-md-9">
+                                <p class="form-control-static">@Model.Aid</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">志愿者姓名:</label>
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(m => m.AName, new { @class = "form-control", placeholder = "请输入志愿者姓名", required = "required" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">电话/密码:</label>
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(m => m.Atelephone, new { @class = "form-control", placeholder = "请输入电话号码（用作登录密码）", required = "required" })
+                                <span class="help-block">注：电话号码将作为该志愿者的登录密码</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">邮箱:</label>
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(m => m.email, new { @class = "form-control", type = "email", placeholder = "请输入电子邮箱" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">志愿时长:</label>
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(m => m.Act_Time, new { @class = "form-control", type = "number", placeholder = "请输入志愿时长", min = "0" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-offset-3 col-md-9">
+                                <button type="submit" class="btn btn-primary">
+                                    <span class="glyphicon glyphicon-floppy-disk"></span> 保存修改
+                                </button>
+                                <a href="@Url.Action("Volunteers")" class="btn btn-default">
+                                    <span class="glyphicon glyphicon-arrow-left"></span> 返回
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        margin-top: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+    }
+
+    .panel {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .help-block {
+        font-size: 12px;
+        color: #777;
+        margin-top: 5px;
+    }
+
+    .form-control-static {
+        padding-top: 7px;
+        font-weight: bold;
+    }
+</style>

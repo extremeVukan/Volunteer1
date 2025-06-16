@@ -1,71 +1,273 @@
 ﻿@{
-    ViewBag.Title = "平台管理";
+    ViewBag.Title = "平台管理中心";
 }
 
-<div class="row">
-    <div class="col-md-12">
-        <h2>欢迎，@ViewBag.Username</h2>
-        <p>您已成功登录为平台管理员。</p>
-        <p>
-            <a href="@Url.Action("Logout", "Account")" class="btn btn-default">
-                <span class="glyphicon glyphicon-log-out"></span> 退出登录
-            </a>
-        </p>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-12">
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h3 class="panel-title">系统管理</h3>
+<div class="container">
+    <div class="page-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h2><span class="glyphicon glyphicon-dashboard"></span> 平台管理中心</h2>
+                <p class="lead">欢迎，@ViewBag.Username <span class="label label-primary">平台管理员</span></p>
             </div>
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">管理员管理</h3>
-                            </div>
-                            <div class="panel-body">
-                                <a href="#" class="btn btn-block btn-info">
-                                    <span class="glyphicon glyphicon-user"></span> 管理员列表
-                                </a>
-                                <a href="#" class="btn btn-block btn-success">
-                                    <span class="glyphicon glyphicon-plus"></span> 添加管理员
-                                </a>
-                            </div>
-                        </div>
+            <div class="col-md-4 text-right admin-stats">
+                <div class="stat-box">
+                    <div class="stat-value">@ViewBag.ActivityCount</div>
+                    <div class="stat-label">活动总数</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">@ViewBag.VolunteerCount</div>
+                    <div class="stat-label">志愿者总数</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">@ViewBag.AdminCount</div>
+                    <div class="stat-label">管理员总数</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 管理员管理模块 -->
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-user"></span> 管理员管理</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="list-group admin-menu">
+                        <a href="@Url.Action("Admins", "SuperAdmin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-list"></span> 管理员列表
+                            <span class="badge">@ViewBag.AdminCount</span>
+                        </a>
+                        <a href="@Url.Action("AddAdmin", "SuperAdmin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-plus"></span> 添加管理员
+                        </a>
+                        <a href="@Url.Action("EditAdmin", "SuperAdmin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-edit"></span> 修改管理员信息
+                        </a>
+                        <a href="@Url.Action("DeleteAdmin", "SuperAdmin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-trash"></span> 删除管理员信息
+                        </a>
                     </div>
-                    <div class="col-md-4">
-                        <div class="panel panel-success">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">志愿者管理</h3>
-                            </div>
-                            <div class="panel-body">
-                                <a href="#" class="btn btn-block btn-info">
-                                    <span class="glyphicon glyphicon-list"></span> 志愿者列表
-                                </a>
-                                <a href="#" class="btn btn-block btn-warning">
-                                    <span class="glyphicon glyphicon-certificate"></span> 志愿者证书审核
-                                </a>
-                            </div>
-                        </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 志愿者管理模块 -->
+        <div class="col-md-4">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-heart"></span> 志愿者管理</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="list-group admin-menu">
+                        <a href="@Url.Action("Volunteers", "SuperAdmin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-list"></span> 志愿者列表
+                            <span class="badge">@ViewBag.VolunteerCount</span>
+                        </a>
+                        <a href="@Url.Action("AddVolunteer", "SuperAdmin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-plus"></span> 添加志愿者
+                        </a>
+                        <a href="@Url.Action("EditVolunteer", "SuperAdmin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-edit"></span> 修改志愿者信息
+                        </a>
+                        <a href="@Url.Action("DeleteVolunteer", "SuperAdmin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-trash"></span> 删除志愿者信息
+                        </a>
+                        <a href="@Url.Action("ExamineIdentify", "SuperAdmin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-certificate"></span> 志愿者证件申请管理
+                            <span class="badge">@ViewBag.PendingIdentifyCount</span>
+                        </a>
                     </div>
-                    <div class="col-md-4">
-                        <div class="panel panel-warning">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">系统日志</h3>
-                            </div>
-                            <div class="panel-body">
-                                <a href="#" class="btn btn-block btn-warning">
-                                    <span class="glyphicon glyphicon-list-alt"></span> 查看系统日志
-                                </a>
-                            </div>
-                        </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 系统管理模块 -->
+        <div class="col-md-4">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-cog"></span> 系统管理</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="list-group admin-menu">
+                        <a href="@Url.Action("Logs", "SuperAdmin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-list-alt"></span> 系统日志
+                        </a>
+                        <a href="@Url.Action("PersonalInfo", "SuperAdmin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-user"></span> 个人信息
+                        </a>
+                        <a href="@Url.Action("ChangePassword", "SuperAdmin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-lock"></span> 修改密码
+                        </a>
+                        <a href="@Url.Action("SystemStats", "SuperAdmin")" class="list-group-item">
+                            <span class="glyphicon glyphicon-stats"></span> 统计数据
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <!-- 最近活动 -->
+        <div class="col-md-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-calendar"></span> 最新活动</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>活动ID</th>
+                                    <th>活动名称</th>
+                                    <th>类型</th>
+                                    <th>开始时间</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.RecentActivities != null)
+                                {
+                                    foreach (var activity in ViewBag.RecentActivities)
+                                    {
+                                        <tr>
+                                            <td>@activity.activity_ID</td>
+                                            <td>@activity.activity_Name</td>
+                                            <td>@activity.activity_type</td>
+                                            <td>@activity.addtime</td>
+                                            <td>
+                                                @if (activity.status == "已结束")
+                                                {
+                                                    <span class="label label-default">已结束</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="label label-success">进行中</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <a href="@Url.Action("ActivityDetails", "SuperAdmin", new { id = activity.activity_ID })" class="btn btn-xs btn-info">
+                                                    <span class="glyphicon glyphicon-eye-open"></span> 查看
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center">暂无活动数据</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="panel-footer text-right">
+                    <a href="@Url.Action("Activities", "SuperAdmin")" class="btn btn-sm btn-default">查看全部</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最近日志 -->
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-time"></span> 最新系统日志</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="list-group">
+                        @if (ViewBag.RecentLogs != null)
+                        {
+                            foreach (var log in ViewBag.RecentLogs)
+                            {
+                                <div class="list-group-item">
+                                    <h4 class="list-group-item-heading">
+                                        <span class="label label-info">@log.log_type</span>
+                                        @log.username
+                                    </h4>
+                                    <p class="list-group-item-text">
+                                        <small>@log.action_date</small> -
+                                        操作表: @log.action_table
+                                    </p>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="list-group-item">
+                                <p class="text-center">暂无日志记录</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="panel-footer text-right">
+                    <a href="@Url.Action("Logs", "SuperAdmin")" class="btn btn-sm btn-default">查看全部</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    .admin-stats {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 15px;
+    }
+
+    .stat-box {
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        padding: 10px 15px;
+        margin-left: 10px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+        min-width: 80px;
+    }
+
+    .stat-value {
+        font-size: 22px;
+        font-weight: bold;
+        color: #3c4b64;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #768192;
+    }
+
+    .admin-menu .list-group-item {
+        border-left: 3px solid transparent;
+        transition: all 0.2s;
+    }
+
+        .admin-menu .list-group-item:hover {
+            border-left-color: #4c75b2;
+            background-color: #f8f9fa;
+        }
+
+    .panel {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        margin-bottom: 20px;
+    }
+
+    .panel-heading {
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+    }
+
+    .panel-body {
+        padding: 15px;
+    }
+
+    .list-group-item:first-child {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+</style>

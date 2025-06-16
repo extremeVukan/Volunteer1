@@ -98,5 +98,53 @@ namespace BLL
                 return false;
             }
         }
+        /// <summary>
+        /// 获取待审核的志愿者证申请
+        /// </summary>
+        public List<VolIdentifyT> GetPendingIdentifies()
+        {
+            return context.VolIdentifyT.Where(i => i.Status == "未审核").ToList();
+        }
+
+        /// <summary>
+        /// 获取已通过的志愿者证
+        /// </summary>
+        public List<VolIdentifyT> GetApprovedIdentifies()
+        {
+            return context.VolIdentifyT.Where(i => i.Status == "已通过").ToList();
+        }
+
+        /// <summary>
+        /// 获取志愿者证总数
+        /// </summary>
+        public int GetTotalIdentifies()
+        {
+            return context.VolIdentifyT.Count();
+        }
+
+        /// <summary>
+        /// 拒绝志愿者证申请
+        /// </summary>
+        public bool RejectIdentify(int identifyId, int empId)
+        {
+            try
+            {
+                var identify = context.VolIdentifyT.Find(identifyId);
+                if (identify == null)
+                    return false;
+
+                identify.Status = "已拒绝";
+                identify.EMPID = empId;
+
+                context.SaveChanges();
+                AddLog($"管理员ID:{empId}", "拒绝证件申请", "VolIdentifyT");
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

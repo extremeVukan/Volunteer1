@@ -22,7 +22,58 @@ namespace BLL
             }
             return 0;
         }
+        /// <summary>
+        /// 获取志愿者总时长
+        /// </summary>
+        public int GetTotalVolunteerHours()
+        {
+            try
+            {
+                int total = 0;
+                foreach (var volunteer in context.volunteerT)
+                {
+                    if (!string.IsNullOrEmpty(volunteer.Act_Time) && int.TryParse(volunteer.Act_Time, out int hours))
+                    {
+                        total += hours;
+                    }
+                }
+                return total;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
 
+        /// <summary>
+        /// 获取平均志愿者时长
+        /// </summary>
+        public double GetAverageVolunteerHours()
+        {
+            try
+            {
+                int total = 0;
+                int count = 0;
+
+                foreach (var volunteer in context.volunteerT)
+                {
+                    if (!string.IsNullOrEmpty(volunteer.Act_Time) && int.TryParse(volunteer.Act_Time, out int hours))
+                    {
+                        total += hours;
+                        count++;
+                    }
+                }
+
+                if (count == 0)
+                    return 0;
+
+                return Math.Round((double)total / count, 2);
+            }
+            catch
+            {
+                return 0;
+            }
+        }
         /// <summary>
         /// 更新志愿者时长
         /// </summary>
@@ -87,10 +138,10 @@ namespace BLL
         {
             try
             {
-                // 检查ID是否已存在
-                if (context.volunteerT.Any(v => v.Aid == volunteer.Aid))
+                // 如果ID为0或已存在，则自动分配下一个可用ID
+                if (volunteer.Aid == 0 || context.volunteerT.Any(v => v.Aid == volunteer.Aid))
                 {
-                    return false;
+                    volunteer.Aid = GetNextVolunteerId();
                 }
 
                 // 检查名称是否已存在

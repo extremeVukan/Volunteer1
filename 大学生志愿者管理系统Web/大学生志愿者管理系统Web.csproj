@@ -196,6 +196,26 @@
     <Content Include="Views\SuperAdmin\Index.cshtml" />
     <Content Include="Views\Volunteer\ActivityDetails.cshtml" />
     <Content Include="Views\Volunteer\MyApplications.cshtml" />
+    <Content Include="Views\Account\_loginLayout.cshtml" />
+    <Content Include="Views\SuperAdmin\Admins.cshtml" />
+    <Content Include="Views\SuperAdmin\Logs.cshtml" />
+    <Content Include="Views\SuperAdmin\AddAdmin.cshtml" />
+    <Content Include="Views\SuperAdmin\EditAdmin.cshtml" />
+    <Content Include="Views\SuperAdmin\DeleteAdmin.cshtml" />
+    <Content Include="Views\SuperAdmin\PersonalInfo.cshtml" />
+    <Content Include="Views\SuperAdmin\ChangePassword.cshtml" />
+    <Content Include="Views\SuperAdmin\ExamineIdentify.cshtml" />
+    <Content Include="Views\SuperAdmin\SelectAdmin.cshtml" />
+    <Content Include="Views\SuperAdmin\SelectAdminToDelete.cshtml" />
+    <Content Include="Views\SuperAdmin\ActivityDetails.cshtml" />
+    <Content Include="Views\SuperAdmin\Volunteers.cshtml" />
+    <Content Include="Views\SuperAdmin\AddVolunteer.cshtml" />
+    <Content Include="Views\SuperAdmin\SelectVolunteer.cshtml" />
+    <Content Include="Views\SuperAdmin\EditVolunteers.cshtml" />
+    <Content Include="Views\SuperAdmin\SelectVolunteerToDelete.cshtml" />
+    <Content Include="Views\SuperAdmin\DeleteVolunteer.cshtml" />
+    <Content Include="Views\SuperAdmin\Activities.cshtml" />
+    <Content Include="Views\SuperAdmin\SystemStats.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

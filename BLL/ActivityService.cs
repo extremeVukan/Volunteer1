@@ -232,6 +232,41 @@ namespace BLL
             return context.ACTMember.Where(m => m.ACTID == activityId).ToList();
         }
         /// <summary>
+        /// 获取活动状态为活跃的活动
+        /// </summary>
+        public List<ActivityT> GetActiveActivities()
+        {
+            return context.ActivityT.Where(a => a.status != "已结束").ToList();
+        }
+
+        /// <summary>
+        /// 获取已结束的活动
+        /// </summary>
+        public List<ActivityT> GetCompletedActivities()
+        {
+            return context.ActivityT.Where(a => a.status == "已结束").ToList();
+        }
+
+        /// <summary>
+        /// 获取活动类型统计
+        /// </summary>
+        public Dictionary<string, int> GetActivityTypeStats()
+        {
+            try
+            {
+                var result = context.ActivityT
+                    .GroupBy(a => a.activity_type)
+                    .Select(g => new { Type = g.Key, Count = g.Count() })
+                    .ToDictionary(x => x.Type, x => x.Count);
+
+                return result;
+            }
+            catch
+            {
+                return new Dictionary<string, int>();
+            }
+        }
+        /// <summary>
         /// 根据志愿者ID获取参与的活动
         /// </summary>
         /// <param name="volunteerId">志愿者ID</param>

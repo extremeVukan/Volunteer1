@@ -1,0 +1,376 @@
+﻿@{
+    ViewBag.Title = "系统统计";
+}
+
+<div class="container">
+    <div class="page-header">
+        <h2><span class="glyphicon glyphicon-stats"></span> 系统统计</h2>
+        <p class="lead">志愿者管理系统运营数据统计</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- 主要统计卡片 -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="panel panel-primary stats-card">
+                <div class="panel-body">
+                    <div class="stats-icon">
+                        <span class="glyphicon glyphicon-user"></span>
+                    </div>
+                    <div class="stats-data">
+                        <h3>@ViewBag.TotalVolunteers</h3>
+                        <p>志愿者总数</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="panel panel-success stats-card">
+                <div class="panel-body">
+                    <div class="stats-icon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </div>
+                    <div class="stats-data">
+                        <h3>@ViewBag.TotalActivities</h3>
+                        <p>活动总数</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="panel panel-info stats-card">
+                <div class="panel-body">
+                    <div class="stats-icon">
+                        <span class="glyphicon glyphicon-time"></span>
+                    </div>
+                    <div class="stats-data">
+                        <h3>@ViewBag.TotalHours</h3>
+                        <p>总志愿时长</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="panel panel-warning stats-card">
+                <div class="panel-body">
+                    <div class="stats-icon">
+                        <span class="glyphicon glyphicon-certificate"></span>
+                    </div>
+                    <div class="stats-data">
+                        <h3>@ViewBag.ApprovedIdentifies</h3>
+                        <p>已颁发证书</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 活动状态统计 -->
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">活动状态分布</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="chart-container">
+                        <canvas id="activityStatusChart"></canvas>
+                    </div>
+                    <div class="row text-center stats-detail">
+                        <div class="col-xs-6">
+                            <div class="well well-sm">
+                                <span class="stats-label">进行中活动</span>
+                                <h4>@ViewBag.ActiveActivities</h4>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="well well-sm">
+                                <span class="stats-label">已结束活动</span>
+                                <h4>@ViewBag.CompletedActivities</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 志愿者统计 -->
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">志愿服务时长</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="chart-container">
+                        <canvas id="volunteerHoursChart"></canvas>
+                    </div>
+                    <div class="row text-center stats-detail">
+                        <div class="col-xs-6">
+                            <div class="well well-sm">
+                                <span class="stats-label">人均志愿时长</span>
+                                <h4>@ViewBag.AverageHours 小时</h4>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="well well-sm">
+                                <span class="stats-label">注册志愿者</span>
+                                <h4>@ViewBag.TotalVolunteers 人</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 活动类型分布 -->
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">活动类型分布</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="chart-container">
+                        <canvas id="activityTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 系统管理员统计 -->
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">管理员账号情况</h3>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-striped">
+                        <tr>
+                            <th>管理员总数</th>
+                            <td>@ViewBag.TotalAdmins</td>
+                        </tr>
+                        <tr>
+                            <th>平台管理员数量</th>
+                            <td>1</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 志愿者证统计 -->
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">志愿者证书情况</h3>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-striped">
+                        <tr>
+                            <th>申请总数</th>
+                            <td>@ViewBag.TotalIdentifies</td>
+                        </tr>
+                        <tr>
+                            <th>已通过</th>
+                            <td>@ViewBag.ApprovedIdentifies</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <a href="@Url.Action("Index")" class="btn btn-default">
+                <span class="glyphicon glyphicon-arrow-left"></span> 返回平台管理中心
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        margin-top: 20px;
+    }
+
+    .stats-card {
+        display: flex;
+        margin-bottom: 20px;
+    }
+
+        .stats-card .panel-body {
+            padding: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+    .stats-icon {
+        font-size: 32px;
+        margin-right: 15px;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .stats-data {
+        flex-grow: 1;
+    }
+
+        .stats-data h3 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-size: 24px;
+        }
+
+        .stats-data p {
+            margin-bottom: 0;
+            color: #777;
+        }
+
+    .chart-container {
+        position: relative;
+        height: 220px;
+        margin-bottom: 15px;
+    }
+
+    .stats-detail .well {
+        margin-bottom: 0;
+    }
+
+    .stats-label {
+        color: #777;
+        font-size: 12px;
+    }
+
+    h4 {
+        margin-top: 8px;
+        margin-bottom: 0;
+    }
+</style>
+
+@section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(function() {
+            // 活动状态分布图
+            var statusCtx = document.getElementById('activityStatusChart').getContext('2d');
+            var statusData = {
+                labels: ['进行中', '已结束'],
+                datasets: [{
+                    data: [@ViewBag.ActiveActivities, @ViewBag.CompletedActivities],
+                    backgroundColor: ['#5cb85c', '#777777']
+                }]
+            };
+
+            var statusChart = new Chart(statusCtx, {
+                type: 'pie',
+                data: statusData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // 志愿服务时长图
+            var hoursCtx = document.getElementById('volunteerHoursChart').getContext('2d');
+            var hoursData = {
+                labels: ['总志愿时长'],
+                datasets: [{
+                    label: '志愿服务时长',
+                    data: [@ViewBag.TotalHours],
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    borderWidth: 1
+                }]
+            };
+
+            var hoursChart = new Chart(hoursCtx, {
+                type: 'bar',
+                data: hoursData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // 活动类型分布图
+            var typeCtx = document.getElementById('activityTypeChart').getContext('2d');
+
+            @if (ViewBag.ActivityTypeStats != null)
+            {
+                <text>
+                var typeLabels = [];
+                var typeData = [];
+
+                @foreach (var type in ViewBag.ActivityTypeStats)
+                {
+                    <text>
+                    typeLabels.push('@type.Key');
+                    typeData.push(@type.Value);
+                    </text>
+                }
+
+                var typeChart = new Chart(typeCtx, {
+                    type: 'horizontalBar',
+                    data: {
+                        labels: typeLabels,
+                        datasets: [{
+                            label: '活动数量',
+                            data: typeData,
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.6)',
+                                'rgba(54, 162, 235, 0.6)',
+                                'rgba(255, 206, 86, 0.6)',
+                                'rgba(75, 192, 192, 0.6)',
+                                'rgba(153, 102, 255, 0.6)',
+                                'rgba(255, 159, 64, 0.6)'
+                            ],
+                            borderColor: [
+                                'rgb(255, 99, 132)',
+                                'rgb(54, 162, 235)',
+                                'rgb(255, 206, 86)',
+                                'rgb(75, 192, 192)',
+                                'rgb(153, 102, 255)',
+                                'rgb(255, 159, 64)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+                </text>
+            }
+        });
+    </script>
+}

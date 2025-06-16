@@ -1,0 +1,106 @@
+﻿@model IEnumerable<DAL.adminT>
+@{
+    ViewBag.Title = "管理员列表";
+}
+
+<div class="container">
+    <div class="page-header">
+        <h2><span class="glyphicon glyphicon-user"></span> 管理员列表</h2>
+        <p class="lead">系统中所有管理员账号</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">
+                    <span class="glyphicon glyphicon-ok-sign"></span> @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h3 class="panel-title"><span class="glyphicon glyphicon-th-list"></span> 管理员信息</h3>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <a href="@Url.Action("AddAdmin")" class="btn btn-success btn-sm">
+                                <span class="glyphicon glyphicon-plus"></span> 添加管理员
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>姓名</th>
+                                    <th>性别</th>
+                                    <th>出生日期</th>
+                                    <th>雇佣日期</th>
+                                    <th>地址</th>
+                                    <th>电话</th>
+                                    <th>工资</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Any())
+                                {
+                                    foreach (var admin in Model)
+                                    {
+                                        <tr>
+                                            <td>@admin.admin_ID</td>
+                                            <td>@admin.admin_Name</td>
+                                            <td>@admin.sex</td>
+                                            <td>@(admin.birth_date.HasValue ? admin.birth_date.Value.ToString("yyyy-MM-dd") : "-")</td>
+                                            <td>@(admin.hire_date.HasValue ? admin.hire_date.Value.ToString("yyyy-MM-dd") : "-")</td>
+                                            <td>@admin.address</td>
+                                            <td>@admin.telephone</td>
+                                            <td>@admin.wages</td>
+                                            <td>
+                                                <a href="@Url.Action("EditAdmin", new { id = admin.admin_ID })" class="btn btn-primary btn-xs">
+                                                    <span class="glyphicon glyphicon-edit"></span> 编辑
+                                                </a>
+                                                <a href="@Url.Action("DeleteAdmin", new { id = admin.admin_ID })" class="btn btn-danger btn-xs">
+                                                    <span class="glyphicon glyphicon-trash"></span> 删除
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="9" class="text-center">暂无管理员数据</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <a href="@Url.Action("Index")" class="btn btn-default">
+                <span class="glyphicon glyphicon-arrow-left"></span> 返回平台管理中心
+            </a>
+        </div>
+    </div>
+</div>

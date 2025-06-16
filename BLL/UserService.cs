@@ -87,7 +87,99 @@ namespace BLL
                 return false;
             }
         }
+        /// <summary>
+        /// 根据ID获取管理员信息
+        /// </summary>
+        public adminT GetAdminById(int adminId)
+        {
+            return context.adminT.Find(adminId);
+        }
 
+        /// <summary>
+        /// 添加管理员
+        /// </summary>
+        public bool AddAdmin(adminT admin, string currentUsername)
+        {
+            try
+            {
+                // 如果ID为0或已存在，则自动分配下一个可用ID
+                if (admin.admin_ID == 0 || context.adminT.Any(a => a.admin_ID == admin.admin_ID))
+                {
+                    admin.admin_ID = GetNextAdminId();
+                }
+
+                context.adminT.Add(admin);
+                context.SaveChanges();
+
+                // 记录日志
+                AddLog(currentUsername, "添加", "adminT");
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 更新管理员信息
+        /// </summary>
+        public bool UpdateAdmin(adminT admin)
+        {
+            try
+            {
+                var existingAdmin = context.adminT.Find(admin.admin_ID);
+                if (existingAdmin == null)
+                    return false;
+
+                // 更新属性
+                existingAdmin.admin_Name = admin.admin_Name;
+                existingAdmin.sex = admin.sex;
+                existingAdmin.birth_date = admin.birth_date;
+                existingAdmin.hire_date = admin.hire_date;
+                existingAdmin.address = admin.address;
+                existingAdmin.telephone = admin.telephone;
+                existingAdmin.wages = admin.wages;
+                existingAdmin.resume = admin.resume;
+
+                context.SaveChanges();
+
+                // 记录日志
+                AddLog(admin.admin_Name, "更新", "adminT");
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 修改超级管理员密码
+        /// </summary>
+        public bool ChangeSuperAdminPassword(string username, string currentPassword, string newPassword)
+        {
+            try
+            {
+                var admin = context.zhuguanT.FirstOrDefault(a => a.Sname == username && a.Semail == currentPassword);
+                if (admin == null)
+                    return false;
+
+                admin.Semail = newPassword;
+                context.SaveChanges();
+
+                // 记录日志
+                AddLog(username, "修改密码", "zhuguanT");
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
         /// <summary>
         /// 修改管理员密码
         /// </summary>
@@ -208,6 +300,17 @@ namespace BLL
         public volunteerT GetVolunteerInfoByName(string volunteerName)
         {
             return context.volunteerT.FirstOrDefault(v => v.AName == volunteerName);
+        }
+        /// <summary>
+        /// 获取下一个管理员ID
+        /// </summary>
+        public int GetNextAdminId()
+        {
+            if (!context.adminT.Any())
+            {
+                return 1;
+            }
+            return context.adminT.Max(a => a.admin_ID) + 1;
         }
     }
 }

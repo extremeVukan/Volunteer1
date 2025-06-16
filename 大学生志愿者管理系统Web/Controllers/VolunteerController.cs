@@ -585,7 +585,7 @@ namespace 大学生志愿者管理系统Web.Controllers
                 TempData["ErrorMessage"] = "请登录后查看我的活动";
                 return RedirectToAction("Login", "Account");
             }
-
+            
             try
             {
                 int volunteerId = (int)Session["UserId"];
