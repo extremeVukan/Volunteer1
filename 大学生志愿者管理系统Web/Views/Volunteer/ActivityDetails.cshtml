@@ -1,107 +1,741 @@
 ﻿@model DAL.ActivityT
 @{
     ViewBag.Title = "活动详情";
+    bool canApply = Model != null && 
+                    Model.status != "已结束" && 
+                    Model.ShengyuNum > 0 && 
+                    Session["Username"] != null;
 }
 
 <div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <h3 class="panel-title">活动详情</h3>
-                </div>
-                <div class="panel-body">
-                    @if (Model != null)
-                    {
-                        <div class="row">
-                            <div class="col-md-4">
-                                @if (!string.IsNullOrEmpty(Model.Image) && !Model.Image.Contains("暂无图片"))
-                                {
-                                    <img src="@Url.Action("Activity", "Image", new { path = Model.Image })"
-                                         alt="活动图片" class="img-responsive img-rounded" style="max-width:100%;"
-                                         onerror="this.src='@Url.Content("~/Content/Images/暂无图片.gif")';" />
-                                }
-                                else
-                                {
-                                    <img src="@Url.Content("~/Content/Images/暂无图片.gif")"
-                                         alt="暂无图片" class="img-responsive img-rounded" style="max-width:100%;" />
-                                }
-                            </div>
-                            <div class="col-md-8">
-                                <h2>@Model.activity_Name</h2>
-                                <table class="table table-striped">
-                                    <tr>
-                                        <th>活动编号</th>
-                                        <td>@Model.activity_ID</td>
-                                    </tr>
-                                    <tr>
-                                        <th>活动类型</th>
-                                        <td>@Model.activity_type</td>
-                                    </tr>
-                                    <tr>
-                                        <th>开始时间</th>
-                                        <td>@Model.addtime</td>
-                                    </tr>
-                                    <tr>
-                                        <th>结束时间</th>
-                                        <td>@Model.stoptime</td>
-                                    </tr>
-                                    <tr>
-                                        <th>地点</th>
-                                        <td>@Model.place</td>
-                                    </tr>
-                                    <tr>
-                                        <th>需要人数</th>
-                                        <td>@Model.renshu</td>
-                                    </tr>
-                                    <tr>
-                                        <th>发起人</th>
-                                        <td>@Model.Holder</td>
-                                    </tr>
-                                    <tr>
-                                        <th>状态</th>
-                                        <td>
-                                            @if (Model.status == "已结束")
-                                            {
-                                                <span class="label label-danger">已结束</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="label label-success">进行中</span>
-                                            }
-                                        </td>
-                                    </tr>
-                                </table>
-
-                                <div class="well">
-                                    <h4>活动描述</h4>
-                                    <p>@Html.Raw(Model.descn)</p>
-                                </div>
-
-                                <div class="text-center">
-                                    <a href="@Url.Action("ApplyActivity", "Volunteer", new { id = Model.activity_ID })" class="btn btn-primary btn-lg">
-                                        
-                                    </a>
-                                    <a href="@Url.Action("Index", "Volunteer")" class="btn btn-default btn-lg">
-                                        <span class="glyphicon glyphicon-arrow-left"></span> 返回列表
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-danger">
-                            未找到活动信息
-                        </div>
-                        <p>
-                            <a href="@Url.Action("Index", "Volunteer")" class="btn btn-default">
-                                <span class="glyphicon glyphicon-arrow-left"></span> 返回列表
-                            </a>
-                        </p>
-                    }
+    <div class="panel panel-default volunteer-panel">
+        <div class="panel-heading volunteer-panel-heading">
+            <div class="row">
+                <div class="col-md-8">
+                    <h2><i class="glyphicon glyphicon-calendar"></i> 志愿活动详情</h2>
+                    <p class="lead">查看活动信息并申请参与</p>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success message-alert">
+                    <i class="glyphicon glyphicon-ok-sign"></i> @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger message-alert">
+                    <i class="glyphicon glyphicon-exclamation-sign"></i> @TempData["ErrorMessage"]
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (Model == null)
+    {
+        <div class="activity-details-container">
+            <div class="alert alert-danger">
+                <i class="glyphicon glyphicon-exclamation-sign"></i> 未找到活动信息
+            </div>
+            <div class="text-center">
+                <a href="@Url.Action("Index")" class="btn btn-default btn-lg">
+                    <i class="glyphicon glyphicon-arrow-left"></i> 返回活动列表
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="activity-details-container">
+            <div class="row">
+                <!-- 左侧：活动基本信息和描述 -->
+                <div class="col-md-8">
+                    <!-- 活动状态指示器 -->
+                    <div class="activity-status-indicator @(Model.status == "已结束" ? "ended" : "ongoing")">
+                        <div class="status-icon">
+                            <i class="glyphicon @(Model.status == "已结束" ? "glyphicon-check" : "glyphicon-play-circle")"></i>
+                        </div>
+                        <div class="status-text">
+                            <h3>活动状态：@Model.status</h3>
+                            <p>
+                                @if (Model.status == "已结束")
+                                {
+                                    <span>该活动已结束</span>
+                                }
+                                else
+                                {
+                                    <span>该活动正在进行中</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 活动基本信息卡片 -->
+                    <div class="activity-detail-panel">
+                        <div class="panel-header">
+                            <h4>
+                                <i class="glyphicon glyphicon-file"></i> 活动基本信息
+                                <span class="activity-type-badge">@Model.activity_type</span>
+                            </h4>
+                        </div>
+                        <div class="panel-body">
+                            <h3 class="activity-title">@Model.activity_Name</h3>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-group">
+                                        <label><i class="glyphicon glyphicon-tag"></i> 活动ID</label>
+                                        <span>@Model.activity_ID</span>
+                                    </div>
+                                    <div class="info-group">
+                                        <label><i class="glyphicon glyphicon-map-marker"></i> 活动地点</label>
+                                        <span>@Model.place</span>
+                                    </div>
+                                    <div class="info-group">
+                                        <label><i class="glyphicon glyphicon-user"></i> 发起人</label>
+                                        <span>@Model.Holder</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-group">
+                                        <label><i class="glyphicon glyphicon-time"></i> 开始时间</label>
+                                        <span>@Model.addtime.ToString("yyyy-MM-dd HH:mm")</span>
+                                    </div>
+                                    <div class="info-group">
+                                        <label><i class="glyphicon glyphicon-time"></i> 结束时间</label>
+                                        <span>@Model.stoptime.ToString("yyyy-MM-dd HH:mm")</span>
+                                    </div>
+                                    <div class="info-group">
+                                        <label><i class="glyphicon glyphicon-th"></i> 所需人数</label>
+                                        <span>@Model.renshu</span>
+                                    </div>
+                                    <div class="info-group">
+                                        <label><i class="glyphicon glyphicon-th-list"></i> 剩余名额</label>
+                                        <span>@Model.ShengyuNum</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 活动描述卡片 -->
+                    <div class="activity-detail-panel">
+                        <div class="panel-header">
+                            <h4><i class="glyphicon glyphicon-align-left"></i> 活动描述</h4>
+                        </div>
+                        <div class="panel-body">
+                            <div class="description-content">
+                                @if (!string.IsNullOrEmpty(Model.descn))
+                                {
+                                    @Html.Raw(Model.descn)
+                                }
+                                else
+                                {
+                                    <div class="no-description">
+                                        <i class="glyphicon glyphicon-info-sign"></i>
+                                        <p>暂无活动描述信息</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 活动申请卡片，只有未结束和有名额的活动才显示 -->
+                    @if (canApply)
+                    {
+                        <div class="activity-application-panel">
+                            <div class="panel-header">
+                                <h4><i class="glyphicon glyphicon-send"></i> 活动申请</h4>
+                            </div>
+                            <div class="panel-body">
+                                <div class="application-info">
+                                    <p><i class="glyphicon glyphicon-info-sign"></i> 申请参加活动后，需要等待管理员审核通过才能正式成为志愿者。</p>
+                                    <p><i class="glyphicon glyphicon-time"></i> 请确保您能够按时参加活动，若有特殊情况无法参加，请提前取消申请。</p>
+                                </div>
+                                
+                                <div class="application-action">
+                                    <a href="@Url.Action("ApplyActivity", new { id = Model.activity_ID })" 
+                                       class="btn btn-success btn-lg apply-btn" 
+                                       onclick="return confirm('确定申请参加该活动吗？');">
+                                        <i class="glyphicon glyphicon-ok-circle"></i> 申请参加活动
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- 右侧：活动图片和活动信息 -->
+                <div class="col-md-4">
+                    <!-- 活动图片卡片 -->
+                    <div class="activity-image-panel">
+                        <div class="panel-header">
+                            <h4><i class="glyphicon glyphicon-picture"></i> 活动图片</h4>
+                        </div>
+                        <div class="panel-body text-center">
+                            <div class="activity-image-container">
+                                @if (!string.IsNullOrEmpty(Model.Image) && !Model.Image.Contains("暂无图片"))
+                                {
+                                    <img src="@Url.Action("Activity", "Image", new { path = Model.Image })"
+                                         alt="@Model.activity_Name"
+                                         onerror="this.src='@Url.Content("~/Content/Images/暂无图片.png")';" />
+                                }
+                                else
+                                {
+                                    <img src="@Url.Content("~/Content/Images/暂无图片.png")" alt="暂无图片" />
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 活动统计卡片 -->
+                    <div class="activity-stats-panel">
+                        <div class="panel-header">
+                            <h4><i class="glyphicon glyphicon-stats"></i> 活动统计</h4>
+                        </div>
+                        <div class="panel-body">
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="glyphicon glyphicon-user"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-value">@(Model.renshu - Model.ShengyuNum)</div>
+                                    <div class="stat-label">已报名</div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="glyphicon glyphicon-th-list"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-value">@Model.ShengyuNum</div>
+                                    <div class="stat-label">剩余名额</div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-value">@((Model.stoptime - Model.addtime).Days)</div>
+                                    <div class="stat-label">活动天数</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 活动时间倒计时 -->
+                    @if (Model.status != "已结束")
+                    {
+                        <div class="activity-countdown-panel">
+                            <div class="panel-header">
+                                <h4><i class="glyphicon glyphicon-time"></i> 活动倒计时</h4>
+                            </div>
+                            <div class="panel-body">
+                                <div class="activity-countdown">
+                                    <h5>距离活动结束还有</h5>
+                                    <div class="countdown-timer" id="countdown" data-end="@Model.stoptime.ToString("yyyy-MM-ddTHH:mm:ss")">
+                                        <div class="countdown-item">
+                                            <span id="countdown-days">0</span>
+                                            <span class="countdown-label">天</span>
+                                        </div>
+                                        <div class="countdown-item">
+                                            <span id="countdown-hours">0</span>
+                                            <span class="countdown-label">时</span>
+                                        </div>
+                                        <div class="countdown-item">
+                                            <span id="countdown-minutes">0</span>
+                                            <span class="countdown-label">分</span>
+                                        </div>
+                                        <div class="countdown-item">
+                                            <span id="countdown-seconds">0</span>
+                                            <span class="countdown-label">秒</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- 快速操作卡片 -->
+                    <div class="quick-action-panel">
+                        <div class="panel-header">
+                            <h4><i class="glyphicon glyphicon-flash"></i> 快速操作</h4>
+                        </div>
+                        <div class="panel-body">
+                            <div class="quick-action-button">
+                                <a href="@Url.Action("MyApplications")" class="btn btn-block btn-info">
+                                    <div class="action-icon">
+                                        <i class="glyphicon glyphicon-list-alt"></i>
+                                    </div>
+                                    <div class="action-text">
+                                        <h4>我的申请</h4>
+                                        <p>查看您的活动申请状态</p>
+                                    </div>
+                                    <div class="action-arrow">
+                                        <i class="glyphicon glyphicon-chevron-right"></i>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div class="quick-action-button">
+                                <a href="@Url.Action("MyActivities")" class="btn btn-block btn-success">
+                                    <div class="action-icon">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                    </div>
+                                    <div class="action-text">
+                                        <h4>我的活动</h4>
+                                        <p>查看您已参加的活动</p>
+                                    </div>
+                                    <div class="action-arrow">
+                                        <i class="glyphicon glyphicon-chevron-right"></i>
+                                    </div>
+                                </a>
+                            </div>
+                            
+                            <div class="quick-action-button">
+                                <a href="@Url.Action("Index")" class="btn btn-block btn-default">
+                                    <div class="action-icon">
+                                        <i class="glyphicon glyphicon-th-list"></i>
+                                    </div>
+                                    <div class="action-text">
+                                        <h4>活动广场</h4>
+                                        <p>返回浏览更多活动</p>
+                                    </div>
+                                    <div class="action-arrow">
+                                        <i class="glyphicon glyphicon-chevron-right"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
+
+<style>
+    /* 基础样式 */
+    body {
+        background-color: #f9f9f9;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* 面板样式 */
+    .volunteer-panel {
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        border: none;
+    }
+
+    .volunteer-panel-heading {
+        background: linear-gradient(135deg, #1E88E5, #42A5F5);
+        color: white;
+        padding: 20px 15px;
+        border-bottom: none;
+    }
+
+    /* 消息提示样式 */
+    .message-alert {
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 活动详情容器 */
+    .activity-details-container {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    /* 状态指示器 */
+    .activity-status-indicator {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        color: white;
+    }
+
+    .activity-status-indicator.ongoing {
+        background: linear-gradient(135deg, #26c6da, #00b8d4);
+    }
+
+    .activity-status-indicator.ended {
+        background: linear-gradient(135deg, #F5365C, #F56036);
+    }
+
+    .status-icon {
+        font-size: 40px;
+        margin-right: 20px;
+    }
+
+    .status-text h3 {
+        margin-top: 0;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+
+    .status-text p {
+        margin: 0;
+        opacity: 0.9;
+    }
+
+    /* 活动标题 */
+    .activity-title {
+        font-weight: bold;
+        color: #333;
+        margin-top: 0;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+    }
+
+    /* 活动信息面板 */
+    .activity-detail-panel, .activity-image-panel, .quick-action-panel, 
+    .activity-stats-panel, .activity-countdown-panel, .activity-application-panel {
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        border: 1px solid #eaeaea;
+    }
+
+    .panel-header {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-bottom: 1px solid #eaeaea;
+    }
+
+    .panel-header h4 {
+        margin: 0;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .panel-header i {
+        margin-right: 5px;
+        color: #1E88E5;
+    }
+
+    .panel-body {
+        padding: 20px;
+    }
+
+    /* 活动类型标签 */
+    .activity-type-badge {
+        display: inline-block;
+        background: linear-gradient(to right, #1E88E5, #42A5F5);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        margin-left: 10px;
+        vertical-align: middle;
+    }
+
+    /* 活动信息组 */
+    .info-group {
+        margin-bottom: 15px;
+    }
+
+    .info-group label {
+        display: block;
+        color: #666;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .info-group label i {
+        margin-right: 5px;
+        color: #1E88E5;
+        width: 16px;
+        text-align: center;
+    }
+
+    .info-group span {
+        color: #333;
+        font-size: 16px;
+    }
+
+    /* 描述内容 */
+    .description-content {
+        color: #333;
+        line-height: 1.6;
+    }
+
+    .no-description {
+        text-align: center;
+        padding: 20px;
+        color: #888;
+    }
+
+    .no-description i {
+        font-size: 40px;
+        margin-bottom: 10px;
+        color: #ddd;
+    }
+
+    /* 活动图片容器 */
+    .activity-image-container {
+        width: 100%;
+        height: 250px;
+        overflow: hidden;
+        border-radius: 8px;
+    }
+
+    .activity-image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+
+    .activity-image-container:hover img {
+        transform: scale(1.05);
+    }
+
+    /* 快速操作按钮 */
+    .quick-action-button {
+        margin-bottom: 15px;
+    }
+
+    .quick-action-button .btn {
+        padding: 0;
+        text-align: left;
+        border-radius: 8px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
+
+    .quick-action-button .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    }
+
+    .quick-action-button .action-icon {
+        width: 50px;
+        height: 100%;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0,0,0,0.1);
+        padding: 15px 0;
+    }
+
+    .quick-action-button .action-text {
+        flex-grow: 1;
+        padding: 10px 15px;
+    }
+
+    .quick-action-button .action-text h4 {
+        margin: 0 0 5px 0;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .quick-action-button .action-text p {
+        margin: 0;
+        font-size: 12px;
+        opacity: 0.8;
+    }
+
+    .quick-action-button .action-arrow {
+        width: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        opacity: 0.5;
+    }
+
+    /* 申请活动信息 */
+    .application-info {
+        background-color: #e8f4f8;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .application-info p {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .application-info p i {
+        margin-right: 10px;
+        color: #1E88E5;
+        margin-top: 3px;
+    }
+
+    .application-action {
+        text-align: center;
+    }
+
+    .apply-btn {
+        padding: 12px 25px;
+        font-size: 16px;
+        border-radius: 30px;
+        box-shadow: 0 4px 10px rgba(38, 198, 218, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .apply-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(38, 198, 218, 0.4);
+    }
+
+    /* 倒计时 */
+    .activity-countdown {
+        text-align: center;
+    }
+
+    .activity-countdown h5 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .countdown-timer {
+        display: flex;
+        justify-content: center;
+    }
+
+    .countdown-item {
+        background-color: #1E88E5;
+        color: white;
+        border-radius: 8px;
+        padding: 8px 5px;
+        min-width: 45px;
+        margin: 0 5px;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .countdown-item span:first-child {
+        font-size: 18px;
+        font-weight: bold;
+        display: block;
+    }
+
+    .countdown-label {
+        font-size: 12px;
+        opacity: 0.8;
+    }
+
+    /* 活动统计 */
+    .activity-stats-panel .panel-body {
+        padding: 0;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .stat-item:last-child {
+        border-bottom: none;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        background-color: #e3f2fd;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        color: #1E88E5;
+        font-size: 18px;
+    }
+
+    .stat-content {
+        flex-grow: 1;
+    }
+
+    .stat-value {
+        color: #333;
+        font-size: 20px;
+        font-weight: bold;
+        line-height: 1;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        color: #777;
+        font-size: 12px;
+    }
+</style>
+
+<script>
+    $(document).ready(function() {
+        // 倒计时功能
+        function updateCountdown() {
+            var countdownElement = $('#countdown');
+            if (countdownElement.length > 0) {
+                var endDate = new Date(countdownElement.data('end'));
+                var now = new Date();
+
+                if (now < endDate) {
+                    var diff = Math.floor((endDate - now) / 1000);
+
+                    var days = Math.floor(diff / 86400);
+                    diff -= days * 86400;
+
+                    var hours = Math.floor(diff / 3600);
+                    diff -= hours * 3600;
+
+                    var minutes = Math.floor(diff / 60);
+                    diff -= minutes * 60;
+
+                    var seconds = diff;
+
+                    $('#countdown-days').text(days);
+                    $('#countdown-hours').text(hours);
+                    $('#countdown-minutes').text(minutes);
+                    $('#countdown-seconds').text(seconds);
+                } else {
+                    $('.countdown-timer').html('<div class="countdown-ended">活动已结束</div>');
+                }
+            }
+        }
+
+        // 初始化并每秒更新倒计时
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        // 5秒后隐藏消息提示
+        setTimeout(function() {
+            $('.message-alert').fadeOut(500);
+        }, 5000);
+    });
+</script>

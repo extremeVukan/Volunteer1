@@ -4,145 +4,588 @@
 }
 
 <div class="container">
-    <div class="page-header">
-        <h2><span class="glyphicon glyphicon-time"></span> 我的志愿时长</h2>
-        <p class="lead">查看您的累计志愿服务时长和参与活动记录</p>
-    </div>
-
+    <!-- 页面顶部标题栏 -->
     <div class="row">
         <div class="col-md-12">
-            @if (TempData["SuccessMessage"] != null)
-            {
-                <div class="alert alert-success">
-                    <span class="glyphicon glyphicon-ok-sign"></span> @TempData["SuccessMessage"]
-                </div>
-            }
-            @if (TempData["ErrorMessage"] != null)
-            {
-                <div class="alert alert-danger">
-                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
-                </div>
-            }
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-4">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title"><span class="glyphicon glyphicon-user"></span> 志愿者信息</h3>
-                </div>
-                <div class="panel-body">
-                    <table class="table">
-                        <tr>
-                            <th>志愿者姓名：</th>
-                            <td>@Model.AName</td>
-                        </tr>
-                        <tr>
-                            <th>志愿者ID：</th>
-                            <td>@Model.Aid</td>
-                        </tr>
-                        <tr>
-                            <th>联系电话：</th>
-                            <td>@Model.Atelephone</td>
-                        </tr>
-                        <tr>
-                            <th>电子邮箱：</th>
-                            <td>@Model.email</td>
-                        </tr>
-                        <tr>
-                            <th>累计志愿时长：</th>
-                            <td>
-                                <span class="badge" style="background-color: #5cb85c; font-size: 16px; padding: 8px 12px;">
-                                    @ViewBag.TotalHours 小时
-                                </span>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-8">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title"><span class="glyphicon glyphicon-list"></span> 参与活动记录</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>活动ID</th>
-                                    <th>活动名称</th>
-                                    <th>活动类型</th>
-                                    <th>开始时间</th>
-                                    <th>结束时间</th>
-                                    <th>地点</th>
-                                    <th>状态</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (ViewBag.Activities != null && ((IEnumerable<DAL.ActivityT>)ViewBag.Activities).Any())
-                                {
-                                    foreach (var activity in (IEnumerable<DAL.ActivityT>)ViewBag.Activities)
-                                    {
-                                        <tr>
-                                            <td>@activity.activity_ID</td>
-                                            <td>@activity.activity_Name</td>
-                                            <td>@activity.activity_type</td>
-                                            <td>@activity.addtime.ToString("yyyy-MM-dd")</td>
-                                            <td>@activity.stoptime.ToString("yyyy-MM-dd")</td>
-                                            <td>@activity.place</td>
-                                            <td>
-                                                @if (activity.status == "已结束")
-                                                {
-                                                    <span class="label label-default">已结束</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="label label-success">进行中</span>
-                                                }
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td colspan="7" class="text-center">您还没有参与过任何活动</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+            <div class="panel panel-default volunteer-panel">
+                <div class="panel-heading volunteer-panel-heading">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h2><i class="glyphicon glyphicon-time"></i> 我的志愿时长</h2>
+                            <p>查看您的累计志愿服务时长和参与活动记录</p>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <p>累计时长：<span class="hours-badge">@ViewBag.TotalHours 小时</span></p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- 提示消息 -->
     <div class="row">
-        <div class="col-md-12 text-center" style="margin-top: 20px;">
-            <a href="@Url.Action("Index")" class="btn btn-default">
-                <span class="glyphicon glyphicon-arrow-left"></span> 返回个人中心
-            </a>
+        <div class="col-md-12">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade in">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <i class="glyphicon glyphicon-ok-sign"></i> @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade in">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <i class="glyphicon glyphicon-exclamation-sign"></i> @TempData["ErrorMessage"]
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 左侧志愿者信息卡片 -->
+        <div class="col-md-4">
+            <div class="hours-summary-card">
+                <div class="hours-circle-container">
+                    <div class="hours-circle">
+                        <span class="hours-number">@ViewBag.TotalHours</span>
+                        <span class="hours-label">小时</span>
+                    </div>
+                </div>
+
+                <div class="volunteer-info">
+                    <div class="volunteer-name">
+                        <i class="glyphicon glyphicon-user"></i> @Model.AName
+                    </div>
+                    <div class="volunteer-details">
+                        <div class="info-row">
+                            <div class="info-label">志愿者ID</div>
+                            <div class="info-value">@Model.Aid</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">联系电话</div>
+                            <div class="info-value">@Model.Atelephone</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">电子邮箱</div>
+                            <div class="info-value">@Model.email</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hours-actions">
+                    <a href="@Url.Action("Index", "Volunteer")" class="btn btn-default btn-block">
+                        <i class="glyphicon glyphicon-home"></i> 返回首页
+                    </a>
+                    <a href="@Url.Action("MyActivities", "Volunteer")" class="btn btn-info btn-block">
+                        <i class="glyphicon glyphicon-calendar"></i> 我的活动
+                    </a>
+                    <a href="@Url.Action("SelfCheck", "Volunteer")" class="btn btn-success btn-block">
+                        <i class="glyphicon glyphicon-user"></i> 个人信息
+                    </a>
+                </div>
+            </div>
+
+            <div class="hours-stats-card">
+                <h4><i class="glyphicon glyphicon-stats"></i> 活动统计</h4>
+                <div class="stats-content">
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="glyphicon glyphicon-ok-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number">@(ViewBag.Activities != null ? ((IEnumerable<DAL.ActivityT>)ViewBag.Activities).Count(a => a.status == "已结束") : 0)</div>
+                            <div class="stat-label">已完成活动</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="glyphicon glyphicon-time"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number">@(ViewBag.Activities != null ? ((IEnumerable<DAL.ActivityT>)ViewBag.Activities).Count(a => a.status == "进行中") : 0)</div>
+                            <div class="stat-label">进行中活动</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="glyphicon glyphicon-calendar"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number">@(ViewBag.Activities != null ? ((IEnumerable<DAL.ActivityT>)ViewBag.Activities).Count() : 0)</div>
+                            <div class="stat-label">总活动数</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧活动记录列表 -->
+        <div class="col-md-8">
+            <div class="hours-activities-card">
+                <div class="card-header">
+                    <h3><i class="glyphicon glyphicon-list"></i> 参与活动记录</h3>
+                    <p class="text-muted">您的志愿服务历史记录</p>
+                </div>
+
+                @if (ViewBag.Activities != null && ((IEnumerable<DAL.ActivityT>)ViewBag.Activities).Any())
+                {
+                    <div class="activities-filter">
+                        <div class="filter-label">筛选：</div>
+                        <div class="filter-options">
+                            <a href="javascript:void(0)" class="filter-option active" onclick="filterActivities('all')">全部活动</a>
+                            <a href="javascript:void(0)" class="filter-option" onclick="filterActivities('ongoing')">进行中</a>
+                            <a href="javascript:void(0)" class="filter-option" onclick="filterActivities('completed')">已结束</a>
+                        </div>
+                    </div>
+
+                    <div class="activities-container">
+                        @foreach (var activity in (IEnumerable<DAL.ActivityT>)ViewBag.Activities)
+                        {
+                            <div class="activity-item @(activity.status == "已结束" ? "activity-completed" : "activity-ongoing")">
+                                <div class="activity-status">
+                                    @if (activity.status == "已结束")
+                                    {
+                                        <span class="status-badge status-completed">
+                                            <i class="glyphicon glyphicon-ok"></i>
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-ongoing">
+                                            <i class="glyphicon glyphicon-time"></i>
+                                        </span>
+                                    }
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-header">
+                                        <div class="activity-title">@activity.activity_Name</div>
+                                        <div class="activity-type">@activity.activity_type</div>
+                                    </div>
+                                    <div class="activity-details">
+                                        <div class="activity-info">
+                                            <i class="glyphicon glyphicon-map-marker"></i> @activity.place
+                                        </div>
+                                        <div class="activity-date">
+                                            <i class="glyphicon glyphicon-calendar"></i>
+                                            @activity.addtime.ToString("yyyy-MM-dd") 至 @activity.stoptime.ToString("yyyy-MM-dd")
+                                        </div>
+                                    </div>
+                                    <div class="activity-status-text">
+                                        @if (activity.status == "已结束")
+                                        {
+                                            <span class="label label-default">已结束</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="label label-success">进行中</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="no-activities">
+                        <div class="no-data-icon">
+                            <i class="glyphicon glyphicon-info-sign"></i>
+                        </div>
+                        <p>您还没有参与过任何活动</p>
+                        <a href="@Url.Action("Index", "Volunteer")" class="btn btn-primary">
+                            <i class="glyphicon glyphicon-search"></i> 浏览可参与活动
+                        </a>
+                    </div>
+                }
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-    .page-header {
+    /* 整体卡片样式 */
+    .volunteer-panel {
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         margin-top: 20px;
-        border-bottom: 1px solid #eee;
+        margin-bottom: 20px;
+        overflow: hidden;
+        border: none;
+    }
+
+    /* 卡片头部 */
+    .volunteer-panel-heading {
+        background: linear-gradient(135deg, #FF9966, #FF5E62);
+        color: white;
+        padding: 20px 15px;
+        border-bottom: none;
+    }
+
+    .hours-badge {
+        background-color: white;
+        color: #FF5E62;
+        font-size: 18px;
+        font-weight: bold;
+        padding: 5px 15px;
+        border-radius: 20px;
+        display: inline-block;
+    }
+
+    /* 左侧时长信息卡片 */
+    .hours-summary-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .hours-circle-container {
+        padding: 20px 0;
+    }
+
+    .hours-circle {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #FF9966, #FF5E62);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto 20px;
+        position: relative;
+        box-shadow: 0 5px 15px rgba(255, 94, 98, 0.3);
+    }
+
+    .hours-circle::after {
+        content: "";
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        right: -5px;
+        bottom: -5px;
+        border-radius: 50%;
+        border: 2px dashed rgba(255, 255, 255, 0.5);
+        animation: rotate 20s linear infinite;
+    }
+
+   
+
+    .hours-number {
+        font-size: 36px;
+        font-weight: bold;
+        line-height: 1;
+    }
+
+    .hours-label {
+        font-size: 16px;
+        opacity: 0.8;
+    }
+
+    .volunteer-info {
+        padding: 20px 0;
+        border-top: 1px solid #f0f0f0;
+        border-bottom: 1px solid #f0f0f0;
+        margin-bottom: 20px;
+    }
+
+    .volunteer-name {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #333;
+    }
+
+    .volunteer-details {
+        text-align: left;
+    }
+
+    .info-row {
+        display: flex;
+        margin-bottom: 10px;
+    }
+
+    .info-label {
+        width: 30%;
+        font-weight: 600;
+        color: #6c757d;
+    }
+
+    .info-value {
+        width: 70%;
+        color: #333;
+    }
+
+    .hours-actions {
+        margin-top: 15px;
+    }
+
+    .hours-actions .btn {
+        margin-bottom: 10px;
+        border-radius: 30px;
+    }
+
+    /* 统计卡片 */
+    .hours-stats-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .hours-stats-card h4 {
+        font-weight: 600;
+        margin-bottom: 15px;
+        font-size: 16px;
+        border-bottom: 1px solid #f0f0f0;
+        padding-bottom: 10px;
+    }
+
+    .stats-content {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-top: 15px;
+    }
+
+    .stat-item {
+        width: 30%;
+        text-align: center;
+    }
+
+    .stat-icon {
+        font-size: 24px;
+        margin-bottom: 8px;
+        color: #FF5E62;
+    }
+
+    .stat-number {
+        font-size: 22px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #6c757d;
+    }
+
+    /* 右侧活动记录卡片 */
+    .hours-activities-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .card-header {
+        margin-bottom: 20px;
+        border-bottom: 1px solid #f0f0f0;
         padding-bottom: 15px;
     }
 
-    .panel {
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    .card-header h3 {
+        margin-top: 0;
+        font-weight: 600;
+        font-size: 20px;
+        color: #333;
     }
 
-    .table > tbody > tr > th {
-        width: 40%;
-        vertical-align: middle;
+    .card-header p {
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+
+    .activities-filter {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        background-color: #f8f9fa;
+        padding: 10px 15px;
+        border-radius: 5px;
+    }
+
+    .filter-label {
+        margin-right: 15px;
+        font-weight: 600;
+        color: #6c757d;
+    }
+
+    .filter-options {
+        display: flex;
+    }
+
+    .filter-option {
+        margin-right: 15px;
+        color: #6c757d;
+        padding: 5px 10px;
+        border-radius: 15px;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .filter-option:hover, .filter-option.active {
+        background-color: #FF5E62;
+        color: white;
+    }
+
+    .activities-container {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    .activities-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .activities-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .activities-container::-webkit-scrollbar-thumb {
+        background: #FF9966;
+        border-radius: 10px;
+    }
+
+    .activities-container::-webkit-scrollbar-thumb:hover {
+        background: #FF5E62;
+    }
+
+    .activity-item {
+        display: flex;
+        padding: 15px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+
+    .activity-status {
+        margin-right: 15px;
+        display: flex;
+        align-items: center;
+    }
+
+    .status-badge {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: white;
+    }
+
+    .status-completed {
+        background-color: #28a745;
+    }
+
+    .status-ongoing {
+        background-color: #17a2b8;
+    }
+
+    .activity-content {
+        flex: 1;
+    }
+
+    .activity-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .activity-title {
+        font-weight: 600;
+        font-size: 16px;
+        color: #333;
+    }
+
+    .activity-type {
+        background-color: #f8f9fa;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 12px;
+        color: #6c757d;
+    }
+
+    .activity-details {
+        margin-bottom: 8px;
+    }
+
+    .activity-info, .activity-date {
+        color: #6c757d;
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .activity-info i, .activity-date i {
+        margin-right: 5px;
+    }
+
+    .activity-status-text {
+        text-align: right;
+    }
+
+    /* 无活动数据 */
+    .no-activities {
+        text-align: center;
+        padding: 30px 0;
+    }
+
+    .no-data-icon {
+        font-size: 48px;
+        color: #cccccc;
+        margin-bottom: 15px;
+    }
+
+    .no-activities p {
+        color: #6c757d;
+        margin-bottom: 20px;
+    }
+
+    /* 提醒消息样式 */
+    .alert {
+        border-radius: 8px;
+        margin-bottom: 20px;
     }
 </style>
+
+@section scripts {
+    <script>$(function () {
+            // 初始化工具提示
+            $('[data-toggle="tooltip"]').tooltip();
+
+            // 设置警告框自动消失
+            $('.alert').delay(5000).fadeOut(500);
+        });
+
+        // 活动过滤功能
+        function filterActivities(filter) {
+            $('.filter-option').removeClass('active');
+            $('[onclick="filterActivities(\'' + filter + '\')"]').addClass('active');
+
+            if (filter === 'all') {
+                $('.activity-item').show();
+            } else if (filter === 'ongoing') {
+                $('.activity-item').hide();
+                $('.activity-ongoing').show();
+            } else if (filter === 'completed') {
+                $('.activity-item').hide();
+                $('.activity-completed').show();
+            }
+        }</script>
+}

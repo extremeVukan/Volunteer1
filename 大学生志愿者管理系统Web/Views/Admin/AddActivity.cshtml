@@ -4,16 +4,23 @@
 }
 
 <div class="container">
-    <div class="page-header">
-        <h2><span class="glyphicon glyphicon-plus"></span> 添加活动</h2>
+    <div class="panel panel-default admin-panel">
+        <div class="panel-heading admin-panel-heading">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2><i class="glyphicon glyphicon-plus-sign"></i> 添加活动</h2>
+                    <p class="lead">创建新的志愿服务活动</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row">
         <div class="col-md-12">
             @if (TempData["ErrorMessage"] != null)
             {
-                <div class="alert alert-danger">
-                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                <div class="alert alert-danger message-alert">
+                    <i class="glyphicon glyphicon-exclamation-sign"></i> @TempData["ErrorMessage"]
                 </div>
             }
         </div>
@@ -21,11 +28,11 @@
 
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title">填写活动信息</h3>
+            <div class="activity-card">
+                <div class="activity-card-header">
+                    <h3 class="card-title"><i class="glyphicon glyphicon-edit"></i> 填写活动信息</h3>
                 </div>
-                <div class="panel-body">
+                <div class="activity-card-body">
                     @using (Html.BeginForm("AddActivity", "Admin", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
                     {
                         @Html.AntiForgeryToken()
@@ -33,119 +40,300 @@
                         <div class="form-group">
                             <label class="control-label col-md-3">活动编号:</label>
                             <div class="col-md-9">
-                                <input type="number" name="activity_ID" value="@ViewBag.NextActivityId" class="form-control" readonly />
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
+                                    <input type="number" name="activity_ID" value="@ViewBag.NextActivityId" class="form-control activity-input" readonly />
+                                </div>
+                                <span class="help-block">系统自动分配的活动编号</span>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="control-label col-md-3">活动名称:<span class="text-danger">*</span></label>
                             <div class="col-md-9">
-                                <input type="text" name="activity_Name" class="form-control" required placeholder="请输入活动名称" />
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-font"></i></span>
+                                    <input type="text" name="activity_Name" class="form-control activity-input" required placeholder="请输入活动名称" />
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="control-label col-md-3">活动类型:<span class="text-danger">*</span></label>
                             <div class="col-md-9">
-                                <select name="activity_type" class="form-control" required>
-                                    @foreach (var type in ViewBag.ActivityTypes)
-                                    {
-                                        <option value="@type">@type</option>
-                                    }
-                                </select>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-list"></i></span>
+                                    <select name="activity_type" class="form-control activity-input" required>
+                                        @foreach (var type in ViewBag.ActivityTypes)
+                                        {
+                                            <option value="@type">@type</option>
+                                        }
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="control-label col-md-3">开始时间:<span class="text-danger">*</span></label>
                             <div class="col-md-9">
-                                <input type="datetime-local" name="addtime" class="form-control" required value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+                                    <input type="datetime-local" name="addtime" class="form-control activity-input" required value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="control-label col-md-3">结束时间:<span class="text-danger">*</span></label>
                             <div class="col-md-9">
-                                <input type="datetime-local" name="stoptime" class="form-control" required value="@DateTime.Now.AddDays(7).ToString("yyyy-MM-ddTHH:mm")" />
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                    <input type="datetime-local" name="stoptime" class="form-control activity-input" required value="@DateTime.Now.AddDays(7).ToString("yyyy-MM-ddTHH:mm")" />
+                                </div>
+                                <span class="help-block">结束时间必须晚于开始时间</span>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="control-label col-md-3">活动地点:<span class="text-danger">*</span></label>
                             <div class="col-md-9">
-                                <input type="text" name="place" class="form-control" required placeholder="请输入活动地点" />
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-map-marker"></i></span>
+                                    <input type="text" name="place" class="form-control activity-input" required placeholder="请输入活动地点" />
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="control-label col-md-3">需要人数:<span class="text-danger">*</span></label>
                             <div class="col-md-9">
-                                <input type="number" name="renshu" class="form-control" required placeholder="请输入需要志愿者人数" min="1" />
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                    <input type="number" name="renshu" class="form-control activity-input" required placeholder="请输入需要志愿者人数" min="1" />
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="control-label col-md-3">活动图片:</label>
                             <div class="col-md-9">
-                                <input type="file" name="activityImage" class="form-control" accept="image/*" />
-                                <span class="help-block">支持JPG, PNG, GIF格式图片</span>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-picture"></i></span>
+                                    <input type="file" name="activityImage" class="form-control activity-input" accept="image/*" />
+                                </div>
+                                <span class="help-block">支持JPG, PNG, GIF格式图片，建议尺寸800x600像素</span>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="control-label col-md-3">活动描述:</label>
                             <div class="col-md-9">
-                                <textarea name="descn" class="form-control" rows="5" placeholder="请输入活动描述"></textarea>
+                                <div class="input-group textarea-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                                    <textarea name="descn" class="form-control activity-input" rows="5" placeholder="请输入活动描述"></textarea>
+                                </div>
+                                <span class="help-block">详细描述活动内容、目的和意义，帮助志愿者了解活动</span>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <div class="col-md-offset-3 col-md-9">
-                                <button type="submit" class="btn btn-primary">
-                                    <span class="glyphicon glyphicon-floppy-disk"></span> 添加活动
+                                <button type="submit" class="btn btn-primary btn-activity">
+                                    <i class="glyphicon glyphicon-floppy-disk"></i> 添加活动
                                 </button>
-                                <a href="@Url.Action("Activities")" class="btn btn-default">
-                                    <span class="glyphicon glyphicon-arrow-left"></span> 返回
+                                <a href="@Url.Action("Activities")" class="btn btn-default btn-back">
+                                    <i class="glyphicon glyphicon-arrow-left"></i> 返回
                                 </a>
                             </div>
                         </div>
                     }
                 </div>
             </div>
+
+            <div class="activity-tips">
+                <h4><i class="glyphicon glyphicon-info-sign"></i> 活动发布提示</h4>
+                <ul>
+                    <li>活动名称应简洁明了，易于志愿者理解活动内容</li>
+                    <li>活动时间设置合理，给志愿者充分的报名和准备时间</li>
+                    <li>详细描述活动地点，方便志愿者准确到达</li>
+                    <li>添加活动图片可以增加活动的吸引力和参与度</li>
+                    <li>活动描述中可以包含：活动背景、活动流程、注意事项等</li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-    .page-header {
+    /* 整体面板样式 */
+    .admin-panel {
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         margin-top: 20px;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 15px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        border: none;
     }
 
-    .panel {
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    /* 面板头部 - 暖色调 */
+    .admin-panel-heading {
+        background: linear-gradient(135deg, #FF9966, #FF5E62);
+        color: white;
+        padding: 20px 15px;
+        border-bottom: none;
     }
 
-    .form-group {
-        margin-bottom: 15px;
+    /* 成功和错误消息 */
+    .message-alert {
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     }
 
+    /* 活动信息卡片 */
+    .activity-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .activity-card-header {
+        background-color: #FFF0EB;
+        padding: 15px;
+        border-bottom: 1px solid #f3e0d8;
+    }
+
+    .card-title {
+        color: #FF7E5F;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .activity-card-body {
+        padding: 20px;
+    }
+
+    /* 输入框样式 */
+    .activity-input {
+        height: 42px;
+        border-radius: 0 4px 4px 0;
+    }
+
+    .input-group-addon {
+        background-color: #FFF0EB;
+        color: #FF9966;
+        border-color: #ddd;
+    }
+
+    /* 文本域组 */
+    .textarea-group .input-group-addon {
+        vertical-align: top;
+        padding-top: 10px;
+    }
+
+    .textarea-group textarea {
+        border-radius: 0 4px 4px 0;
+    }
+
+    /* 必填字段标记 */
     .text-danger {
-        color: #a94442;
+        color: #FF5E62;
         margin-left: 3px;
     }
 
+    /* 按钮样式 */
+    .btn {
+        border-radius: 4px;
+        padding: 8px 16px;
+    }
+
+    .btn-primary {
+        background-color: #FF9966;
+        border-color: #FF9966;
+    }
+
+        .btn-primary:hover {
+            background-color: #FF7E5F;
+            border-color: #FF7E5F;
+        }
+
+    .btn-activity {
+        margin-right: 10px;
+    }
+
+    .btn-back {
+        background-color: #f8f9fa;
+        color: #333;
+    }
+
+        .btn-back:hover {
+            background-color: #e9ecef;
+            color: #333;
+        }
+
+    /* 提示区域 */
+    .activity-tips {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        border-left: 4px solid #FF9966;
+    }
+
+        .activity-tips h4 {
+            color: #FF7E5F;
+            margin-top: 0;
+            font-weight: 600;
+        }
+
+        .activity-tips ul {
+            padding-left: 20px;
+        }
+
+        .activity-tips li {
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+    /* 表单样式 */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .control-label {
+        padding-top: 10px;
+    }
+
     .help-block {
-        font-size: 12px;
-        color: #777;
+        color: #999;
         margin-top: 5px;
+        font-size: 12px;
+    }
+
+    /* 只读字段样式 */
+    input[readonly] {
+        background-color: #f8f9fa;
+        cursor: not-allowed;
+    }
+
+    /* 文件上传控件样式 */
+    input[type=file] {
+        padding: 5px 12px;
     }
 </style>
 
-<script>$(document).ready(function() {
+<script>
+    $(document).ready(function () {
+        // 隐藏5秒后消失消息提示
+        setTimeout(function () {
+            $(".message-alert").fadeOut(500);
+        }, 5000);
+
         // 表单验证
-        $('form').submit(function(e) {
+        $('form').submit(function (e) {
             var startTime = new Date($('[name="addtime"]').val());
             var endTime = new Date($('[name="stoptime"]').val());
 
@@ -157,4 +345,5 @@
 
             return true;
         });
-    });</script>
+    });
+</script>

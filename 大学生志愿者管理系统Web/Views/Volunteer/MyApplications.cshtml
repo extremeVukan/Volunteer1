@@ -4,60 +4,183 @@
 }
 
 <div class="container">
-    <div class="page-header">
-        <h2><span class="glyphicon glyphicon-list-alt"></span> 我的申请</h2>
-        <p class="lead">查看您已提交的申请</p>
+    <!-- 页面顶部标题栏 -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default volunteer-panel">
+                <div class="panel-heading volunteer-panel-heading">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h2><i class="glyphicon glyphicon-list-alt"></i> 我的申请</h2>
+                            <p>查看您已提交的活动申请记录</p>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <p>总申请数：<span class="application-badge">@(Model != null ? Model.Count() : 0)</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <!-- 提示消息 -->
     <div class="row">
         <div class="col-md-12">
             @if (TempData["SuccessMessage"] != null)
             {
-                <div class="alert alert-success">
-                    <span class="glyphicon glyphicon-ok-sign"></span> @TempData["SuccessMessage"]
+                <div class="alert alert-success alert-dismissible fade in">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <i class="glyphicon glyphicon-ok-sign"></i> @TempData["SuccessMessage"]
                 </div>
             }
             @if (TempData["ErrorMessage"] != null)
             {
-                <div class="alert alert-danger">
-                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                <div class="alert alert-danger alert-dismissible fade in">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <i class="glyphicon glyphicon-exclamation-sign"></i> @TempData["ErrorMessage"]
                 </div>
             }
         </div>
     </div>
 
     <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title">申请列表</h3>
+        <!-- 左侧功能区 -->
+        <div class="col-md-3">
+            <!-- 申请状态统计 -->
+            <div class="application-stats-card">
+                <div class="stats-header">
+                    <h4><i class="glyphicon glyphicon-stats"></i> 申请状态统计</h4>
                 </div>
-                <div class="panel-body">
-                    @if (Model != null && Model.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>申请ID</th>
-                                        <th>活动ID</th>
-                                        <th>活动名称</th>
-                                        <th>申请日期</th>
-                                        <th>发起人</th>
-                                        <th>状态</th>
-                                        <th>操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var order in Model)
+                <div class="stats-content">
+                    <div class="stat-item">
+                        <div class="stat-circle approved">
+                            <span class="stat-number">@(Model != null ? Model.Count(o => o.status == "已审核") : 0)</span>
+                        </div>
+                        <div class="stat-label">已通过</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-circle pending">
+                            <span class="stat-number">@(Model != null ? Model.Count(o => o.status != "已审核") : 0)</span>
+                        </div>
+                        <div class="stat-label">审核中</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-circle total">
+                            <span class="stat-number">@(Model != null ? Model.Count() : 0)</span>
+                        </div>
+                        <div class="stat-label">总申请</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 快捷导航 -->
+            <div class="function-card">
+                <div class="function-title">
+                    <i class="glyphicon glyphicon-th-list"></i> 功能导航
+                </div>
+                <div class="function-buttons">
+                    <a href="@Url.Action("Index", "Volunteer")" class="btn btn-default">
+                        <i class="glyphicon glyphicon-home"></i> 活动首页
+                    </a>
+                    <a href="@Url.Action("MyActivities", "Volunteer")" class="btn btn-default">
+                        <i class="glyphicon glyphicon-calendar"></i> 我的活动
+                    </a>
+                    <a href="@Url.Action("GetVolunteerHours", "Volunteer")" class="btn btn-default">
+                        <i class="glyphicon glyphicon-time"></i> 志愿时长
+                    </a>
+                    <a href="@Url.Action("SelfCheck", "Volunteer")" class="btn btn-default">
+                        <i class="glyphicon glyphicon-user"></i> 个人信息
+                    </a>
+                </div>
+            </div>
+
+            <!-- 操作指南卡片 -->
+            <div class="help-card">
+                <div class="help-header">
+                    <h4><i class="glyphicon glyphicon-question-sign"></i> 操作指南</h4>
+                </div>
+                <div class="help-content">
+                    <div class="help-item">
+                        <div class="help-icon"><i class="glyphicon glyphicon-search"></i></div>
+                        <div class="help-text">在首页浏览并申请活动</div>
+                    </div>
+                    <div class="help-item">
+                        <div class="help-icon"><i class="glyphicon glyphicon-time"></i></div>
+                        <div class="help-text">等待管理员审核申请</div>
+                    </div>
+                    <div class="help-item">
+                        <div class="help-icon"><i class="glyphicon glyphicon-ok-circle"></i></div>
+                        <div class="help-text">审核通过后参与活动</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧申请列表 -->
+        <div class="col-md-9">
+            <div class="applications-card">
+                <div class="card-header">
+                    <h3><i class="glyphicon glyphicon-list"></i> 申请记录</h3>
+                    <p class="text-muted">您的志愿活动申请记录</p>
+                </div>
+
+                <div class="applications-filter">
+                    <div class="filter-label">筛选：</div>
+                    <div class="filter-options">
+                        <a href="javascript:void(0)" class="filter-option active" onclick="filterApplications('all')">全部申请</a>
+                        <a href="javascript:void(0)" class="filter-option" onclick="filterApplications('approved')">已通过</a>
+                        <a href="javascript:void(0)" class="filter-option" onclick="filterApplications('pending')">审核中</a>
+                    </div>
+                </div>
+
+                @if (Model != null && Model.Any())
+                {
+                    <div class="applications-container">
+                        @foreach (var order in Model)
+                        {
+                            <div class="application-item @(order.status == "已审核" ? "application-approved" : "application-pending")">
+                                <div class="application-status">
+                                    @if (order.status == "已审核")
                                     {
-                                        <tr>
-                                            <td>@order.OrderID</td>
-                                            <td>@order.ActID</td>
-                                            <td>@order.Act_Name</td>
-                                            <td>@(order.OrderDate?.ToString("yyyy-MM-dd HH:mm") ?? "未记录")</td>
-                                            <td>@order.Holder</td>
-                                            <td>
+                                        <div class="status-indicator status-approved">
+                                            <i class="glyphicon glyphicon-ok"></i>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="status-indicator status-pending">
+                                            <i class="glyphicon glyphicon-hourglass"></i>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="application-content">
+                                    <div class="application-header">
+                                        <div class="application-title">@order.Act_Name</div>
+                                        <div class="application-date">
+                                            <i class="glyphicon glyphicon-calendar"></i>
+                                            申请日期：@(order.OrderDate?.ToString("yyyy-MM-dd") ?? "未记录")
+                                        </div>
+                                    </div>
+                                    <div class="application-details">
+                                        <div class="detail-item">
+                                            <div class="detail-label">申请ID：</div>
+                                            <div class="detail-value">@order.OrderID</div>
+                                        </div>
+                                        <div class="detail-item">
+                                            <div class="detail-label">活动ID：</div>
+                                            <div class="detail-value">@order.ActID</div>
+                                        </div>
+                                        <div class="detail-item">
+                                            <div class="detail-label">发起人：</div>
+                                            <div class="detail-value">@order.Holder</div>
+                                        </div>
+                                        <div class="detail-item">
+                                            <div class="detail-label">状态：</div>
+                                            <div class="detail-value">
                                                 @if (order.status == "已审核")
                                                 {
                                                     <span class="label label-success">已通过</span>
@@ -66,46 +189,421 @@
                                                 {
                                                     <span class="label label-warning">审核中</span>
                                                 }
-                                            </td>
-                                            <td>
-                                                <a href="@Url.Action("ActivityDetails", new { id = order.ActID })" class="btn btn-info btn-xs">
-                                                    <span class="glyphicon glyphicon-eye-open"></span> 查看活动
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="application-actions">
+                                        <a href="@Url.Action("ActivityDetails", new { id = order.ActID })" class="btn btn-primary btn-sm">
+                                            <i class="glyphicon glyphicon-eye-open"></i> 查看活动
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="no-applications">
+                        <div class="no-data-icon">
+                            <i class="glyphicon glyphicon-info-sign"></i>
                         </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-info">
-                            <span class="glyphicon glyphicon-info-sign"></span> 您还没有提交过申请，请在活动广场浏览并申请感兴趣的活动。
-                        </div>
-                    }
-                </div>
+                        <p>您还没有提交过申请，请在活动广场浏览并申请感兴趣的活动</p>
+                        <a href="@Url.Action("Index", "Volunteer")" class="btn btn-primary">
+                            <i class="glyphicon glyphicon-search"></i> 浏览可参与活动
+                        </a>
+                    </div>
+                }
             </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-12 text-center">
-            <a href="@Url.Action("Index")" class="btn btn-default">
-                <span class="glyphicon glyphicon-arrow-left"></span> 返回活动广场
-            </a>
         </div>
     </div>
 </div>
 
 <style>
-    .page-header {
+    /* 整体卡片样式 */
+    .volunteer-panel {
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         margin-top: 20px;
-        border-bottom: 1px solid #eee;
+        margin-bottom: 20px;
+        overflow: hidden;
+        border: none;
+    }
+
+    /* 卡片头部 */
+    .volunteer-panel-heading {
+        background: linear-gradient(135deg, #FF9966, #FF5E62);
+        color: white;
+        padding: 20px 15px;
+        border-bottom: none;
+    }
+
+    .application-badge {
+        background-color: white;
+        color: #FF5E62;
+        font-size: 18px;
+        font-weight: bold;
+        padding: 5px 15px;
+        border-radius: 20px;
+        display: inline-block;
+    }
+
+    /* 左侧状态统计卡片 */
+    .application-stats-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .stats-header h4 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-weight: 600;
+        font-size: 16px;
+        color: #333;
+        border-bottom: 1px solid #f0f0f0;
+        padding-bottom: 10px;
+    }
+
+    .stats-content {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .stat-item {
+        text-align: center;
+        width: 30%;
+    }
+
+    .stat-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px;
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+        position: relative;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+
+        .stat-circle.approved {
+            background-color: #28a745;
+        }
+
+        .stat-circle.pending {
+            background-color: #ffc107;
+        }
+
+        .stat-circle.total {
+            background: linear-gradient(135deg, #FF9966, #FF5E62);
+        }
+
+    .stat-label {
+        font-size: 12px;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+
+    /* 功能按钮卡片 */
+    .function-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        padding: 15px;
+    }
+
+    .function-title {
+        font-weight: bold;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .function-buttons .btn {
+        margin-bottom: 10px;
+        width: 100%;
+        text-align: left;
+        padding: 10px 15px;
+    }
+
+    /* 操作指南卡片 */
+    .help-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .help-header h4 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-weight: 600;
+        font-size: 16px;
+        color: #333;
+        border-bottom: 1px solid #f0f0f0;
+        padding-bottom: 10px;
+    }
+
+    .help-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .help-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        color: #FF5E62;
+    }
+
+    .help-text {
+        flex: 1;
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    /* 右侧申请列表卡片 */
+    .applications-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .card-header {
+        margin-bottom: 20px;
+        border-bottom: 1px solid #f0f0f0;
         padding-bottom: 15px;
     }
 
-    .panel {
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        .card-header h3 {
+            margin-top: 0;
+            font-weight: 600;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .card-header p {
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+
+    /* 过滤选项 */
+    .applications-filter {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        background-color: #f8f9fa;
+        padding: 10px 15px;
+        border-radius: 5px;
+    }
+
+    .filter-label {
+        margin-right: 15px;
+        font-weight: 600;
+        color: #6c757d;
+    }
+
+    .filter-options {
+        display: flex;
+    }
+
+    .filter-option {
+        margin-right: 15px;
+        color: #6c757d;
+        padding: 5px 10px;
+        border-radius: 15px;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+        .filter-option:hover, .filter-option.active {
+            background-color: #FF5E62;
+            color: white;
+        }
+
+    /* 申请列表容器 */
+    .applications-container {
+        max-height: 600px;
+        overflow-y: auto;
+    }
+
+        .applications-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .applications-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .applications-container::-webkit-scrollbar-thumb {
+            background: #FF9966;
+            border-radius: 10px;
+        }
+
+            .applications-container::-webkit-scrollbar-thumb:hover {
+                background: #FF5E62;
+            }
+
+    /* 单个申请项 */
+    .application-item {
+        display: flex;
+        padding: 15px;
+        border-bottom: 1px solid #f0f0f0;
+        background-color: #fff;
+        transition: all 0.3s ease;
+    }
+
+        .application-item:hover {
+            background-color: #f8f9fa;
+            transform: translateX(5px);
+        }
+
+        .application-item:last-child {
+            border-bottom: none;
+        }
+
+    /* 申请状态指示 */
+    .application-status {
+        margin-right: 15px;
+    }
+
+    .status-indicator {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 18px;
+    }
+
+    .status-approved {
+        background-color: #28a745;
+    }
+
+    .status-pending {
+        background-color: #ffc107;
+    }
+
+    /* 申请内容 */
+    .application-content {
+        flex: 1;
+    }
+
+    .application-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .application-title {
+        font-weight: bold;
+        font-size: 16px;
+        color: #333;
+    }
+
+    .application-date {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    /* 申请详情 */
+    .application-details {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+        background-color: #f8f9fa;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .detail-item {
+        width: 50%;
+        display: flex;
+        margin-bottom: 5px;
+    }
+
+    .detail-label {
+        width: 80px;
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    .detail-value {
+        flex: 1;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .application-actions {
+        text-align: right;
+    }
+
+    /* 无申请数据 */
+    .no-applications {
+        text-align: center;
+        padding: 40px 0;
+    }
+
+    .no-data-icon {
+        font-size: 48px;
+        color: #cccccc;
+        margin-bottom: 15px;
+    }
+
+    .no-applications p {
+        color: #6c757d;
+        margin-bottom: 20px;
+        font-size: 16px;
+    }
+
+    /* 提醒消息样式 */
+    .alert {
+        border-radius: 8px;
+        margin-bottom: 20px;
     }
 </style>
+
+@section scripts {
+    <script>$(function () {
+            // 初始化工具提示
+            $('[data-toggle="tooltip"]').tooltip();
+
+            // 设置警告框自动消失
+            $('.alert').delay(5000).fadeOut(500);
+        });
+
+        // 申请过滤功能
+        function filterApplications(filter) {
+            $('.filter-option').removeClass('active');
+            $('[onclick="filterApplications(\'' + filter + '\')"]').addClass('active');
+
+            if (filter === 'all') {
+                $('.application-item').show();
+            } else if (filter === 'approved') {
+                $('.application-item').hide();
+                $('.application-approved').show();
+            } else if (filter === 'pending') {
+                $('.application-item').hide();
+                $('.application-pending').show();
+            }
+        }</script>
+}

@@ -4,138 +4,407 @@
 }
 
 <div class="container">
-    <div class="page-header">
-        <h2><span class="glyphicon glyphicon-user"></span> 个人信息</h2>
-        <p class="lead">查看和编辑您的个人资料</p>
+    <!-- 页面顶部标题栏 -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default volunteer-panel">
+                <div class="panel-heading volunteer-panel-heading">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h2><i class="glyphicon glyphicon-user"></i> 个人信息</h2>
+                            <p>查看和编辑您的个人资料</p>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <p>您的志愿时长：<span class="label label-success">@Model.Act_Time 小时</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <!-- 提示消息 -->
     <div class="row">
         <div class="col-md-12">
             @if (TempData["SuccessMessage"] != null)
             {
-                <div class="alert alert-success">
-                    <span class="glyphicon glyphicon-ok-sign"></span> @TempData["SuccessMessage"]
+                <div class="alert alert-success alert-dismissible fade in">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <i class="glyphicon glyphicon-ok-sign"></i> @TempData["SuccessMessage"]
                 </div>
             }
             @if (TempData["ErrorMessage"] != null)
             {
-                <div class="alert alert-danger">
-                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                <div class="alert alert-danger alert-dismissible fade in">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <i class="glyphicon glyphicon-exclamation-sign"></i> @TempData["ErrorMessage"]
                 </div>
             }
         </div>
     </div>
 
     <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title">个人资料</h3>
+        <!-- 左侧个人资料图片和快捷功能 -->
+        <div class="col-md-4">
+            <div class="profile-sidebar">
+                <div class="profile-image-container">
+                    <div class="profile-image">
+                        <i class="glyphicon glyphicon-user"></i>
+                        <div class="profile-name">@Model.AName</div>
+                    </div>
                 </div>
-                <div class="panel-body">
-                    @using (Html.BeginForm("UpdatePersonalInfo", "Volunteer", FormMethod.Post, new { @class = "form-horizontal" }))
-                    {
-                        @Html.AntiForgeryToken()
-                        @Html.HiddenFor(m => m.Aid)
 
-                        <div class="form-group">
-                            <label class="control-label col-md-3">志愿者ID:</label>
-                            <div class="col-md-9">
-                                <p class="form-control-static">@Model.Aid</p>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="control-label col-md-3">姓名:</label>
-                            <div class="col-md-9">
-                                @Html.TextBoxFor(m => m.AName, new { @class = "form-control" })
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="control-label col-md-3">电话/密码:</label>
-                            <div class="col-md-9">
-                                @Html.TextBoxFor(m => m.Atelephone, new { @class = "form-control" })
-                                <span class="help-block">注：电话号码同时作为您的登录密码</span>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="control-label col-md-3">电子邮箱:</label>
-                            <div class="col-md-9">
-                                @Html.TextBoxFor(m => m.email, new { @class = "form-control", type = "email" })
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="control-label col-md-3">志愿时长:</label>
-                            <div class="col-md-9">
-                                <p class="form-control-static">@Model.Act_Time 小时</p>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="control-label col-md-3">志愿者证状态:</label>
-                            <div class="col-md-9">
-                                <p class="form-control-static">
-                                    @if (ViewBag.IdentifyStatus == "已通过")
-                                    {
-                                        <span class="label label-success">已通过</span>
-                                    }
-                                    else if (ViewBag.IdentifyStatus == "已拒绝")
-                                    {
-                                        <span class="label label-danger">已拒绝</span>
-                                    }
-                                    else if (ViewBag.IdentifyStatus == "审核中")
-                                    {
-                                        <span class="label label-warning">审核中</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="label label-default">未申请</span>
-                                        <a href="@Url.Action("ApplyIdentify", "Volunteer")" class="btn btn-xs btn-primary">
-                                            <span class="glyphicon glyphicon-file"></span> 申请志愿者证
-                                        </a>
-                                    }
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="col-md-offset-3 col-md-9">
-                                <button type="submit" class="btn btn-primary">
-                                    <span class="glyphicon glyphicon-floppy-disk"></span> 保存信息
-                                </button>
-                                <a href="@Url.Action("Index")" class="btn btn-default">
-                                    <span class="glyphicon glyphicon-arrow-left"></span> 返回
-                                </a>
-                            </div>
-                        </div>
-                    }
+                <div class="profile-info-summary">
+                    <div class="info-item">
+                        <div class="info-label">志愿者ID</div>
+                        <div class="info-value">@Model.Aid</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">志愿时长</div>
+                        <div class="info-value">@Model.Act_Time 小时</div>
+                    </div>
                 </div>
+
+                <div class="profile-buttons">
+                    <a href="@Url.Action("Index", "Volunteer")" class="btn btn-default btn-block">
+                        <i class="glyphicon glyphicon-home"></i> 返回首页
+                    </a>
+                    <a href="@Url.Action("GetVolunteerHours", "Volunteer")" class="btn btn-info btn-block">
+                        <i class="glyphicon glyphicon-time"></i> 查看志愿时长
+                    </a>
+                    <a href="@Url.Action("MyActivities", "Volunteer")" class="btn btn-success btn-block">
+                        <i class="glyphicon glyphicon-calendar"></i> 我的活动
+                    </a>
+                </div>
+
+                <div class="volunteer-status-card">
+                    <h4><i class="glyphicon glyphicon-certificate"></i> 志愿者证状态</h4>
+                    <div class="status-content">
+                        @if (ViewBag.IdentifyStatus == "已通过")
+                        {
+                            <div class="status-badge status-success">
+                                <i class="glyphicon glyphicon-ok-circle"></i> 已通过
+                            </div>
+                            <p>您的志愿者证已通过审核，可以正常使用。</p>
+                        }
+                        else if (ViewBag.IdentifyStatus == "已拒绝")
+                        {
+                            <div class="status-badge status-danger">
+                                <i class="glyphicon glyphicon-remove-circle"></i> 已拒绝
+                            </div>
+                            <p>您的志愿者证申请被拒绝，请联系管理员了解详情。</p>
+                        }
+                        else if (ViewBag.IdentifyStatus == "审核中")
+                        {
+                            <div class="status-badge status-warning">
+                                <i class="glyphicon glyphicon-hourglass"></i> 审核中
+                            </div>
+                            <p>您的志愿者证申请正在审核中，请耐心等待。</p>
+                        }
+                        else
+                        {
+                            <div class="status-badge status-default">
+                                <i class="glyphicon glyphicon-info-sign"></i> 未申请
+                            </div>
+                            <p>您尚未申请志愿者证，可以点击下方按钮申请。</p>
+                            <a href="@Url.Action("ApplyIdentify", "Volunteer")" class="btn btn-primary btn-block">
+                                <i class="glyphicon glyphicon-file"></i> 申请志愿者证
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧编辑表单 -->
+        <div class="col-md-8">
+            <div class="profile-edit-card">
+                <div class="card-header">
+                    <h3><i class="glyphicon glyphicon-edit"></i> 编辑个人资料</h3>
+                    <p class="text-muted">修改您的个人信息</p>
+                </div>
+
+                @using (Html.BeginForm("UpdatePersonalInfo", "Volunteer", FormMethod.Post, new { @class = "profile-form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.Aid)
+
+                    <div class="form-group">
+                        <label>姓名</label>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                            @Html.TextBoxFor(m => m.AName, new { @class = "form-control", placeholder = "请输入姓名" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>电话/密码</label>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                            @Html.TextBoxFor(m => m.Atelephone, new { @class = "form-control", placeholder = "请输入电话/密码" })
+                        </div>
+                        <div class="help-text">注：电话号码同时作为您的登录密码</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>电子邮箱</label>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+                            @Html.TextBoxFor(m => m.email, new { @class = "form-control", type = "email", placeholder = "请输入电子邮箱" })
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="glyphicon glyphicon-floppy-disk"></i> 保存信息
+                        </button>
+                    </div>
+                }
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    .page-header {
+    /* 整体卡片样式 */
+    .volunteer-panel {
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         margin-top: 20px;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 15px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        border: none;
     }
 
-    .panel {
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    /* 卡片头部 */
+    .volunteer-panel-heading {
+        background: linear-gradient(135deg, #FF9966, #FF5E62);
+        color: white;
+        padding: 20px 15px;
+        border-bottom: none;
     }
 
-    .form-group {
+    /* 左侧个人资料卡片 */
+    .profile-sidebar {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .profile-image-container {
+        background: linear-gradient(135deg, #FF9966, #FF5E62);
+        color: white;
+        padding: 30px 20px;
+        text-align: center;
+    }
+
+    .profile-image {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: white;
+        color: #FF5E62;
+        font-size: 50px;
+        line-height: 100px;
+        margin: 0 auto 15px;
+        box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.3);
+    }
+
+    .profile-name {
+        font-size: 16px;
+        font-weight: bold;
+        margin-top: 10px;
+        color: #FF5E62;
+    }
+
+    .profile-info-summary {
+        padding: 15px;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+    }
+
+    .info-item {
+        text-align: center;
+        flex: 1;
+        padding: 0 10px;
+    }
+
+    .info-label {
+        font-size: 12px;
+        color: #6c757d;
+        margin-bottom: 5px;
+    }
+
+    .info-value {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .profile-buttons {
+        padding: 15px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+        .profile-buttons .btn {
+            margin-bottom: 10px;
+            border-radius: 30px;
+        }
+
+    .volunteer-status-card {
+        padding: 15px;
+    }
+
+        .volunteer-status-card h4 {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+    .status-content {
+        text-align: center;
+        padding: 10px;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 8px 20px;
+        border-radius: 30px;
+        font-weight: 600;
         margin-bottom: 15px;
     }
 
-    .help-block {
+    .status-success {
+        background-color: #d4edda;
+        color: #28a745;
+    }
+
+    .status-danger {
+        background-color: #f8d7da;
+        color: #dc3545;
+    }
+
+    .status-warning {
+        background-color: #fff3cd;
+        color: #ffc107;
+    }
+
+    .status-default {
+        background-color: #e2e3e5;
+        color: #6c757d;
+    }
+
+    /* 右侧编辑表单卡片 */
+    .profile-edit-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+
+        .profile-edit-card:hover {
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+    .card-header {
+        margin-bottom: 30px;
+        border-bottom: 1px solid #f0f0f0;
+        padding-bottom: 20px;
+    }
+
+        .card-header h3 {
+            margin-top: 0;
+            font-weight: 600;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .card-header p {
+            color: #6c757d;
+        }
+
+    .profile-form .form-group {
+        margin-bottom: 25px;
+    }
+
+    .profile-form label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .profile-form .form-control {
+        height: 46px;
+        box-shadow: none;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 10px 12px;
+        font-size: 15px;
+        transition: all 0.2s ease;
+    }
+
+        .profile-form .form-control:focus {
+            border-color: #FF9966;
+            box-shadow: 0 0 0 0.2rem rgba(255, 94, 98, 0.25);
+        }
+
+    .profile-form .input-group-addon {
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        color: #495057;
+    }
+
+    .help-text {
         font-size: 12px;
-        color: #777;
+        color: #6c757d;
         margin-top: 5px;
     }
+
+    .form-actions {
+        margin-top: 30px;
+    }
+
+        .form-actions .btn {
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .form-actions .btn-primary {
+            background-color: #FF5E62;
+            border-color: #FF5E62;
+        }
+
+            .form-actions .btn-primary:hover {
+                background-color: #e54e52;
+                border-color: #e54e52;
+            }
+
+    /* 提醒消息样式 */
+    .alert {
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
 </style>
+
+@section scripts {
+    <script>$(function () {
+            // 初始化工具提示
+            $('[data-toggle="tooltip"]').tooltip();
+
+            // 设置警告框自动消失
+            $('.alert').delay(5000).fadeOut(500);
+        });</script>
+}

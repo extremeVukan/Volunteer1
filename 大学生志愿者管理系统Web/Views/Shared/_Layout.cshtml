@@ -4,8 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - 大学生志愿者管理系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     @RenderSection("Styles", required: false)
 </head>
 <body>
@@ -17,7 +19,9 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a href="@Url.Action("Index", "Home")" class="navbar-brand">大学生志愿者管理系统</a>
+                <a href="@Url.Action("Index", "Home")" class="navbar-brand">
+                    <i class="glyphicon glyphicon-heart"></i> 大学生志愿者管理系统
+                </a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
@@ -27,18 +31,23 @@
                         {
                             <li>@Html.ActionLink("活动列表", "Index", "Volunteer")</li>
                             <li>@Html.ActionLink("我的申请", "MyApplications", "Volunteer")</li>
-                            <li>@Html.ActionLink("志愿时长", "MyHours", "Volunteer")</li>
+                            <li>@Html.ActionLink("我的活动", "MyActivities", "Volunteer")</li>
+                            <li>@Html.ActionLink("志愿时长", "GetVolunteerHours", "Volunteer")</li>
+                            <li>@Html.ActionLink("志愿者证", "CheckIdentifyStatus", "Volunteer")</li>
                         }
                         else if ((int)Session["UserType"] == 1) // 管理员
                         {
                             <li>@Html.ActionLink("活动管理", "Index", "Admin")</li>
-                            <li>@Html.ActionLink("申请审核", "Applications", "Admin")</li>
+                            <li>@Html.ActionLink("活动列表", "Activities", "Admin")</li>
+                            <li>@Html.ActionLink("申请审核", "ApplicationReview", "Admin")</li>
                         }
                         else if ((int)Session["UserType"] == 2) // 平台管理员
                         {
                             <li>@Html.ActionLink("系统管理", "Index", "SuperAdmin")</li>
                             <li>@Html.ActionLink("管理员管理", "Admins", "SuperAdmin")</li>
                             <li>@Html.ActionLink("志愿者管理", "Volunteers", "SuperAdmin")</li>
+                            <li>@Html.ActionLink("活动管理", "Activities", "SuperAdmin")</li>
+                            <li>@Html.ActionLink("系统日志", "Logs", "SuperAdmin")</li>
                         }
                     }
                 </ul>
@@ -47,12 +56,25 @@
                     {
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                @Session["Username"] <span class="caret"></span>
+                                <i class="glyphicon glyphicon-user"></i> @Session["Username"] <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li>@Html.ActionLink("个人信息", "Profile", "Account")</li>
+                                @if ((int)Session["UserType"] == 0)
+                                {
+                                    <li><a href="@Url.Action("SelfCheck", "Volunteer")"><i class="glyphicon glyphicon-user"></i> 个人信息</a></li>
+                                }
+                                else if ((int)Session["UserType"] == 1)
+                                {
+                                    <li><a href="@Url.Action("PersonalInfo", "Admin")"><i class="glyphicon glyphicon-user"></i> 个人信息</a></li>
+                                    <li><a href="@Url.Action("ChangePassword", "Admin")"><i class="glyphicon glyphicon-lock"></i> 修改密码</a></li>
+                                }
+                                else if ((int)Session["UserType"] == 2)
+                                {
+                                    <li><a href="@Url.Action("PersonalInfo", "SuperAdmin")"><i class="glyphicon glyphicon-user"></i> 个人信息</a></li>
+                                    <li><a href="@Url.Action("ChangePassword", "SuperAdmin")"><i class="glyphicon glyphicon-lock"></i> 修改密码</a></li>
+                                }
                                 <li class="divider"></li>
-                                <li>@Html.ActionLink("退出登录", "Logout", "Account")</li>
+                                <li><a href="@Url.Action("Logout", "Account")"><i class="glyphicon glyphicon-log-out"></i> 退出登录</a></li>
                             </ul>
                         </li>
                     }
@@ -69,21 +91,21 @@
     <div class="container body-content">
         @if (TempData["SuccessMessage"] != null)
         {
-            <div class="alert alert-success alert-dismissible" role="alert">
+            <div class="alert alert-success alert-dismissible fade in animate__animated animate__fadeIn" role="alert">
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <strong>成功!</strong> @TempData["SuccessMessage"]
+                <i class="glyphicon glyphicon-ok-sign"></i> <strong>成功!</strong> @TempData["SuccessMessage"]
             </div>
         }
 
         @if (TempData["ErrorMessage"] != null)
         {
-            <div class="alert alert-danger alert-dismissible" role="alert">
+            <div class="alert alert-danger alert-dismissible fade in animate__animated animate__fadeIn" role="alert">
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <strong>错误!</strong> @TempData["ErrorMessage"]
+                <i class="glyphicon glyphicon-exclamation-sign"></i> <strong>错误!</strong> @TempData["ErrorMessage"]
             </div>
         }
 
@@ -91,12 +113,35 @@
 
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - 大学生志愿者管理系统</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <p>&copy; @DateTime.Now.Year - 大学生志愿者管理系统</p>
+                </div>
+                <div class="col-md-6 text-right">
+                    <p>共建美好社会 · 传递爱与希望</p>
+                </div>
+            </div>
         </footer>
     </div>
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    <script>$(function () {
+            // 启用所有工具提示
+            $('[data-toggle="tooltip"]').tooltip();
+
+            // 设置警告框自动消失
+            $('.alert').delay(5000).fadeOut(500);
+
+            // 高亮当前活动菜单项
+            var currentUrl = window.location.pathname;
+            $('.navbar-nav li a').each(function() {
+                var linkUrl = $(this).attr('href');
+                if (currentUrl.indexOf(linkUrl) > -1) {
+                    $(this).parent().addClass('active');
+                }
+            });
+        });</script>
     @RenderSection("scripts", required: false)
 </body>
 </html>

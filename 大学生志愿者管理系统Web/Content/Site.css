@@ -1,20 +1,167 @@
-﻿/* Set padding to keep content from hitting the edges */
+﻿/* 全局样式设置 */
+:root {
+    --primary-color: #4c75b2;
+    --secondary-color: #FF5E62;
+    --success-color: #28a745;
+    --info-color: #17a2b8;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --gray-color: #6c757d;
+}
+
+body {
+    font-family: "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #333;
+    background-color: #f5f7fa;
+    padding-top: 60px;
+}
+
+/* 页面内容容器 */
 .body-content {
-    margin-top: 15px;
-    padding-left: 15px;
-    padding-right: 15px;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-/* Override the default bootstrap behavior where horizontal description lists 
-   will truncate terms that are too long to fit in the left column 
-*/
-.dl-horizontal dt {
-    white-space: normal;
+/* 重写输入框样式 */
+.form-control {
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+    padding: 8px 12px;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-/* Set width on the form input elements since they're 100% wide by default */
-input,
-select,
-textarea {
-    max-width: 280px;
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(76, 117, 178, 0.25);
+    }
+
+/* 按钮样式优化 */
+.btn {
+    border-radius: 4px;
+    font-weight: 500;
+    padding: 8px 16px;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+    .btn-primary:hover {
+        background-color: #3c5d8f;
+        border-color: #3c5d8f;
+    }
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
+/* 卡片和面板样式 */
+.panel, .card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.panel-heading, .card-header {
+    font-weight: 600;
+    padding: 15px;
+}
+
+/* 表格样式 */
+.table {
+    margin-bottom: 0;
+}
+
+    .table th {
+        background-color: #f8f9fa;
+        border-bottom-width: 1px;
+        font-weight: 600;
+    }
+
+.table-hover tbody tr:hover {
+    background-color: rgba(76, 117, 178, 0.05);
+}
+
+/* 导航栏样式 */
+.navbar-inverse {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+    .navbar-inverse .navbar-brand,
+    .navbar-inverse .navbar-nav > li > a {
+        color: #fff;
+    }
+
+        .navbar-inverse .navbar-nav > li > a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+/* 徽章和标签样式 */
+.badge, .label {
+    font-weight: 500;
+}
+
+/* 状态指示器 */
+.status-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.status-active {
+    background-color: var(--success-color);
+}
+
+.status-inactive {
+    background-color: var(--danger-color);
+}
+
+.status-pending {
+    background-color: var(--warning-color);
+}
+
+/* 页脚样式 */
+footer {
+    text-align: center;
+    padding: 10px 0;
+    font-size: 14px;
+    color: var(--gray-color);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .body-content {
+        padding: 10px;
+    }
+
+    .navbar-brand {
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .admin-stats {
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .stat-box {
+        margin-bottom: 10px;
+        width: 100%;
+    }
 }

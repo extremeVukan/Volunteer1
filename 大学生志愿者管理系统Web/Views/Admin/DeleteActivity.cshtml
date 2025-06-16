@@ -4,112 +4,319 @@
 }
 
 <div class="container">
-    <div class="page-header">
-        <h2><span class="glyphicon glyphicon-trash"></span> 删除活动</h2>
+    <div class="panel panel-default admin-panel">
+        <div class="panel-heading admin-panel-heading">
+            <div class="row">
+                <div class="col-md-8">
+                    <h2><i class="glyphicon glyphicon-trash"></i> 删除活动</h2>
+                    <p class="lead">请确认您要删除的活动信息</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row">
         <div class="col-md-12">
             @if (TempData["ErrorMessage"] != null)
             {
-                <div class="alert alert-danger">
-                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                <div class="alert alert-danger message-alert">
+                    <i class="glyphicon glyphicon-exclamation-sign"></i> @TempData["ErrorMessage"]
                 </div>
             }
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-            <div class="panel panel-danger">
-                <div class="panel-heading">
-                    <h3 class="panel-title">确认删除</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="alert alert-warning">
-                        <strong>警告!</strong> 您即将删除此活动。此操作无法撤销！
-                    </div>
+    <div class="delete-activity-container">
+        <div class="delete-warning">
+            <div class="warning-icon">
+                <i class="glyphicon glyphicon-warning-sign"></i>
+            </div>
+            <div class="warning-content">
+                <h3>警告！此操作不可撤销</h3>
+                <p>您即将删除活动 <strong>"@Model.activity_Name"</strong>，删除后将无法恢复。请确认您的操作。</p>
+            </div>
+        </div>
 
-                    <div class="activity-details">
-                        <h4>活动详情</h4>
-                        <table class="table table-striped">
-                            <tr>
-                                <th style="width: 120px;">活动编号:</th>
-                                <td>@Model.activity_ID</td>
-                            </tr>
-                            <tr>
-                                <th>活动名称:</th>
-                                <td>@Model.activity_Name</td>
-                            </tr>
-                            <tr>
-                                <th>活动类型:</th>
-                                <td>@Model.activity_type</td>
-                            </tr>
-                            <tr>
-                                <th>开始时间:</th>
-                                <td>@Model.addtime.ToString("yyyy-MM-dd HH:mm")</td>
-                            </tr>
-                            <tr>
-                                <th>结束时间:</th>
-                                <td>@Model.stoptime.ToString("yyyy-MM-dd HH:mm")</td>
-                            </tr>
-                            <tr>
-                                <th>活动地点:</th>
-                                <td>@Model.place</td>
-                            </tr>
-                            <tr>
-                                <th>需要人数:</th>
-                                <td>@Model.renshu</td>
-                            </tr>
-                            <tr>
-                                <th>活动状态:</th>
-                                <td>@Model.status</td>
-                            </tr>
-                            <tr>
-                                <th>活动描述:</th>
-                                <td>@Model.descn</td>
-                            </tr>
-                        </table>
-                    </div>
-
-                    @using (Html.BeginForm("DeleteActivityConfirmed", "Admin", FormMethod.Post))
+        <div class="activity-detail-card">
+            <div class="card-header">
+                <h4>活动基本信息</h4>
+            </div>
+            <div class="card-body">
+                <div class="activity-image-container">
+                    @if (!string.IsNullOrEmpty(Model.Image) && !Model.Image.Contains("暂无图片"))
                     {
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@Model.activity_ID" />
-
-                        <div class="form-actions text-right">
-                            <button type="submit" class="btn btn-danger">
-                                <span class="glyphicon glyphicon-trash"></span> 确认删除
-                            </button>
-                            <a href="@Url.Action("Activities")" class="btn btn-default">
-                                <span class="glyphicon glyphicon-arrow-left"></span> 返回
-                            </a>
-                        </div>
+                        <img src="@Url.Action("Activity", "Image", new { path = Model.Image })"
+                             alt="@Model.activity_Name"
+                             onerror="this.src='@Url.Content("~/Content/Images/暂无图片.png")';" />
                     }
+                    else
+                    {
+                        <img src="@Url.Content("~/Content/Images/暂无图片.png")" alt="暂无图片" />
+                    }
+                    <div class="activity-type">@Model.activity_type</div>
+                    <div class="activity-status @(Model.status == "已结束" ? "ended" : "ongoing")">@Model.status</div>
+                </div>
+
+                <div class="activity-info">
+                    <div class="info-group">
+                        <label>活动编号：</label>
+                        <span>@Model.activity_ID</span>
+                    </div>
+                    <div class="info-group">
+                        <label>活动名称：</label>
+                        <span>@Model.activity_Name</span>
+                    </div>
+                    <div class="info-group">
+                        <label>举办地点：</label>
+                        <span>@Model.place</span>
+                    </div>
+                    <div class="info-group">
+                        <label>发起人：</label>
+                        <span>@Model.Holder</span>
+                    </div>
+                    <div class="info-group">
+                        <label>所需人数：</label>
+                        <span>@Model.renshu</span>
+                    </div>
+                    <div class="info-group">
+                        <label>开始时间：</label>
+                        <span>@Model.addtime.ToString("yyyy-MM-dd HH:mm")</span>
+                    </div>
+                    <div class="info-group">
+                        <label>结束时间：</label>
+                        <span>@Model.stoptime.ToString("yyyy-MM-dd HH:mm")</span>
+                    </div>
                 </div>
             </div>
+            <div class="card-footer">
+                <div class="description-container">
+                    <h5>活动描述：</h5>
+                    <div class="description-content">
+                        @(Model.descn?.Length > 100
+                            ? Model.descn.Substring(0, 100) + "..."
+                            : Model.descn ?? "暂无描述")
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-container">
+            @using (Html.BeginForm("DeleteActivityConfirmed", "Admin", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.activity_ID" />
+
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-danger btn-lg" onclick="return confirm('确认要删除此活动吗？此操作不可恢复！');">
+                        <i class="glyphicon glyphicon-trash"></i> 确认删除
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn btn-default btn-lg">
+                        <i class="glyphicon glyphicon-arrow-left"></i> 返回活动列表
+                    </a>
+                </div>
+            }
         </div>
     </div>
 </div>
 
 <style>
-    .page-header {
+    /* 基础样式 */
+    body {
+        background-color: #f9f9f9;
+    }
+
+    .container {
+        max-width: 960px;
+        margin: 0 auto;
+    }
+
+    /* 面板样式 */
+    .admin-panel {
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         margin-top: 20px;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 15px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        border: none;
     }
 
-    .panel {
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    .admin-panel-heading {
+        background: linear-gradient(135deg, #FF5E62, #FF9966);
+        color: white;
+        padding: 20px 15px;
+        border-bottom: none;
     }
 
-    .activity-details {
+    /* 消息提示样式 */
+    .message-alert {
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 删除活动容器 */
+    .delete-activity-container {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    /* 警告消息样式 */
+    .delete-warning {
+        background-color: #fff3cd;
+        border-left: 5px solid #ffc107;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+    }
+
+    .warning-icon {
+        font-size: 40px;
+        color: #ffc107;
+        margin-right: 15px;
+    }
+
+    .warning-content h3 {
+        color: #856404;
+        margin-top: 0;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .warning-content p {
+        color: #856404;
+        margin-bottom: 0;
+    }
+
+    /* 活动详情卡片样式 */
+    .activity-detail-card {
+        border: 1px solid #eaeaea;
+        border-radius: 8px;
+        overflow: hidden;
         margin-bottom: 20px;
     }
 
-    .form-actions {
-        margin-top: 20px;
-        padding-top: 15px;
-        border-top: 1px solid #eee;
+    .card-header {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-bottom: 1px solid #eaeaea;
     }
+
+        .card-header h4 {
+            margin: 0;
+            color: #333;
+            font-weight: 600;
+        }
+
+    .card-body {
+        padding: 20px;
+        display: flex;
+    }
+
+    /* 活动图片容器 */
+    .activity-image-container {
+        width: 200px;
+        height: 200px;
+        position: relative;
+        margin-right: 20px;
+        flex-shrink: 0;
+    }
+
+        .activity-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+    .activity-type {
+        position: absolute;
+        top: 10px;
+        left: 0;
+        background: linear-gradient(to right, #FF5E62, #FF9966);
+        color: white;
+        padding: 5px 10px;
+        font-size: 12px;
+        border-radius: 0 4px 4px 0;
+    }
+
+    .activity-status {
+        position: absolute;
+        bottom: 10px;
+        right: 0;
+        padding: 5px 10px;
+        color: white;
+        font-size: 12px;
+        border-radius: 4px 0 0 4px;
+    }
+
+        .activity-status.ongoing {
+            background-color: #28a745;
+        }
+
+        .activity-status.ended {
+            background-color: #dc3545;
+        }
+
+    /* 活动信息样式 */
+    .activity-info {
+        flex-grow: 1;
+    }
+
+    .info-group {
+        margin-bottom: 10px;
+    }
+
+        .info-group label {
+            color: #666;
+            font-weight: 600;
+            margin-right: 5px;
+            width: 80px;
+            display: inline-block;
+        }
+
+        .info-group span {
+            color: #333;
+        }
+
+    /* 卡片底部 */
+    .card-footer {
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-top: 1px solid #eaeaea;
+    }
+
+    .description-container h5 {
+        color: #666;
+        font-weight: 600;
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+
+    .description-content {
+        color: #333;
+        line-height: 1.5;
+        max-height: 80px;
+        overflow: auto;
+    }
+
+    /* 操作按钮容器 */
+    .action-container {
+        margin-top: 30px;
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
+
+        .action-buttons .btn {
+            padding: 10px 20px;
+        }
 </style>

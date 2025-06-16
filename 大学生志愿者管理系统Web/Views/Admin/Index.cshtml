@@ -4,197 +4,786 @@
 }
 
 <div class="container">
-    <div class="page-header">
-        <h2><span class="glyphicon glyphicon-dashboard"></span> 管理员控制面板</h2>
-        <p class="lead">您好，@ViewBag.Username，欢迎使用志愿者管理系统</p>
+    <!-- 页面顶部标题栏 -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default admin-panel">
+                <div class="panel-heading admin-panel-heading">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h2><i class="glyphicon glyphicon-dashboard"></i> 管理员控制面板</h2>
+                            <p>欢迎回来，@ViewBag.Username！今天是 @DateTime.Now.ToString("yyyy年MM月dd日")</p>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <div class="admin-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value">@ViewBag.ActivityCount</div>
+                                    <div class="stat-label">活动总数</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">@ViewBag.PendingOrderCount</div>
+                                    <div class="stat-label">待审核</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <!-- 提示消息 -->
     <div class="row">
         <div class="col-md-12">
             @if (TempData["SuccessMessage"] != null)
             {
-                <div class="alert alert-success">
-                    <span class="glyphicon glyphicon-ok-sign"></span> @TempData["SuccessMessage"]
+                <div class="alert alert-success alert-dismissible fade in">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <i class="glyphicon glyphicon-ok-sign"></i> @TempData["SuccessMessage"]
                 </div>
             }
             @if (TempData["ErrorMessage"] != null)
             {
-                <div class="alert alert-danger">
-                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                <div class="alert alert-danger alert-dismissible fade in">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <i class="glyphicon glyphicon-exclamation-sign"></i> @TempData["ErrorMessage"]
                 </div>
             }
         </div>
     </div>
 
     <div class="row">
-        <!-- 活动管理模块 -->
-        <div class="col-md-4">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title"><span class="glyphicon glyphicon-calendar"></span> 活动管理</h3>
+        <!-- 左侧功能区 -->
+        <div class="col-md-3">
+            <!-- 个人信息卡片 -->
+            <div class="profile-card">
+                <div class="profile-avatar">
+                    <i class="glyphicon glyphicon-user"></i>
                 </div>
-                <div class="panel-body">
-                    <div class="list-group admin-menu">
-                        <a href="@Url.Action("Activities", "Admin")" class="list-group-item">
-                            <span class="glyphicon glyphicon-list"></span> 活动列表
-                            <span class="badge">@ViewBag.ActivityCount</span>
-                        </a>
-                        <a href="@Url.Action("AddActivity", "Admin")" class="list-group-item">
-                            <span class="glyphicon glyphicon-plus"></span> 添加活动
-                        </a>
-                        <a href="@Url.Action("EditActivity", "Admin")" class="list-group-item">
-                            <span class="glyphicon glyphicon-edit"></span> 修改活动
-                        </a>
-                        <a href="@Url.Action("DeleteActivity", "Admin")" class="list-group-item">
-                            <span class="glyphicon glyphicon-trash"></span> 删除活动
-                        </a>
-                        <a href="@Url.Action("EndActivity", "Admin")" class="list-group-item">
-                            <span class="glyphicon glyphicon-check"></span> 结束活动
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 申请管理模块 -->
-        <div class="col-md-4">
-            <div class="panel panel-success">
-                <div class="panel-heading">
-                    <h3 class="panel-title"><span class="glyphicon glyphicon-file"></span> 申请管理</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="list-group admin-menu">
-                        <a href="@Url.Action("ApplicationReview", "Admin")" class="list-group-item">
-                            <span class="glyphicon glyphicon-check"></span> 审核志愿者申请
-                            <span class="badge">@ViewBag.PendingOrderCount</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 个人设置模块 -->
-        <div class="col-md-4">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <h3 class="panel-title"><span class="glyphicon glyphicon-user"></span> 个人管理</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="list-group admin-menu">
-                        <a href="@Url.Action("PersonalInfo", "Admin")" class="list-group-item">
-                            <span class="glyphicon glyphicon-user"></span> 个人信息
-                        </a>
-                        <a href="@Url.Action("ChangePassword", "Admin")" class="list-group-item">
-                            <span class="glyphicon glyphicon-lock"></span> 修改密码
-                        </a>
-                        <a href="@Url.Action("Logout", "Account")" class="list-group-item">
-                            <span class="glyphicon glyphicon-log-out"></span> 退出登录
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 最近活动列表 -->
-    <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title"><span class="glyphicon glyphicon-time"></span> 最近的活动</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>活动ID</th>
-                                    <th>活动名称</th>
-                                    <th>类型</th>
-                                    <th>开始时间</th>
-                                    <th>结束时间</th>
-                                    <th>地点</th>
-                                    <th>人数</th>
-                                    <th>状态</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (Model != null && Model.Any())
-                                {
-                                    foreach (var activity in Model.OrderByDescending(a => a.addtime).Take(5))
-                                    {
-                                        <tr>
-                                            <td>@activity.activity_ID</td>
-                                            <td>@activity.activity_Name</td>
-                                            <td>@activity.activity_type</td>
-                                            <td>@(activity.addtime.ToString("yyyy-MM-dd HH:mm"))</td>
-                                            <td>@(activity.stoptime.ToString("yyyy-MM-dd HH:mm"))</td>
-                                            <td>@activity.place</td>
-                                            <td>@activity.renshu</td>
-                                            <td>
-                                                @if (activity.status == "已结束")
-                                                {
-                                                    <span class="label label-default">已结束</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="label label-success">进行中</span>
-                                                }
-                                            </td>
-                                            <td>
-                                                <a href="@Url.Action("ActivityDetails", "Admin", new { id = activity.activity_ID })" class="btn btn-info btn-xs">
-                                                    <span class="glyphicon glyphicon-eye-open"></span> 查看
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td colspan="9" class="text-center">暂无活动数据</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="panel-footer">
-                    <a href="@Url.Action("Activities", "Admin")" class="btn btn-primary">
-                        <span class="glyphicon glyphicon-list"></span> 查看所有活动
+                <div class="profile-name">@ViewBag.Username</div>
+                <div class="profile-role">管理员</div>
+                <div class="profile-buttons">
+                    <a href="@Url.Action("PersonalInfo", "Admin")" class="btn btn-info">
+                        <i class="glyphicon glyphicon-user"></i> 个人信息
+                    </a>
+                    <a href="@Url.Action("ChangePassword", "Admin")" class="btn btn-warning">
+                        <i class="glyphicon glyphicon-lock"></i> 修改密码
+                    </a>
+                    <a href="@Url.Action("Logout", "Account")" class="btn btn-danger">
+                        <i class="glyphicon glyphicon-log-out"></i> 退出登录
                     </a>
                 </div>
             </div>
+
+            <!-- 快速操作卡片 -->
+            <div class="function-card">
+                <div class="function-title">
+                    <i class="glyphicon glyphicon-flash"></i> 快速操作
+                </div>
+                <div class="function-buttons">
+                    <a href="@Url.Action("AddActivity", "Admin")" class="btn btn-success">
+                        <i class="glyphicon glyphicon-plus"></i> 添加活动
+                    </a>
+                    <a href="@Url.Action("ApplicationReview", "Admin")" class="btn btn-primary">
+                        <i class="glyphicon glyphicon-check"></i> 审核申请
+                        @if (ViewBag.PendingOrderCount > 0)
+                        {
+                            <span class="badge">@ViewBag.PendingOrderCount</span>
+                        }
+                    </a>
+                    <a href="@Url.Action("EndActivity", "Admin")" class="btn btn-default">
+                        <i class="glyphicon glyphicon-flag"></i> 结束活动
+                    </a>
+                </div>
+            </div>
+
+            <!-- 功能导航卡片 -->
+            <div class="nav-card">
+                <div class="nav-title">
+                    <i class="glyphicon glyphicon-th-list"></i> 管理功能
+                </div>
+                <div class="nav-content">
+                    <div class="nav-group">
+                        <div class="nav-group-title">
+                            <i class="glyphicon glyphicon-calendar"></i> 活动管理
+                        </div>
+                        <div class="nav-items">
+                            <a href="@Url.Action("Activities", "Admin")" class="nav-item">
+                                <i class="glyphicon glyphicon-list"></i> 活动列表
+                                <span class="item-badge">@ViewBag.ActivityCount</span>
+                            </a>
+                            <a href="@Url.Action("AddActivity", "Admin")" class="nav-item">
+                                <i class="glyphicon glyphicon-plus"></i> 添加活动
+                            </a>
+                            <a href="@Url.Action("EditActivity", "Admin")" class="nav-item">
+                                <i class="glyphicon glyphicon-edit"></i> 修改活动
+                            </a>
+                            <a href="@Url.Action("DeleteActivity", "Admin")" class="nav-item">
+                                <i class="glyphicon glyphicon-trash"></i> 删除活动
+                            </a>
+                            <a href="@Url.Action("EndActivity", "Admin")" class="nav-item">
+                                <i class="glyphicon glyphicon-check"></i> 结束活动
+                            </a>
+                        </div>
+                    </div>
+                    <div class="nav-group">
+                        <div class="nav-group-title">
+                            <i class="glyphicon glyphicon-file"></i> 申请管理
+                        </div>
+                        <div class="nav-items">
+                            <a href="@Url.Action("ApplicationReview", "Admin")" class="nav-item">
+                                <i class="glyphicon glyphicon-check"></i> 审核志愿者申请
+                                <span class="item-badge">@ViewBag.PendingOrderCount</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧内容区 -->
+        <div class="col-md-9">
+            <!-- 统计卡片 -->
+            <div class="row stats-row">
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-card-body">
+                            <div class="stat-card-icon bg-blue">
+                                <i class="glyphicon glyphicon-calendar"></i>
+                            </div>
+                            <div class="stat-card-content">
+                                <div class="stat-card-value">@ViewBag.ActivityCount</div>
+                                <div class="stat-card-title">管理的活动</div>
+                            </div>
+                        </div>
+                        <div class="stat-card-footer">
+                            <a href="@Url.Action("Activities", "Admin")">查看所有活动 <i class="glyphicon glyphicon-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-card-body">
+                            <div class="stat-card-icon bg-green">
+                                <i class="glyphicon glyphicon-check"></i>
+                            </div>
+                            <div class="stat-card-content">
+                                <div class="stat-card-value">@ViewBag.PendingOrderCount</div>
+                                <div class="stat-card-title">待审核申请</div>
+                            </div>
+                        </div>
+                        <div class="stat-card-footer">
+                            <a href="@Url.Action("ApplicationReview", "Admin")">查看所有申请 <i class="glyphicon glyphicon-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-card-body">
+                            <div class="stat-card-icon bg-orange">
+                                <i class="glyphicon glyphicon-user"></i>
+                            </div>
+                            <div class="stat-card-content">
+                                <div class="stat-card-value">@(Model != null ? Model.Sum(a => a.renshu) : 0)</div>
+                                <div class="stat-card-title">志愿者容量</div>
+                            </div>
+                        </div>
+                        <div class="stat-card-footer">
+                            <a href="@Url.Action("Activities", "Admin")">查看所有活动 <i class="glyphicon glyphicon-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 最近活动卡片 -->
+            <div class="activities-card">
+                <div class="card-header">
+                    <h3><i class="glyphicon glyphicon-time"></i> 最近的活动</h3>
+                    <div class="header-actions">
+                        <a href="@Url.Action("Activities", "Admin")" class="btn btn-sm btn-primary">
+                            <i class="glyphicon glyphicon-list"></i> 查看所有活动
+                        </a>
+                        <a href="@Url.Action("AddActivity", "Admin")" class="btn btn-sm btn-success">
+                            <i class="glyphicon glyphicon-plus"></i> 添加活动
+                        </a>
+                    </div>
+                </div>
+
+                @if (Model != null && Model.Any())
+                {
+                    <div class="activities-container">
+                        @foreach (var activity in Model.OrderByDescending(a => a.addtime).Take(5))
+                        {
+                            <div class="activity-item">
+                                <div class="activity-status">
+                                    @if (activity.status == "已结束")
+                                    {
+                                        <div class="status-indicator status-ended">
+                                            <i class="glyphicon glyphicon-ok-circle"></i>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="status-indicator status-ongoing">
+                                            <i class="glyphicon glyphicon-time"></i>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        <a href="@Url.Action("ActivityDetails", "Admin", new { id = activity.activity_ID })">
+                                            @activity.activity_Name
+                                        </a>
+                                    </div>
+                                    <div class="activity-metadata">
+                                        <span class="metadata-item">
+                                            <i class="glyphicon glyphicon-tag"></i> @activity.activity_type
+                                        </span>
+                                        <span class="metadata-item">
+                                            <i class="glyphicon glyphicon-user"></i> @activity.renshu 人
+                                        </span>
+                                        <span class="metadata-item">
+                                            <i class="glyphicon glyphicon-map-marker"></i> @activity.place
+                                        </span>
+                                    </div>
+                                    <div class="activity-time">
+                                        <span class="time-label">开始时间:</span>
+                                        <span class="time-value">@activity.addtime.ToString("yyyy-MM-dd HH:mm")</span>
+                                        <span class="time-separator">|</span>
+                                        <span class="time-label">结束时间:</span>
+                                        <span class="time-value">@activity.stoptime.ToString("yyyy-MM-dd HH:mm")</span>
+                                    </div>
+                                </div>
+                                <div class="activity-actions">
+                                    <a href="@Url.Action("ActivityDetails", "Admin", new { id = activity.activity_ID })" class="btn btn-info btn-sm">
+                                        <i class="glyphicon glyphicon-eye-open"></i> 查看
+                                    </a>
+                                    <a href="@Url.Action("EditActivity", "Admin", new { id = activity.activity_ID })" class="btn btn-warning btn-sm">
+                                        <i class="glyphicon glyphicon-edit"></i> 编辑
+                                    </a>
+                                    @if (activity.status != "已结束")
+                                    {
+                                        <a href="@Url.Action("EndActivity", "Admin", new { id = activity.activity_ID })" class="btn btn-danger btn-sm">
+                                            <i class="glyphicon glyphicon-flag"></i> 结束
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="no-activities">
+                        <div class="no-data-icon">
+                            <i class="glyphicon glyphicon-info-sign"></i>
+                        </div>
+                        <p>暂无活动数据</p>
+                        <a href="@Url.Action("AddActivity", "Admin")" class="btn btn-primary">
+                            <i class="glyphicon glyphicon-plus"></i> 添加活动
+                        </a>
+                    </div>
+                }
+            </div>
+
+            <!-- 快速审核卡片 -->
+            @if (ViewBag.PendingOrderCount > 0)
+            {
+                <div class="quick-review-card">
+                    <div class="card-header">
+                        <h3><i class="glyphicon glyphicon-check"></i> 待审核申请</h3>
+                        <div class="header-actions">
+                            <a href="@Url.Action("ApplicationReview", "Admin")" class="btn btn-sm btn-primary">
+                                <i class="glyphicon glyphicon-list"></i> 查看所有申请
+                            </a>
+                        </div>
+                    </div>
+                    <div class="quick-review-content">
+                        <div class="pending-badge">
+                            <span class="pending-number">@ViewBag.PendingOrderCount</span>
+                            <span class="pending-label">待审核申请</span>
+                        </div>
+                        <div class="pending-text">
+                            <p>您有 @ViewBag.PendingOrderCount 个待审核的志愿者活动申请，请及时处理！</p>
+                        </div>
+                        <div class="pending-action">
+                            <a href="@Url.Action("ApplicationReview", "Admin")" class="btn btn-primary">
+                                <i class="glyphicon glyphicon-check"></i> 立即审核
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
     </div>
 </div>
 
 <style>
-    .page-header {
+    /* 整体卡片样式 */
+    .admin-panel {
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         margin-top: 20px;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 15px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        border: none;
     }
 
-    .admin-menu {
-        margin-bottom: 0;
+    /* 卡片头部 */
+    .admin-panel-heading {
+        background: linear-gradient(135deg, #4c75b2, #2c5282);
+        color: white;
+        padding: 20px 15px;
+        border-bottom: none;
     }
 
-    .panel {
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    /* 管理员统计数据 */
+    .admin-stats {
+        display: flex;
+        justify-content: flex-end;
     }
 
-    .list-group-item {
-        border-left: none;
-        border-right: none;
-    }
-
-        .list-group-item:first-child {
-            border-top: none;
+        .admin-stats .stat-item {
+            margin-left: 15px;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            text-align: center;
         }
 
-        .list-group-item:last-child {
+        .admin-stats .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .admin-stats .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+    /* 个人信息卡片 */
+    .profile-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: #4c75b2;
+        color: white;
+        font-size: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+    }
+
+    .profile-name {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .profile-role {
+        color: #6c757d;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .profile-buttons {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .profile-buttons .btn {
+            margin-bottom: 10px;
+            border-radius: 30px;
+        }
+
+    /* 快速操作卡片 */
+    .function-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .function-title {
+        font-weight: 600;
+        margin-bottom: 15px;
+        font-size: 16px;
+        border-bottom: 1px solid #f0f0f0;
+        padding-bottom: 10px;
+    }
+
+    .function-buttons {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .function-buttons .btn {
+            margin-bottom: 10px;
+            border-radius: 30px;
+        }
+
+    /* 导航卡片 */
+    .nav-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .nav-title {
+        background-color: #f8f9fa;
+        padding: 15px;
+        font-weight: 600;
+        font-size: 16px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .nav-content {
+        padding: 10px 0;
+    }
+
+    .nav-group {
+        margin-bottom: 15px;
+    }
+
+    .nav-group-title {
+        padding: 10px 15px;
+        font-weight: 600;
+        color: #4c75b2;
+        font-size: 14px;
+    }
+
+    .nav-items {
+        padding: 0;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 15px;
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+        .nav-item:hover {
+            background-color: #f8f9fa;
+            color: #4c75b2;
+            padding-left: 18px;
+        }
+
+        .nav-item i {
+            margin-right: 10px;
+        }
+
+    .item-badge {
+        background-color: #4c75b2;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 12px;
+    }
+
+    /* 统计卡片 */
+    .stats-row {
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        height: 100%;
+        margin-bottom: 20px;
+    }
+
+    .stat-card-body {
+        padding: 20px;
+        display: flex;
+        align-items: center;
+    }
+
+    .stat-card-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+        margin-right: 15px;
+    }
+
+    .bg-blue {
+        background-color: #4c75b2;
+    }
+
+    .bg-green {
+        background-color: #28a745;
+    }
+
+    .bg-orange {
+        background-color: #fd7e14;
+    }
+
+    .stat-card-content {
+        flex: 1;
+    }
+
+    .stat-card-value {
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .stat-card-title {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    .stat-card-footer {
+        background-color: #f8f9fa;
+        padding: 10px 20px;
+        border-top: 1px solid #f0f0f0;
+    }
+
+        .stat-card-footer a {
+            color: #4c75b2;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+            .stat-card-footer a i {
+                margin-left: 5px;
+                font-size: 12px;
+            }
+
+    /* 活动列表卡片 */
+    .activities-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .card-header {
+        padding: 20px;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .card-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+    .header-actions .btn {
+        margin-left: 10px;
+    }
+
+    .activities-container {
+        padding: 10px 0;
+    }
+
+    .activity-item {
+        display: flex;
+        padding: 15px 20px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+        .activity-item:last-child {
             border-bottom: none;
         }
+
+    .activity-status {
+        margin-right: 20px;
+    }
+
+    .status-indicator {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: white;
+    }
+
+    .status-ongoing {
+        background-color: #28a745;
+    }
+
+    .status-ended {
+        background-color: #6c757d;
+    }
+
+    .activity-content {
+        flex: 1;
+    }
+
+    .activity-title {
+        font-weight: 600;
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+        .activity-title a {
+            color: #333;
+            text-decoration: none;
+        }
+
+            .activity-title a:hover {
+                color: #4c75b2;
+            }
+
+    .activity-metadata {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+
+    .metadata-item {
+        margin-right: 20px;
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+        .metadata-item i {
+            margin-right: 5px;
+        }
+
+    .activity-time {
+        font-size: 13px;
+        color: #6c757d;
+    }
+
+    .time-label {
+        color: #6c757d;
+    }
+
+    .time-value {
+        color: #495057;
+        margin-right: 15px;
+    }
+
+    .time-separator {
+        margin: 0 5px;
+        color: #dee2e6;
+    }
+
+    .activity-actions {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-left: 20px;
+    }
+
+        .activity-actions .btn {
+            margin-bottom: 5px;
+        }
+
+    /* 无活动数据 */
+    .no-activities {
+        text-align: center;
+        padding: 40px 0;
+    }
+
+    .no-data-icon {
+        font-size: 48px;
+        color: #cccccc;
+        margin-bottom: 15px;
+    }
+
+    .no-activities p {
+        color: #6c757d;
+        margin-bottom: 20px;
+    }
+
+    /* 快速审核卡片 */
+    .quick-review-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .quick-review-content {
+        padding: 20px;
+        display: flex;
+        align-items: center;
+    }
+
+    .pending-badge {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: #fd7e14;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+    }
+
+    .pending-number {
+        font-size: 32px;
+        font-weight: bold;
+    }
+
+    .pending-label {
+        font-size: 12px;
+    }
+
+    .pending-text {
+        flex: 1;
+    }
+
+        .pending-text p {
+            font-size: 16px;
+            margin-bottom: 0;
+        }
+
+    .pending-action {
+        margin-left: 20px;
+    }
+
+    /* 提醒消息样式 */
+    .alert {
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
 </style>
+
+@section scripts {
+    <script>$(function () {
+            // 初始化工具提示
+            $('[data-toggle="tooltip"]').tooltip();
+
+            // 设置警告框自动消失
+            $('.alert').delay(5000).fadeOut(500);
+        });</script>
+}

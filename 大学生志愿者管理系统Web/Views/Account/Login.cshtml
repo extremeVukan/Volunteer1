@@ -3,133 +3,128 @@
     Layout = "~/Views/Account/_loginLayout.cshtml";
 }
 
-<div class="container"style="margin-left:500px;margin-top:100px">
+<div class="auth-container slide-up">
     <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-            <div class="login-panel">
-                <div class="row">
-                    <!-- 左侧信息区 -->
-                    <div class="col-md-5 login-info">
-                        <div class="login-banner">
-                            <h2>大学生志愿者管理系统</h2>
-                            <p>参与志愿服务，传递爱与希望</p>
-                            <div class="stats-container">
-                                <div class="stat-item">
-                                    <div class="stat-value">1000+</div>
-                                    <div class="stat-label">志愿者</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-value">500+</div>
-                                    <div class="stat-label">活动</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-value">5000+</div>
-                                    <div class="stat-label">服务时长</div>
-                                </div>
-                            </div>
-                        </div>
+        <!-- 左侧信息区 -->
+        <div class="col-md-5 login-info">
+            <div class="login-banner">
+                <div class="heart-icon"><i class="glyphicon glyphicon-heart"></i></div>
+                <h2>大学生志愿者管理系统</h2>
+                <p>参与志愿服务，传递爱与希望</p>
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <div class="stat-value">1500+</div>
+                        <div class="stat-label">志愿者</div>
                     </div>
-
-                    <!-- 右侧登录表单 -->
-                    <div class="col-md-7 login-form-container">
-                        <div class="login-header">
-                            <h3>用户登录</h3>
-                            <p class="text-muted">请输入您的账号信息</p>
-                        </div>
-
-                        @if (ViewBag.ErrorMessage != null)
-                        {
-                            <div class="alert alert-danger">
-                                <span class="glyphicon glyphicon-exclamation-sign"></span>
-                                @ViewBag.ErrorMessage
-                            </div>
-                        }
-
-                        @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "login-form" }))
-                        {
-                            @Html.AntiForgeryToken()
-
-                            <div class="form-group">
-                                <label>用户类型</label>
-                                <div class="user-type-selector">
-                                    <div class="user-type-option">
-                                        <input type="radio" id="volunteer" name="userType" value="0" checked />
-                                        <label for="volunteer">
-                                            <span class="glyphicon glyphicon-heart"></span> 志愿者
-                                        </label>
-                                    </div>
-                                    <div class="user-type-option">
-                                        <input type="radio" id="admin" name="userType" value="1" />
-                                        <label for="admin">
-                                            <span class="glyphicon glyphicon-user"></span> 管理员
-                                        </label>
-                                    </div>
-                                    <div class="user-type-option">
-                                        <input type="radio" id="superadmin" name="userType" value="2" />
-                                        <label for="superadmin">
-                                            <span class="glyphicon glyphicon-tower"></span> 平台管理员
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label>用户名</label>
-                                <div class="input-group">
-                                    <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-                                    <input type="text" name="username" class="form-control" placeholder="请输入用户名" required />
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label>密码</label>
-                                <div class="input-group">
-                                    <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
-                                    <input type="password" name="password" class="form-control" placeholder="请输入密码" required />
-                                </div>
-                            </div>
-
-                            <div class="form-group login-actions">
-                                <button type="submit" class="btn btn-primary btn-login">
-                                    <span class="glyphicon glyphicon-log-in"></span> 登录
-                                </button>
-                                <a href="@Url.Action("Register")" class="btn btn-default btn-register">
-                                    <span class="glyphicon glyphicon-user"></span> 注册
-                                </a>
-                            </div>
-                        }
+                    <div class="stat-item">
+                        <div class="stat-value">200+</div>
+                        <div class="stat-label">活动</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">8000+</div>
+                        <div class="stat-label">服务时长</div>
+                    </div>
+                </div>
+                <div class="login-features">
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="glyphicon glyphicon-ok-circle"></i></div>
+                        <div class="feature-text">便捷的活动申请与管理</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="glyphicon glyphicon-ok-circle"></i></div>
+                        <div class="feature-text">智能的志愿时长统计</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="glyphicon glyphicon-ok-circle"></i></div>
+                        <div class="feature-text">完善的志愿者证申请流程</div>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- 右侧登录表单 -->
+        <div class="col-md-7 login-form-container">
+            <div class="login-header">
+                <h3>用户登录</h3>
+                <p class="text-muted">请输入您的账号信息</p>
+            </div>
+
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <div class="alert alert-danger error-message">
+                    <i class="glyphicon glyphicon-exclamation-sign"></i>
+                    @ViewBag.ErrorMessage
+                </div>
+            }
+
+            @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "login-form" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="form-group">
+                    <label>用户类型</label>
+                    <div class="user-type-selector">
+                        <div class="user-type-option">
+                            <input type="radio" id="volunteer" name="userType" value="0" checked />
+                            <label for="volunteer">
+                                <i class="glyphicon glyphicon-heart"></i>
+                                <div class="type-name">志愿者</div>
+                            </label>
+                        </div>
+                        <div class="user-type-option">
+                            <input type="radio" id="admin" name="userType" value="1" />
+                            <label for="admin">
+                                <i class="glyphicon glyphicon-briefcase"></i>
+                                <div class="type-name">管理员</div>
+                            </label>
+                        </div>
+                        <div class="user-type-option">
+                            <input type="radio" id="superadmin" name="userType" value="2" />
+                            <label for="superadmin">
+                                <i class="glyphicon glyphicon-tower"></i>
+                                <div class="type-name">平台管理员</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>用户名</label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                        <input type="text" name="username" class="form-control" placeholder="请输入用户名" required autofocus />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>密码</label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                        <input type="password" name="password" class="form-control" placeholder="请输入密码" required />
+                    </div>
+                </div>
+
+                <div class="form-group login-actions">
+                    <button type="submit" class="btn btn-primary btn-login">
+                        <i class="glyphicon glyphicon-log-in"></i> 登录
+                    </button>
+                    <a href="@Url.Action("Register")" class="btn btn-default btn-register">
+                        <i class="glyphicon glyphicon-user"></i> 注册
+                    </a>
+                </div>
+            }
         </div>
     </div>
 </div>
 
 <style>
-    body {
-        background-color: #f5f7fa;
-        padding-top: 40px;
-        padding-bottom: 40px;
-    }
-
-    .container {
-        margin-top: 50px;
-    }
-
-    .login-panel {
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        overflow: hidden;
-    }
-
     /* 左侧信息区样式 */
     .login-info {
-        background: linear-gradient(135deg, #4c75b2 0%, #2c5282 100%);
+        background: linear-gradient(135deg, #FF9966, #FF5E62);
         color: white;
         padding: 40px 20px;
         height: 100%;
-        position: relative;
+        min-height: 500px;
     }
 
     .login-banner {
@@ -137,22 +132,30 @@
         padding: 20px 10px;
     }
 
-        .login-banner h2 {
-            font-weight: 600;
-            margin-bottom: 20px;
-            font-size: 22px;
-        }
+    .heart-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+        animation: pulse 1.5s infinite;
+    }
 
-        .login-banner p {
-            font-size: 16px;
-            margin-bottom: 40px;
-            opacity: 0.9;
-        }
+    
+
+    .login-banner h2 {
+        font-weight: 600;
+        margin-bottom: 15px;
+        font-size: 24px;
+    }
+
+    .login-banner p {
+        font-size: 16px;
+        margin-bottom: 30px;
+        opacity: 0.9;
+    }
 
     .stats-container {
         display: flex;
         justify-content: space-between;
-        margin-top: 30px;
+        margin-bottom: 30px;
     }
 
     .stat-item {
@@ -171,114 +174,161 @@
         opacity: 0.8;
     }
 
+    .login-features {
+        margin-top: 30px;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        text-align: left;
+    }
+
+    .feature-icon {
+        margin-right: 10px;
+        font-size: 18px;
+    }
+
+    .feature-text {
+        font-size: 14px;
+    }
+
     /* 右侧表单样式 */
     .login-form-container {
-        padding: 30px 40px;
+        padding: 40px;
+        background-color: #fff;
     }
 
     .login-header {
-        margin-bottom: 25px;
+        margin-bottom: 30px;
         text-align: center;
     }
 
-        .login-header h3 {
-            color: #2c5282;
-            font-weight: 600;
-        }
+    .login-header h3 {
+        color: #333;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
 
-        .login-header p {
-            color: #718096;
-        }
+    .login-header p {
+        color: #6c757d;
+    }
 
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
 
-        .form-group label {
-            font-weight: 600;
-            color: #4a5568;
-            margin-bottom: 8px;
-            display: block;
-        }
+    .form-group label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+        display: block;
+    }
 
     .form-control {
-        height: 42px;
+        height: 46px;
         box-shadow: none;
-        border-color: #e2e8f0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 10px 12px;
+        font-size: 15px;
+        transition: all 0.2s ease;
     }
 
-        .form-control:focus {
-            border-color: #4c75b2;
-            box-shadow: 0 0 0 1px rgba(76, 117, 178, 0.2);
-        }
+    .form-control:focus {
+        border-color: #FF9966;
+        box-shadow: 0 0 0 0.2rem rgba(255, 94, 98, 0.25);
+    }
 
     .input-group-addon {
-        background-color: #f8fafc;
-        border-color: #e2e8f0;
-        color: #4a5568;
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        color: #495057;
     }
 
     /* 用户类型选择器样式 */
     .user-type-selector {
         display: flex;
-        margin-bottom: 10px;
-        gap: 10px;
+        margin-bottom: 5px;
+        gap: 15px;
     }
 
     .user-type-option {
         flex: 1;
     }
 
-        .user-type-option input[type="radio"] {
-            display: none;
-        }
+    .user-type-option input[type="radio"] {
+        display: none;
+    }
 
-        .user-type-option label {
-            display: block;
-            background-color: #f8fafc;
-            padding: 8px 12px;
-            text-align: center;
-            border: 1px solid #e2e8f0;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: normal;
-        }
+    .user-type-option label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #f8f9fa;
+        padding: 15px 10px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        height: 100%;
+    }
 
-        .user-type-option input[type="radio"]:checked + label {
-            background-color: #4c75b2;
-            color: white;
-            border-color: #4c75b2;
-        }
+    .user-type-option label i {
+        font-size: 24px;
+        margin-bottom: 8px;
+    }
+
+    .user-type-option .type-name {
+        font-size: 14px;
+        font-weight: normal;
+    }
+
+    .user-type-option input[type="radio"]:checked + label {
+        background-color: #FF5E62;
+        color: white;
+        border-color: #FF5E62;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    }
 
     .login-actions {
-        margin-top: 25px;
-        text-align: center;
+        margin-top: 30px;
+        display: flex;
+        gap: 15px;
+    }
+
+    .btn-login, .btn-register {
+        flex: 1;
+        height: 46px;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .btn-login {
-        background-color: #4c75b2;
-        border-color: #4c75b2;
-        width: 120px;
-        padding: 10px;
+        background-color: #FF5E62;
+        border-color: #FF5E62;
     }
 
-        .btn-login:hover {
-            background-color: #2c5282;
-            border-color: #2c5282;
-        }
-
-    .btn-register {
-        width: 120px;
-        padding: 10px;
+    .btn-login:hover {
+        background-color: #e54e52;
+        border-color: #e54e52;
     }
 
-    .alert {
-        border-radius: 4px;
+    .btn-login i, .btn-register i {
+        margin-right: 8px;
+    }
+
+    .error-message {
+        border-radius: 8px;
         padding: 15px;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
+        animation: shake 0.5s;
     }
 
-    /* 响应式调整 */
-
+   
 </style>

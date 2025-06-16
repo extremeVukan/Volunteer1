@@ -321,5 +321,27 @@ namespace BLL
                 return new List<ActivityT>();
             }
         }
+        /// <summary>
+        /// 更新活动成员签到时间
+        /// </summary>
+        public bool UpdateMemberSignTime(int activityId, int volunteerId, DateTime signTime)
+        {
+            try
+            {
+                var member = context.ACTMember
+                    .FirstOrDefault(m => m.ACTID == activityId && m.Volunteerid == volunteerId);
+
+                if (member == null)
+                    return false;
+
+                member.SignTime = signTime;
+                context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

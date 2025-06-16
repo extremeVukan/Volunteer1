@@ -180,7 +180,7 @@ namespace 大学生志愿者管理系统Web.Controllers
         #region 活动管理
 
         // GET: Admin/Activities
-        public ActionResult Activities(string activityType = "", string status = "")
+        public ActionResult Activities(string activityType = "", string status = "", int page = 1, int pageSize = 8)
         {
             // 检查权限
             if (Session["Username"] == null || ((int)Session["UserType"] != 1 && (int)Session["UserType"] != 2))
@@ -191,21 +191,41 @@ namespace 大学生志愿者管理系统Web.Controllers
             try
             {
                 string username = Session["Username"].ToString();
-                var activities = _activityService.GetActivitiesByHolder(username);
+                var allActivities = _activityService.GetActivitiesByHolder(username);
 
                 // 按类型筛选
                 if (!string.IsNullOrEmpty(activityType))
                 {
-                    activities = activities.Where(a => a.activity_type == activityType).ToList();
+                    allActivities = allActivities.Where(a => a.activity_type == activityType).ToList();
                     ViewBag.ActivityType = activityType;
                 }
 
                 // 按状态筛选
                 if (!string.IsNullOrEmpty(status))
                 {
-                    activities = activities.Where(a => (a.status ?? "") == status).ToList();
+                    allActivities = allActivities.Where(a => (a.status ?? "") == status).ToList();
                     ViewBag.Status = status;
                 }
+
+                // 分页逻辑
+                int totalCount = allActivities.Count();
+                int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+                // 确保页码有效
+                if (page < 1) page = 1;
+                if (page > totalPages && totalPages > 0) page = totalPages;
+
+                // 获取当前页的数据
+                var activities = allActivities
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                // 传递分页信息到视图
+                ViewBag.CurrentPage = page;
+                ViewBag.PageSize = pageSize;
+                ViewBag.TotalPages = totalPages;
+                ViewBag.TotalCount = totalCount;
 
                 return View(activities);
             }
@@ -772,7 +792,130 @@ namespace 大学生志愿者管理系统Web.Controllers
                 return RedirectToAction("ApplicationReview");
             }
         }
+        // GET: Admin/ActivityParticipants/5
+        public ActionResult ActivityParticipants(int? id)
+        {
+            // 检查权限
+            if (Session["Username"] == null || ((int)Session["UserType"] != 1 && (int)Session["UserType"] != 2))
+            {
+                return RedirectToAction("AccessDenied", "Account");
+            }
 
+            // 如果ID为空，重定向到活动列表
+            if (id == null)
+            {
+                TempData["ErrorMessage"] = "未指定活动ID，请从活动列表中选择一个活动";
+                return RedirectToAction("Activities");
+            }
+
+            try
+            {
+                // 获取活动信息
+                var activity = _activityService.GetActivityById(id.Value);
+                if (activity == null)
+                {
+                    TempData["ErrorMessage"] = "找不到指定的活动";
+                    return RedirectToAction("Activities");
+                }
+
+                // 获取活动参与者
+                var members = _activityService.GetActivityMembers(id.Value);
+
+                // 传递活动基本信息到视图
+                ViewBag.ActivityId = id.Value;
+                ViewBag.ActivityName = activity.activity_Name;
+
+                return View(members);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"获取活动参与者出错: {ex.Message}";
+                return RedirectToAction("ActivityDetails", new { id = id.Value });
+            }
+        }
+        // POST: Admin/ConfirmSignIn
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ConfirmSignIn(int volunteerId, int activityId)
+        {
+            // 检查权限
+            if (Session["Username"] == null || ((int)Session["UserType"] != 1 && (int)Session["UserType"] != 2))
+            {
+                return RedirectToAction("AccessDenied", "Account");
+            }
+
+            try
+            {
+                // 查找活动成员
+                var member = _activityService.GetActivityMembers(activityId)
+                    .FirstOrDefault(m => m.Volunteerid == volunteerId);
+
+                if (member == null)
+                {
+                    TempData["ErrorMessage"] = "找不到指定的志愿者信息";
+                    return RedirectToAction("ActivityParticipants", new { id = activityId });
+                }
+
+                // 更新签到时间
+                bool result = _activityService.UpdateMemberSignTime(activityId, volunteerId, DateTime.Now);
+                if (result)
+                {
+                    TempData["SuccessMessage"] = $"志愿者 {member.volunteer}(ID:{volunteerId}) 签到成功";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "签到操作失败";
+                }
+
+                return RedirectToAction("ActivityParticipants", new { id = activityId });
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"签到出错: {ex.Message}";
+                return RedirectToAction("ActivityParticipants", new { id = activityId });
+            }
+        }
+
+        // POST: Admin/EndActivityTask
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EndActivityTask(int activityId)
+        {
+            // 检查权限
+            if (Session["Username"] == null || ((int)Session["UserType"] != 1 && (int)Session["UserType"] != 2))
+            {
+                return RedirectToAction("AccessDenied", "Account");
+            }
+
+            try
+            {
+                // 获取活动信息
+                var activity = _activityService.GetActivityById(activityId);
+                if (activity == null)
+                {
+                    TempData["ErrorMessage"] = "找不到指定的活动";
+                    return RedirectToAction("Activities");
+                }
+
+                // 结束活动
+                bool result = _activityService.EndActivity(activityId, Session["Username"].ToString());
+                if (result)
+                {
+                    TempData["SuccessMessage"] = $"活动 \"{activity.activity_Name}\" 已成功结束";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "结束活动失败";
+                }
+
+                return RedirectToAction("Activities");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"结束活动出错: {ex.Message}";
+                return RedirectToAction("Activities");
+            }
+        }
         #endregion
     }
 }

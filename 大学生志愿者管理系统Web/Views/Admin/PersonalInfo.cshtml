@@ -4,23 +4,29 @@
 }
 
 <div class="container">
-    <div class="page-header">
-        <h2><span class="glyphicon glyphicon-user"></span> 个人信息</h2>
-        <p class="lead">查看和修改您的个人资料</p>
+    <div class="panel panel-default admin-panel">
+        <div class="panel-heading admin-panel-heading">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2><i class="glyphicon glyphicon-user"></i> 个人信息</h2>
+                    <p class="lead">查看和修改您的个人资料</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row">
         <div class="col-md-12">
             @if (TempData["SuccessMessage"] != null)
             {
-                <div class="alert alert-success">
-                    <span class="glyphicon glyphicon-ok-sign"></span> @TempData["SuccessMessage"]
+                <div class="alert alert-success message-alert">
+                    <i class="glyphicon glyphicon-ok-sign"></i> @TempData["SuccessMessage"]
                 </div>
             }
             @if (TempData["ErrorMessage"] != null)
             {
-                <div class="alert alert-danger">
-                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                <div class="alert alert-danger message-alert">
+                    <i class="glyphicon glyphicon-exclamation-sign"></i> @TempData["ErrorMessage"]
                 </div>
             }
         </div>
@@ -28,11 +34,11 @@
 
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title">个人详细信息</h3>
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <h3 class="card-title"><i class="glyphicon glyphicon-edit"></i> 个人详细信息</h3>
                 </div>
-                <div class="panel-body">
+                <div class="profile-card-body">
                     @using (Html.BeginForm("UpdatePersonalInfo", "Admin", FormMethod.Post, new { @class = "form-horizontal" }))
                     {
                         @Html.AntiForgeryToken()
@@ -41,52 +47,74 @@
                         <div class="form-group">
                             <label class="control-label col-md-3">管理员ID:</label>
                             <div class="col-md-9">
-                                <p class="form-control-static">@Model.admin_ID</p>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
+                                    <p class="form-control-static id-display">@Model.admin_ID</p>
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="control-label col-md-3">姓名:</label>
                             <div class="col-md-9">
-                                @Html.TextBoxFor(m => m.admin_Name, new { @class = "form-control", @readonly = "readonly" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                    @Html.TextBoxFor(m => m.admin_Name, new { @class = "form-control profile-input", @readonly = "readonly" })
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="control-label col-md-3">性别:</label>
                             <div class="col-md-9">
-                                <select name="sex" class="form-control">
-                                    <option value="男" @(Model.sex == "男" ? "selected" : "")>男</option>
-                                    <option value="女" @(Model.sex == "女" ? "selected" : "")>女</option>
-                                </select>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-heart"></i></span>
+                                    <select name="sex" class="form-control profile-input">
+                                        <option value="男" @(Model.sex == "男" ? "selected" : "")>男</option>
+                                        <option value="女" @(Model.sex == "女" ? "selected" : "")>女</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="control-label col-md-3">出生日期:</label>
                             <div class="col-md-9">
-                                @Html.TextBoxFor(m => m.birth_date, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                    @Html.TextBoxFor(m => m.birth_date, "{0:yyyy-MM-dd}", new { @class = "form-control profile-input", type = "date" })
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="control-label col-md-3">雇佣日期:</label>
                             <div class="col-md-9">
-                                @Html.TextBoxFor(m => m.hire_date, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @readonly = "readonly" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-briefcase"></i></span>
+                                    @Html.TextBoxFor(m => m.hire_date, "{0:yyyy-MM-dd}", new { @class = "form-control profile-input", type = "date", @readonly = "readonly" })
+                                </div>
+                                <span class="help-block">雇佣日期不可修改</span>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="control-label col-md-3">地址:</label>
                             <div class="col-md-9">
-                                @Html.TextBoxFor(m => m.address, new { @class = "form-control" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
+                                    @Html.TextBoxFor(m => m.address, new { @class = "form-control profile-input" })
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="control-label col-md-3">电话/密码:</label>
                             <div class="col-md-9">
-                                @Html.TextBoxFor(m => m.telephone, new { @class = "form-control", @readonly = "readonly" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-phone"></i></span>
+                                    @Html.TextBoxFor(m => m.telephone, new { @class = "form-control profile-input", @readonly = "readonly" })
+                                </div>
                                 <span class="help-block">注：如需修改密码，请使用"修改密码"功能</span>
                             </div>
                         </div>
@@ -94,52 +122,214 @@
                         <div class="form-group">
                             <label class="control-label col-md-3">工资:</label>
                             <div class="col-md-9">
-                                @Html.TextBoxFor(m => m.wages, new { @class = "form-control", @readonly = "readonly" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-usd"></i></span>
+                                    @Html.TextBoxFor(m => m.wages, new { @class = "form-control profile-input", @readonly = "readonly" })
+                                </div>
+                                <span class="help-block">工资信息不可修改</span>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="control-label col-md-3">个人简介:</label>
                             <div class="col-md-9">
-                                @Html.TextAreaFor(m => m.resume, new { @class = "form-control", rows = "4" })
+                                <div class="input-group textarea-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                                    @Html.TextAreaFor(m => m.resume, new { @class = "form-control profile-input", rows = "4" })
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <div class="col-md-offset-3 col-md-9">
-                                <button type="submit" class="btn btn-primary">
-                                    <span class="glyphicon glyphicon-floppy-disk"></span> 保存修改
+                                <button type="submit" class="btn btn-primary btn-profile">
+                                    <i class="glyphicon glyphicon-floppy-disk"></i> 保存修改
                                 </button>
-                                <a href="@Url.Action("Index")" class="btn btn-default">
-                                    <span class="glyphicon glyphicon-arrow-left"></span> 返回
+                                <a href="@Url.Action("Index")" class="btn btn-default btn-back">
+                                    <i class="glyphicon glyphicon-arrow-left"></i> 返回
                                 </a>
                             </div>
                         </div>
                     }
                 </div>
             </div>
+
+            <div class="profile-tips">
+                <h4><i class="glyphicon glyphicon-info-sign"></i> 信息维护提示</h4>
+                <ul>
+                    <li>请确保您的联系信息保持最新，方便系统通知及时送达</li>
+                    <li>个人资料中的敏感信息（如工资等）不可在此修改</li>
+                    <li>如果需要修改账户密码，请点击导航菜单中的"修改密码"选项</li>
+                    <li>如有信息修改问题，请联系系统管理员获取帮助</li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-    .page-header {
+    /* 整体面板样式 */
+    .admin-panel {
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         margin-top: 20px;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 15px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        border: none;
     }
 
-    .panel {
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    /* 面板头部 - 暖色调 */
+    .admin-panel-heading {
+        background: linear-gradient(135deg, #FF9966, #FF5E62);
+        color: white;
+        padding: 20px 15px;
+        border-bottom: none;
     }
 
+    /* 成功和错误消息 */
+    .message-alert {
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 个人信息卡片 */
+    .profile-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .profile-card-header {
+        background-color: #FFF0EB;
+        padding: 15px;
+        border-bottom: 1px solid #f3e0d8;
+    }
+
+    .card-title {
+        color: #FF7E5F;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .profile-card-body {
+        padding: 20px;
+    }
+
+    /* 输入框样式 */
+    .profile-input {
+        height: 42px;
+        border-radius: 0 4px 4px 0;
+    }
+
+    .input-group-addon {
+        background-color: #FFF0EB;
+        color: #FF9966;
+        border-color: #ddd;
+    }
+
+    /* 文本域组 */
+    .textarea-group .input-group-addon {
+        vertical-align: top;
+        padding-top: 10px;
+    }
+
+    .textarea-group textarea {
+        border-radius: 0 4px 4px 0;
+    }
+
+    /* ID显示样式 */
+    .id-display {
+        padding: 10px 12px;
+        background-color: #f8f9fa;
+        margin-bottom: 0;
+        border-radius: 0 4px 4px 0;
+        font-weight: bold;
+        color: #FF7E5F;
+    }
+
+    /* 按钮样式 */
+    .btn {
+        border-radius: 4px;
+        padding: 8px 16px;
+    }
+
+    .btn-primary {
+        background-color: #FF9966;
+        border-color: #FF9966;
+    }
+
+        .btn-primary:hover {
+            background-color: #FF7E5F;
+            border-color: #FF7E5F;
+        }
+
+    .btn-profile {
+        margin-right: 10px;
+    }
+
+    .btn-back {
+        background-color: #f8f9fa;
+        color: #333;
+    }
+
+        .btn-back:hover {
+            background-color: #e9ecef;
+            color: #333;
+        }
+
+    /* 提示区域 */
+    .profile-tips {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        border-left: 4px solid #FF9966;
+    }
+
+        .profile-tips h4 {
+            color: #FF7E5F;
+            margin-top: 0;
+            font-weight: 600;
+        }
+
+        .profile-tips ul {
+            padding-left: 20px;
+        }
+
+        .profile-tips li {
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+    /* 表单样式 */
     .form-group {
-        margin-bottom: 15px;
+        margin-bottom: 20px;
+    }
+
+    .control-label {
+        padding-top: 10px;
     }
 
     .help-block {
-        font-size: 12px;
-        color: #777;
+        color: #999;
         margin-top: 5px;
+        font-size: 12px;
+    }
+
+    /* 只读字段样式 */
+    input[readonly] {
+        background-color: #f8f9fa;
+        cursor: not-allowed;
     }
 </style>
+
+<script>$(document).ready(function() {
+        // 隐藏5秒后消失消息提示
+        setTimeout(function() {
+            $(".message-alert").fadeOut(500);
+        }, 5000);
+    });</script>
