@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MVC", "MVC", "{02EA681E-C7D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "大学生志愿者管理系统Web", "大学生志愿者管理系统Web\大学生志愿者管理系统Web.csproj", "{950DA787-D8F9-4353-9E75-1EFDA021F11B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BLL.Tests", "BLL.Tests\BLL.Tests.csproj", "{7C93F3FF-2B29-4E38-9B4E-D5F22A8F4009}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{950DA787-D8F9-4353-9E75-1EFDA021F11B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{950DA787-D8F9-4353-9E75-1EFDA021F11B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{950DA787-D8F9-4353-9E75-1EFDA021F11B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C93F3FF-2B29-4E38-9B4E-D5F22A8F4009}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C93F3FF-2B29-4E38-9B4E-D5F22A8F4009}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C93F3FF-2B29-4E38-9B4E-D5F22A8F4009}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C93F3FF-2B29-4E38-9B4E-D5F22A8F4009}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -312,5 +312,20 @@ namespace BLL
             }
             return context.adminT.Max(a => a.admin_ID) + 1;
         }
+        /// <summary>
+        /// 检查管理员ID是否存在
+        /// </summary>
+        public bool IsAdminIdExists(int adminId)
+        {
+            return context.adminT.Any(a => a.admin_ID == adminId);
+        }
+
+        /// <summary>
+        /// 检查管理员名称是否存在
+        /// </summary>
+        public bool IsAdminNameExists(string adminName)
+        {
+            return context.adminT.Any(a => a.admin_Name == adminName);
+        }
     }
 }

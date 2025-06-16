@@ -129,6 +129,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ImageController.cs" />
     <Compile Include="Controllers\SuperAdminController.cs" />
     <Compile Include="Controllers\VolunteerController.cs" />
     <Compile Include="Global.asax.cs">
@@ -230,10 +231,12 @@
     <Content Include="Views\Admin\ActivityMembersList.cshtml" />
     <Content Include="Views\Volunteer\SelfCheck.cshtml" />
     <Content Include="Views\Volunteer\GetVolunteerHours.cshtml" />
+    <Content Include="Views\Admin\ActivityDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Models\" />
+    <Folder Include="Views\Image\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

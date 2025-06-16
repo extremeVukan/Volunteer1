@@ -1,0 +1,147 @@
+﻿@model DAL.ActivityT
+@{
+    ViewBag.Title = "活动详情";
+}
+
+<div class="container">
+    <div class="page-header">
+        <h2><span class="glyphicon glyphicon-info-sign"></span> 活动详情</h2>
+        <p class="lead">查看活动的详细信息</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">
+                    <span class="glyphicon glyphicon-ok"></span> @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    <span class="glyphicon glyphicon-exclamation-sign"></span> @TempData["ErrorMessage"]
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">@Model.activity_Name <span class="label @(Model.status == "已结束" ? "label-default" : "label-success")">@Model.status</span></h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <dl class="dl-horizontal">
+                                <dt>活动ID：</dt>
+                                <dd>@Model.activity_ID</dd>
+
+                                <dt>活动名称：</dt>
+                                <dd>@Model.activity_Name</dd>
+
+                                <dt>活动类型：</dt>
+                                <dd>@Model.activity_type</dd>
+
+                                <dt>开始时间：</dt>
+                                <dd>@Model.addtime.ToString("yyyy-MM-dd HH:mm")</dd>
+
+                                <dt>结束时间：</dt>
+                                <dd>@Model.stoptime.ToString("yyyy-MM-dd HH:mm")</dd>
+
+                                <dt>活动地点：</dt>
+                                <dd>@Model.place</dd>
+
+                                <dt>所需人数：</dt>
+                                <dd>@Model.renshu</dd>
+
+                                <dt>剩余名额：</dt>
+                                <dd>@Model.ShengyuNum</dd>
+
+                                <dt>活动发起人：</dt>
+                                <dd>@Model.Holder</dd>
+
+                                <dt>活动状态：</dt>
+                                <dd>@Model.status</dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <h4>活动描述</h4>
+                    <div class="well">
+                        @Html.Raw(Model.descn ?? "无描述")
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="btn-group">
+                        <a href="@Url.Action("Activities")" class="btn btn-default">
+                            <span class="glyphicon glyphicon-arrow-left"></span> 返回列表
+                        </a>
+                        <a href="@Url.Action("EditActivity", new { id = Model.activity_ID })" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-edit"></span> 编辑活动
+                        </a>
+                        @if (Model.status != "已结束")
+                        {
+                            <a href="@Url.Action("EndActivity")" class="btn btn-warning">
+                                <span class="glyphicon glyphicon-stop"></span> 结束活动
+                            </a>
+                        }
+                        <a href="@Url.Action("DeleteActivity", new { id = Model.activity_ID })" class="btn btn-danger">
+                            <span class="glyphicon glyphicon-trash"></span> 删除活动
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">活动图片</h3>
+                </div>
+                <div class="panel-body text-center">
+                    @if (!string.IsNullOrEmpty(Model.Image) && !Model.Image.Contains("暂无图片"))
+                    {
+                        <img src="@Url.Action("Activity", "Image", new { path = Model.Image })"
+                             alt="活动图片" class="img-responsive img-rounded" style="max-width:100%;"
+                             onerror="this.src='@Url.Content("~/Content/Images/暂无图片.gif")';" />
+                    }
+                    else
+                    {
+                        <img src="@Url.Content("~/Content/Images/暂无图片.gif")"
+                             alt="暂无图片" class="img-responsive img-rounded" style="max-width:100%;" />
+                    }
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">快速操作</h3>
+                </div>
+                <div class="list-group">
+                    <a href="@Url.Action("ApplicationReview")" class="list-group-item">
+                        <span class="glyphicon glyphicon-check"></span> 查看申请
+                    </a>
+                    <a href="#" class="list-group-item" id="btnShowMembers" data-activity-id="@Model.activity_ID">
+                        <span class="glyphicon glyphicon-user"></span> 查看参与者
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(function () {
+            // 查看参与者按钮点击事件
+            $("#btnShowMembers").click(function (e) {
+                e.preventDefault();
+                var activityId = $(this).data("activity-id");
+                window.location.href = '@Url.Action("ActivityMembers")/' + activityId;
+            });
+        });
+    </script>
+}
